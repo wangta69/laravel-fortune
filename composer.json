@@ -1,0 +1,33 @@
+{
+  "name": "wangta69/laravel-fortune",
+  "description": "사주에 관한 laravel package",
+	"keywords": ["laravel", "사주", "토정비결", "만세력"],
+  "homepage": "https://www.onstory.fun/packages/laravel-saju",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pondol",
+      "email": "wangta69@gmail.com",
+      "homepage": "https://www.onstory.fun"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "autoload": {
+    "files": [
+        "src/Helper/helpers.php"
+      ],
+    "psr-4": {
+      "Pondol\\Fortune\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Pondol\\Fortune\\FortuneServiceProvider"
+      ]
+    }
+  }
+}
