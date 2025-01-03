@@ -3,7 +3,7 @@
 
 ## Installation
 ```
-composer require wangta69/laravel-saju
+composer require wangta69/laravel-fortune
 
 ```
 

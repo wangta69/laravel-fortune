@@ -41,20 +41,20 @@ class FortuneServiceProvider extends ServiceProvider {
   {
 
     // Publish config file and merge
-    if (!config()->has('pondol-saju')) {
+    if (!config()->has('pondol-fortune')) {
       $this->publishes([
-        __DIR__ . '/config/pondol-saju.php' => config_path('pondol-saju.php'),
+        __DIR__ . '/config/pondol-fortune.php' => config_path('pondol-fortune.php'),
       ], 'config');  
     } 
       
     $this->mergeConfigFrom(
-      __DIR__ . '/config/pondol-saju.php',
-      'pondol-saju'
+      __DIR__ . '/config/pondol-fortune.php',
+      'pondol-fortune'
     );
 
     // Register migrations
     $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-    $this->loadViewsFrom(__DIR__.'/resources/views', 'pondol-saju');
+    $this->loadViewsFrom(__DIR__.'/resources/views', 'pondol-fortune');
 
     // $this->commands([
     //   InstallCommand::class
@@ -66,19 +66,19 @@ class FortuneServiceProvider extends ServiceProvider {
   private function loadSajuRoutes()
   {
 
-    $config = config('pondol-saju.route_saju');
+    $config = config('pondol-fortune.route_fortune');
     Route::prefix($config['prefix'])
       ->as($config['as'])
       ->middleware($config['middleware'])
       ->namespace('Pondol\Saju\Http\Controllers')
-      ->group(__DIR__ . '/routes/saju.php');
+      ->group(__DIR__ . '/routes/fortune.php');
 
 
-    $config = config('pondol-saju.route_saju_admin');
+    $config = config('pondol-saju.route_fortune_admin');
     Route::prefix($config['prefix'])
       ->as($config['as'])
       ->middleware($config['middleware'])
-      ->namespace('Pondol\Saju\Http\Controllers\Admin')
-      ->group(__DIR__ . '/routes/saju-admin.php');
+      ->namespace('Pondol\fortune\Http\Controllers\Admin')
+      ->group(__DIR__ . '/routes/fortune-admin.php');
   }
 }

@@ -1,11 +1,11 @@
 <?php
 return [
-  'route_saju'=>[
+  'route_fortune'=>[
     'prefix'=>'fortune',
     'as'=>'fortune.',
     'middleware'=>['web'],
   ],
-  'route_saju_admin'=>[
+  'route_fortune_admin'=>[
     'prefix'=>'fortune/admin',
     'as'=>'fortune.admin.',
     'middleware'=>['web', 'admin'],
