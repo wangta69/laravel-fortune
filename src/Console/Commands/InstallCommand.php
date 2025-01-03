@@ -1,6 +1,6 @@
 <?php
 
-namespace Pondol\Saju\Console\Commands;
+namespace Pondol\Fortune\Console\Commands;
 
 use Illuminate\Console\Command;
 // use Illuminate\Filesystem\Filesystem;

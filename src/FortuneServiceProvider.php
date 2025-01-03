@@ -60,21 +60,21 @@ class FortuneServiceProvider extends ServiceProvider {
     //   InstallCommand::class
     // ]);
 
-    $this->loadSajuRoutes();
+    $this->loadFortuneRoutes();
   }
 
-  private function loadSajuRoutes()
+  private function loadFortuneRoutes()
   {
 
     $config = config('pondol-fortune.route_fortune');
     Route::prefix($config['prefix'])
       ->as($config['as'])
       ->middleware($config['middleware'])
-      ->namespace('Pondol\Saju\Http\Controllers')
+      ->namespace('Pondol\Fortune\Http\Controllers')
       ->group(__DIR__ . '/routes/fortune.php');
 
 
-    $config = config('pondol-saju.route_fortune_admin');
+    $config = config('pondol-fortune.route_fortune_admin');
     Route::prefix($config['prefix'])
       ->as($config['as'])
       ->middleware($config['middleware'])

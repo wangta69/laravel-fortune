@@ -1,5 +1,5 @@
 <?php
-namespace Pondol\Saju\Facades;
+namespace Pondol\Fortune\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
