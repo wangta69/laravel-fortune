@@ -91,8 +91,8 @@ Class Lunar extends Lunar_API {
         $d = (int) date ('d', $v);
       } else {
         if ( preg_match ('/^(-?[0-9]{1,4})[\/-]?([0-9]{1,2})[\/-]?([0-9]{1,2})$/', trim ($v), $match) ) {
-          array_shift ($match);
-          list ($y, $m, $d) = $match;
+          // array_shift ($match);
+          list (, $y, $m, $d) = $match;
         } else {
           return false;
         }
@@ -836,7 +836,7 @@ Class Lunar extends Lunar_API {
   }
   // }}}
 
-  // {{{ +-- public (object) dayfortune ($v = null)
+
   /**
    * 세차(년)/월건(월)/일진(일) 데이터를 구한다.
    *
@@ -871,25 +871,47 @@ Class Lunar extends Lunar_API {
    *     - Ymd or Y-m-d
    *     - null data (현재 시간)
    *     - 1582년 10월 15일 이전의 날자는 율리우스력의 날자로 취급함.
+   *  @param string hhmm (시간 및 분)
    */
-  public function dayfortune ($v = null) {
-    list ($y, $m, $d) = $this->toargs ($v);
-    list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
+  public function dayfortune ($v = null, $hm = null) {
 
+    // echo 'v:'.$v.PHP_EOL;
+    list ($y, $m, $d) = $this->toargs ($v);
+    // echo "y:".$y.', m:'.$m.', d:'.$d.PHP_EOL;
+
+    list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
+    // echo "y:".$y.', m:'.$m.', d:'.$d.PHP_EOL;
+    // print_r($this->sydtoso24yd ($y, $m, $d, 17, 30));
+    if($hm) {
+      if ( preg_match ('/^([0-9]{1,2})([0-9]{2})$/', trim ($hm), $match) ) {
+        // array_shift ($match);
+
+        // print_r($match);
+        list (, $h, $i) = $match;
+      }
+    } else {
+      $h = 1;
+      $i = 0;
+    }
+
+    // echo "y:".$y.', m:'.$m.', d:'.$d.', h:'. $h.', i:'.$i.PHP_EOL;
     list ($so24, $year, $month, $day, $hour)
-      = $this->sydtoso24yd ($y, $m, $d, 1, 0);
+      = $this->sydtoso24yd ($y, $m, $d, $h, $i);
+
 
     return (object) array (
       'data' => (object) array ('y' => $year, 'm' => $month, 'd' => $day),
       'year' => $this->ganji[$year],
       'month' => $this->ganji[$month],
       'day' => $this->ganji[$day],
+      'hour' => $this->ganji[$hour],
       'hyear' => $this->hganji[$year],
       'hmonth' => $this->hganji[$month],
       'hday' => $this->hganji[$day],
+      'hhour' => $this->hganji[$hour],
     );
   }
-  // }}}
+
 
   // {{{ +-- public (object) s28day ($v = null)
   /**
@@ -943,8 +965,6 @@ Class Lunar extends Lunar_API {
     );
   }
 
-
-  // {{{ +-- public (array) seasondate ($v = null)
   /**
    * 해당 양력일에 대한 음력 월의 절기 시간 구하기
    *
@@ -1005,7 +1025,9 @@ Class Lunar extends Lunar_API {
    *   - null data (현재 시간
    *   - 1582년 10월 15일 이전의 날자는 율리우스력의 날자로 취급함.
    */
-  public function seasondate ($v = null) {
+  // public function seasondate ($v = null) {
+  public function seasonal_division ($v = null) {
+    
       list ($y, $m, $d) = $this->toargs ($v);
       list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
 
@@ -1013,7 +1035,7 @@ Class Lunar extends Lunar_API {
         $inginame, $ingiyear, $ingimonth, $ingiday, $ingihour, $ingimin,
         $midname, $midyear, $midmonth, $midday, $midhour, $midmin,
         $outginame, $outgiyear, $outgimonth, $outgiday, $outgihour, $outgimin
-      ) = $this->solortoso24 ($y, $m, 20, 1, 0);
+      ) = $this->solortoso24 ($y, $m, $d, 1, 0);
 
       $j_ce = $this->to_utc_julian (
         sprintf (
@@ -1067,6 +1089,7 @@ Class Lunar extends Lunar_API {
       }
 
       return (object) array (
+        // 절입
         'center'  => (object) array (
           'name'   => $this->month_st[$inginame],
           'hname'  => $this->hmonth_st[$inginame],
@@ -1078,6 +1101,7 @@ Class Lunar extends Lunar_API {
           'min'    => $ingimin,
           'julian' => $j_ce
         ),
+        // 중기
         'ccenter' => (object) array (
           'name'   => $this->month_st[$midname],
           'hname'  => $this->hmonth_st[$midname],
@@ -1089,6 +1113,7 @@ Class Lunar extends Lunar_API {
           'min'    => $midmin,
           'julian' => $j_cc
         ),
+        // 다음 절입
         'nenter'  => (object) array (
           'name'   => $this->month_st[$outginame],
           'hname'  => $this->hmonth_st[$outginame],

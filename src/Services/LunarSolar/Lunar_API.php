@@ -419,7 +419,6 @@ Class Lunar_API {
   }
   // }}}
 
-  // {{{ +-- protected (array) getdatebymin ($tmin, $uyear, $umonth, $uday, $uhour, $umin)
   /**
    * uyear,umonth,uday,uhour,umin으로부터 tmin(분)떨이진 시점의
    * 년월일시분(태양력) 구하는 프로시져
@@ -502,7 +501,6 @@ Class Lunar_API {
   }
   // }}}
 
-  // {{{ +-- protected (array) sydtoso24yd ($soloryear, $solormonth, $solorday, $solorhour, $solormin)
   /**
    * 그레고리력의 년월시일분으로 60년의 배수, 세차, 월건(태양력),
    * 일진, 시주를 구함
@@ -648,7 +646,6 @@ Class Lunar_API {
   }
   // }}}
 
-  // {{{ +-- protected (array) solortoso24 ($soloryear, $solormonth, $solorday, $solorhour, $solormin)
   /**
    * 절기 시간 구하기
    *

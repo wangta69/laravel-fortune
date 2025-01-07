@@ -9,9 +9,17 @@ composer require wangta69/laravel-fortune
 
 
 ## 만세력  
-- ymd : 생년월일 (yyyymmdd)
+- ymdhi : 생년월일 일시 (yyyymmdd)  //202010100350
 - sl : solar | lunar (default : solar)
 - leap : 윤 여부 (default : false)
 ```
-YourDomain/fortune/manse/{ymd}/{sl?}/{leap?}
+YourDomain/fortune/manse/{ymdhi}/{sl?}/{leap?}
+```
+
+## 사주 
+- ymdhi : 생년월일 일시 (yyyymmdd)  //202010100350
+- sl : solar | lunar (default : solar)
+- leap : 윤 여부 (default : false)
+```
+YourDomain/fortune/saj/{ymdhi}/{sl?}/{leap?}
 ```
