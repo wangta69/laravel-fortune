@@ -56,10 +56,7 @@ class DaeWoon
         break;
     }
 
-    // print_r($daeun_h);
-    // print_r($daeun_e);
-    
-    // 대운 나이 구하기
+     // 대운 나이 구하기
     $this->daeunAge($manse); // $this->daeunAge($lunar_ymd, $birth_time, $direction)
 
     $this->sipsin_e = $this->sipsin_e($manse);

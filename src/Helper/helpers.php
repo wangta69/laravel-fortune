@@ -4,6 +4,24 @@ if (!function_exists('pad_zero')) {
     return str_pad($no, $digit, '0', STR_PAD_LEFT);
   }
 }
+
+if (!function_exists('arr_forward_rotate')) {
+  function arr_forward_rotate($array, $distance) {
+    for ($i = 0; $i < $distance; $i++) {
+      array_push($array, array_shift($array));
+    }
+    return $array;
+  }
+}
+
+if (!function_exists('arr_reverse_rotate')) {
+  function arr_reverse_rotate($array, $distance) {
+    for ($i = 0; $i < $distance; $i++) {
+      array_unshift($array, array_pop($array));
+    }
+    return $array;
+  }
+}
 /**
  * 지지를 시리얼로 변경 (배열처리시)
  */
@@ -57,23 +75,24 @@ if (!function_exists('h_to_serial')) {
   }
 }
 
-if (!function_exists('arr_forward_rotate')) {
-  function arr_forward_rotate($array, $distance) {
-    for ($i = 0; $i < $distance; $i++) {
-      array_push($array, array_shift($array));
-    }
-    return $array;
+ /**
+   * 년월을 이용해서 단순하게 계산
+   */
+if (!function_exists('calgabja')) {
+  function calgabja($year) {
+    // 0 ~ 11
+    $h = ['庚','辛','壬','癸','甲','乙','丙','丁','戊','己'];
+    $e = ['申','酉','戌','亥', '子','丑','寅','卯','辰','巳','午','未'];
+    $rtn = new \stdClass;
+    $remain = $year % 10;
+    $rtn->h = $h[$remain];
+    $remain = $year % 12;
+    $rtn->e = $e[$remain];
+    
+    return $rtn;
   }
-}
+  }
 
-if (!function_exists('arr_reverse_rotate')) {
-  function arr_reverse_rotate($array, $distance) {
-    for ($i = 0; $i < $distance; $i++) {
-      array_unshift($array, array_pop($array));
-    }
-    return $array;
-  }
-}
 
 /**
 * 양력 연도로 내 나이를 계산

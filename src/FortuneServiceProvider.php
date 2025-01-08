@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 // use Pondol\Kftc\Console\Commands\InstallCommand;
 use Pondol\Fortune\Services\LunarSolar\Lunar;
 use Pondol\Fortune\Services\Manse;
-// use Pondol\Fortune\Services\Saju;
+
 
 class FortuneServiceProvider extends ServiceProvider {
 
@@ -34,10 +34,6 @@ class FortuneServiceProvider extends ServiceProvider {
     $this->app->bind('manse', function () {
       return new Manse();
     });
-
-    // $this->app->bind('saju', function () {
-    //   return new Saju();
-    // });
   }
 
 	/**

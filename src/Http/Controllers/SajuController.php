@@ -22,7 +22,8 @@ class SajuController extends Controller
     ->woonsung12()
     ->zizangan()
     ->sinsal()
-    ->daewoon();
+    ->daewoon()
+    ->saewoon();
     return response()->json($saju, 200, [], JSON_UNESCAPED_UNICODE); 
   }
 }

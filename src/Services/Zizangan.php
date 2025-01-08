@@ -6,7 +6,6 @@ namespace Pondol\Fortune\Services;
  * 지장간은 지지에 포함된 천간을 찾는 것이다.
  */
 
-
 class Zizangan
 {
 
@@ -30,7 +29,7 @@ class Zizangan
     '亥' => '戊甲壬', // 무갑임
   ];
 
- 
+
   public function withManse($manse) {
     $this->hour = $this->cal($this->zizangan[$manse->get_e('hour')],  $manse->get_h('day'));
     $this->day = $this->cal($this->zizangan[$manse->get_e('day')], $manse->get_h('day'));
@@ -38,7 +37,6 @@ class Zizangan
     $this->year = $this->cal($this->zizangan[$manse->get_e('year')], $manse->get_h('day'));
     return $this;
   }
-
 
   /**
    * 사주화 정보는 e_code의 1 이 인으로 시작하는데 프로그램상 자 를 1로 변경

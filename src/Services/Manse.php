@@ -171,4 +171,13 @@ class Manse {
     $this->daewoon = $daewoon->withManse($this);
     return $this;
   }
+
+  /**
+   * 세운구하기
+   */
+  public function saewoon() {
+    $saewoon = new SaeWoon();
+    $this->saewoon = $saewoon->withManse($this);
+    return $this;
+  }
 }
