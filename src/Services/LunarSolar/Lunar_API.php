@@ -1050,7 +1050,7 @@ Class Lunar_API {
   }
   // }}}
 
-  // {{{ +-- protected (array) lunartosolar ($lyear, $lmonth, $lday, $leap)
+
   /**
    * 음력 날자를 양력 날자로 변환
    *
@@ -1121,7 +1121,7 @@ Class Lunar_API {
   }
   // }}}
 
-  // {{{ +-- protected (int) getweekday ($syear, $smonth, $sday)
+
   /**
    * 그레고리력 날자를 요일의 배열 번호로 변환
    *

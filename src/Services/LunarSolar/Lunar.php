@@ -706,7 +706,6 @@ Class Lunar extends Lunar_API {
   }
   // }}}
 
-  // {{{ +-- public (object) tosolar ($v = null, $leap = false)
   /**
    * 음력 날자를 양력으로 변환.
    *
@@ -794,6 +793,8 @@ Class Lunar extends Lunar_API {
 
     if ( $kasi === false ) {
       $r = $this->lunartosolar ($y, $m, $d, $leap);
+      // echo "=======================".PHP_EOL;
+      // print_r($r);
       list ($year, $month, $day) = $r;
 
       $w = $this->getweekday ($year, $month, $day);
@@ -913,7 +914,6 @@ Class Lunar extends Lunar_API {
   }
 
 
-  // {{{ +-- public (object) s28day ($v = null)
   /**
    * 특정일의 28수를 구한다.
    *

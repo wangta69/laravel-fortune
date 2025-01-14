@@ -23,7 +23,7 @@ class Manse {
   public function ymdhi($ymdhi) {
     $len = strlen($ymdhi);
     switch($len) {
-      case 8: $this->ymd = $ymd; break;
+      case 8: $this->ymd = $ymdhi; break;
       case 12: 
         preg_match ('/^([0-9]{8})([0-9]{4})$/', trim ($ymdhi), $match);
         list (, $ymd, $hi) = $match;
@@ -115,6 +115,13 @@ class Manse {
     return mb_substr($this->{$str}->ch, 1, 1);
   }
 
+  /**
+   * 만세력에서 60갑자 가져오기
+   */
+  public function get_he($str) {
+    return $this->{$str}->ch;
+  }
+
 
   /**
    * oheng 구하기
@@ -178,6 +185,19 @@ class Manse {
   public function saewoon() {
     $saewoon = new SaeWoon();
     $this->saewoon = $saewoon->withManse($this);
+    return $this;
+  }
+
+  /**
+   *  토정비결용 작괘 구하기
+   */
+  public function jakque($callback=null) {
+
+    $jakque = new TojungJakque();
+    if($callback) {
+      $callback($jakque);
+    }
+    $this->jakque = $jakque->create($this);
     return $this;
   }
 }

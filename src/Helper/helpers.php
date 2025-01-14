@@ -5,6 +5,19 @@ if (!function_exists('pad_zero')) {
   }
 }
 
+/**
+ * 현재 나누는 값보다 클경우는 나누고 아니면 입력값을 입력
+ * 모드를 사용할 경우 0이 나오는 것을 피하기 위해
+ */
+// mod 를 보정하여 값 넘기기
+if (!function_exists('mod_zero_to_mod')) {
+  function mod_zero_to_mod($number, $mod) {
+    $result = $number % $mod;
+    $result = $result ? $result : $mod;
+    return $result;
+  }
+}
+
 if (!function_exists('arr_forward_rotate')) {
   function arr_forward_rotate($array, $distance) {
     for ($i = 0; $i < $distance; $i++) {

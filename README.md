@@ -89,3 +89,15 @@ Manse::ymdhi($ymdhi)->create()
 ->daewoon(); // 대운
 ->saewoon(); // 세운
 ```
+
+## 토정비결 작괘
+```
+Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(); // default 당해년
+Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->>jakque(function($jakque){
+  $jakque->set_year('2025');
+}); // 특정년을 넣을 경우
+```
+> 결과
+```
+"jakque":{"que":[8,6,3],"total":"863"}
+```
