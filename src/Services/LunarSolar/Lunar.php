@@ -1,6 +1,7 @@
 <?php
 namespace Pondol\Fortune\Services\LunarSolar;
-
+// 60갑자 연도 표기는 음력이 기준
+// 사주명리학에서는 입춘이 기준
 /**
  * import Lunar API
  */
@@ -114,9 +115,7 @@ Class Lunar extends Lunar_API {
 
     return array ($y, $m, $d);
   }
-  // }}}
 
-  // {{{ +-- public (string) human_year ($y)
   /**
    * 연도를 human readable하게 표시
    *
@@ -137,8 +136,6 @@ Class Lunar extends Lunar_API {
     return sprintf ('%s %d', $t, $y);
   }
 
-
-  // {{{ +-- public (array) split_date ($date)
   /**
    * YYYY-MM-DD 또는 array ((string) YYYY, (string) MM, (string) DD)
    * 입력값을 * array ((int) $y, (int) $m, (int) $d)으로 변환
@@ -166,8 +163,6 @@ Class Lunar extends Lunar_API {
     return $r;
   }
 
-
-  // {{{ +-- private (string) regdate ($v)
   /**
    * YYYY-MM-DD 형식의 날자를 반환
    *
@@ -187,9 +182,7 @@ Class Lunar extends Lunar_API {
       (int) $day
     );
   }
-  // }}}
 
-  // {{{ +-- public (bool) is_leap ($y, $julian = false)
   /**
    * 윤년 체크
    *
@@ -218,9 +211,7 @@ Class Lunar extends Lunar_API {
 
     return false;
   }
-  // }}}
 
-  // {{{ +-- public (bool) is_gregorian ($y, $m, $d = 1)
   /**
    * 해당 날자가 gregorian 범위인지 체크
    *
@@ -243,9 +234,7 @@ Class Lunar extends Lunar_API {
 
     return true;
   }
-  // }}}
 
-  // {{{ +-- private (string) gregorian2julian ($v)
   /**
    * 그레고리력을 율리안력으로 변환
    *
@@ -322,15 +311,11 @@ Class Lunar extends Lunar_API {
         'week'  => $week
     );
   }
-  // }}}
 
-  // {{{ +-- private mod ($x, $y)
   private function mod ($x, $y) {
     return ($x % $y + $y) % $y;
   }
-  // }}}
 
-  // {{{ +-- private (string) julian2gregorian ($v)
   /**
    * 율리안력을 그레고리안역으로 변환
    *
@@ -841,9 +826,6 @@ Class Lunar extends Lunar_API {
   /**
    * 세차(년)/월건(월)/일진(일) 데이터를 구한다.
    *
-   * 예제:
-   * {@example Lunar/tests/sample.php 163 56}
-   *
    * @access public
    * @return stdClass 
    *
@@ -876,18 +858,10 @@ Class Lunar extends Lunar_API {
    */
   public function dayfortune ($v = null, $hm = null) {
 
-    // echo 'v:'.$v.PHP_EOL;
     list ($y, $m, $d) = $this->toargs ($v);
-    // echo "y:".$y.', m:'.$m.', d:'.$d.PHP_EOL;
-
     list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
-    // echo "y:".$y.', m:'.$m.', d:'.$d.PHP_EOL;
-    // print_r($this->sydtoso24yd ($y, $m, $d, 17, 30));
     if($hm) {
       if ( preg_match ('/^([0-9]{1,2})([0-9]{2})$/', trim ($hm), $match) ) {
-        // array_shift ($match);
-
-        // print_r($match);
         list (, $h, $i) = $match;
       }
     } else {
@@ -895,13 +869,12 @@ Class Lunar extends Lunar_API {
       $i = 0;
     }
 
-    // echo "y:".$y.', m:'.$m.', d:'.$d.', h:'. $h.', i:'.$i.PHP_EOL;
     list ($so24, $year, $month, $day, $hour)
       = $this->sydtoso24yd ($y, $m, $d, $h, $i);
 
 
     return (object) array (
-      'data' => (object) array ('y' => $year, 'm' => $month, 'd' => $day),
+      // 'data' => (object) array ('y' => $year, 'm' => $month, 'd' => $day),
       'year' => $this->ganji[$year],
       'month' => $this->ganji[$month],
       'day' => $this->ganji[$day],
@@ -1025,12 +998,13 @@ Class Lunar extends Lunar_API {
    *   - null data (현재 시간
    *   - 1582년 10월 15일 이전의 날자는 율리우스력의 날자로 취급함.
    */
-  // public function seasondate ($v = null) {
   public function seasonal_division ($v = null) {
     
-      list ($y, $m, $d) = $this->toargs ($v);
-      list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
+      list ($y, $m, $d) = $this->toargs($v);
 
+      // echo "ymd:".$y.$m.$d.PHP_EOL;
+      list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
+      // echo "ymd:".$y.$m.$d.PHP_EOL;
       list (
         $inginame, $ingiyear, $ingimonth, $ingiday, $ingihour, $ingimin,
         $midname, $midyear, $midmonth, $midday, $midhour, $midmin,
@@ -1127,9 +1101,7 @@ Class Lunar extends Lunar_API {
         )
     );
   }
-  // }}}
 
-  // {{{ +-- public (object) moonstatus ($v = null)
   /**
    * 양력일에 대한 음력월 합삭/망 데이터 구하기
    *
@@ -1239,8 +1211,6 @@ Class Lunar extends Lunar_API {
     );
   }
 
-
-  // {{{ +-- public (string) ganji_ref ($no, $mode = false)
   /**
    * dayfortune method의 ganji index 반환값을 이용하여, ganji
    * 값을 구함
@@ -1252,7 +1222,7 @@ Class Lunar extends Lunar_API {
    * @return string 
    * @param int ganji index number
    * @param bool 출력 모드 (false => 한글, true => 한자)
-   */
+   
   public function ganji_ref ($no, $mode = false) {
     if ( $no > 59 ) {
       $no -= 60;
@@ -1260,17 +1230,6 @@ Class Lunar extends Lunar_API {
 
     $m = $mode ? 'hganji' : 'ganji';
     return $this->{$m}[$no];
-  }
+  }*/
 
 }
-
-/*
-* Local variables:
-* tab-width: 4
-* c-basic-offset: 4
-* End:
-* vim: set filetype=php noet sw=4 ts=4 fdm=marker:
-* vim600: noet sw=4 ts=4 fdm=marker
-* vim<600: noet sw=4 ts=4
-*/
-?>

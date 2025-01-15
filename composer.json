@@ -17,7 +17,9 @@
   },
   "autoload": {
     "files": [
+        "src/Helper/constants.php",
         "src/Helper/helpers.php"
+        
       ],
     "psr-4": {
       "Pondol\\Fortune\\": "src/"

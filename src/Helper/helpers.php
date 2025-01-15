@@ -18,6 +18,9 @@ if (!function_exists('mod_zero_to_mod')) {
   }
 }
 
+/**
+ * 맨 앞을 맨뒤로 보낸다.
+ */
 if (!function_exists('arr_forward_rotate')) {
   function arr_forward_rotate($array, $distance) {
     for ($i = 0; $i < $distance; $i++) {
@@ -27,12 +30,42 @@ if (!function_exists('arr_forward_rotate')) {
   }
 }
 
+/**
+ * 맨 뒤를 맨 앞으로 보낸다.
+ */
 if (!function_exists('arr_reverse_rotate')) {
   function arr_reverse_rotate($array, $distance) {
     for ($i = 0; $i < $distance; $i++) {
       array_unshift($array, array_pop($array));
     }
     return $array;
+  }
+}
+
+// 특정글자의 위치를 얻어와서 다른 언어의 동일 위치의 값을 가져온다.  
+if (!function_exists('tr_code')) {
+  function tr_code($from, $to, $val) {
+    $val_type = gettype($val);
+
+    if($val_type == 'array') {
+      $rtn = [];
+      foreach($val as $v) {
+        $key = array_keys($from, $v);
+        if($key) {
+          array_push($rtn, $to[$key]);
+        } else {
+          array_push($rtn, null);
+        }
+      }
+      return $rtn;
+    } else { // string
+      $key = array_keys($from, $val);
+      if($key) {
+        return $to[$key];
+      }
+    }
+    
+    return null;
   }
 }
 /**

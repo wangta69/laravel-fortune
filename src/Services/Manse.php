@@ -86,10 +86,11 @@ class Manse {
   }
 
   public function set_solar_or_lunar($manse) {
-    $ymd = str_pad($manse->year, 4, '0', STR_PAD_LEFT)
-      .str_pad($manse->month, 2, '0', STR_PAD_LEFT)
-      .str_pad($manse->day, 2, '0', STR_PAD_LEFT);
-
+    $ymd = pad_zero($manse->year, 4)
+      .pad_zero($manse->month)
+      .pad_zero($manse->day);
+    // print_r($manse);
+    // $this->largemonth = $manse->largemonth;
     switch($this->sl) {
       case 'solar': $this->lunar = $ymd ; break;
       case 'lunar': $this->solar = $ymd ; break;

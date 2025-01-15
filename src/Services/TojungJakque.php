@@ -41,8 +41,6 @@ class TojungJakque
   */
   public function create($manse) {
 
-    // echo "now year:".$this->now_year;
-
     $this->now_year == $this->now_year ?? date('Y');
     // 오늘의 만세력을 구한다. 입춘을 기준으로 띠가 변경되므로 대략 3월을 올해의 기준점으로 잡는다.
     // $this->now = Manse::refresh()->ymdhi(date('Y').'0301')->create();
@@ -52,7 +50,7 @@ class TojungJakque
     $this_year_ymd = $this->now_year.substr($manse->lunar, 4, 2).substr($manse->lunar, 6, 2);
     $this->now = Manse::refresh()->ymdhi($this_year_ymd)->sl('lunar')->create();
 
-
+    // print_r($this->now);
 
     ## 상괘 
     $this->que[0] = $this->sangque($manse);
@@ -78,10 +76,7 @@ class TojungJakque
   private function sangque($manse) {
 
     // 나이 구하기
-    $manse_year = substr($manse->solar, 0, 4);
-    // $user_lunar_month = substr($manse->lunar, 4, 2);
-    // $user_lunar_day = substr($manse->lunar, 6, 2);
-  
+    $manse_year = substr($manse->solar, 0, 4); 
     $this->age = $this->now_year - $manse_year + 1; // 올해의 한국 나이
 
     // 토정을 보는 해의 60갑자를 가져와 태세수를 구하고 나이와 더한후 8로 나눈다.
@@ -100,22 +95,21 @@ class TojungJakque
   private function jungque($manse) {
 
     // 달수 구하기 (태어날 달의 대소(30, 29) 구하기)
-    $wol_ymd = $this->now_year.substr($manse->lunar, 4, 2).'30';
-    $solar_ymd = Lunar::tosolar($wol_ymd);
-    $lunar_ymd = Lunar::tolunar($solar_ymd->gregory);
-    // 30일에 lunar 날짜에서 30일이 없으면 다음달 1일의 날짜랄 가져오므로 가져온 양력날짜를 다시 음력으로 변경하여 같은지 여부를 체크함 
-    if ($wol_ymd == str_replace('-', '', $lunar_ymd->fmt)) { // 없으면 29
+    $lunar = Lunar::tolunar($manse->solar);
+    if ($lunar->largemonth) { // 없으면 29
       $this->dal_su = 30;
     }else{
       $this->dal_su = 29;
     }
 
+    // echo $this->dal_su;
+
     // 월건수 구하기 (올해에서 내 생월이 포함된 것을 절기를 기준)
-    // 1. 아래 monthgun 을 이용하는 방법
+    // 1. monthgun 을 이용하는 방법
     // $month_he = $this->monthgun($this_year_mnase->get_h('year'), substr($this_year_mnase->lunar, 4, 2));
     // 2. 만세력에서 바로가져오기
-
     $month_he = $this->now->get_he('month');
+    
     $gabja = $this->taewolil[$month_he];
     $this->wolgeon_su = $gabja[1]; // 월건수
     return mod_zero_to_mod(($this->dal_su + $this->wolgeon_su), 6);

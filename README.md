@@ -8,14 +8,14 @@ composer require wangta69/laravel-fortune
 
 
 ## 만세력  
-### Sample
+### Api
 - ymdhi : 생년월일 일시 (yyyymmdd)  //202010100350
 - sl : solar | lunar (default : solar)
 - leap : 윤 여부 (default : false)
 ```
 YourDomain/fortune/manse/{ymdhi}/{sl?}/{leap?}
 ```
-### 사용법
+### Facades
 
 ```
 use Pondol\Fortune\Facades\Manse;
@@ -31,14 +31,14 @@ $manse = Manse::ymdhi($ymdhi)->sl($sl)->gender($gender)->leap($leap)->create();
 {"sl":"","solar":"","lunar":"","leap":,"ymd":"","hi":"","year":{"ch":"壬子","ko":"임자"},"month":{"ch":"辛亥","ko":"신해"},"day":{"ch":"丁未","ko":"정미"},"hour":{"ch":"己酉","ko":"기유"},"gender":"M","korean_age":54}
 ```
 ## 사주 
-### Sample
+### Api
 - ymdhi : 생년월일 일시 (yyyymmdd)  //202010100350
 - sl : solar | lunar (default : solar)
 - leap : 윤 여부 (default : false)
 ```
 YourDomain/fortune/saj/{ymdhi}/{sl?}/{leap?}
 ```
-### 사용법
+### Facades
 > 위의 만세력을 이용하여 각각의 함수를 호출하면  결과 값들을 리턴한다.
 ```
 use Pondol\Fortune\Facades\Manse;
@@ -53,37 +53,37 @@ $saju = Manse::ymdhi($ymdhi)->create()
   ->saewoon();
 ```
 > 각각에 대해서 보고 싶을때는 아래처럼 처리하면 됩니다.
-### 오행
+#### 오행
 ```
 Manse::ymdhi($ymdhi)->create()
   ->oheng();
 ```
-### 십신
+#### 십신
 ```
 ..........
 
 ```
-### 지장간
+#### 지장간
 ```
 ..........
 ->zizangan();
 ```
-### 길신/흉신
+#### 길신/흉신
 ```
 ..........
 ->sinsal();
 ```
-### 12신살
+#### 12신살
 ```
 ..........
 ->sinsal12();
 ```
-### 12운성
+#### 12운성
 ```
 ..........
 ->woonsung12();
 ```
-### 대운 / 세운
+#### 대운 / 세운
 ```
 ..........
 ->daewoon(); // 대운
@@ -91,7 +91,10 @@ Manse::ymdhi($ymdhi)->create()
 ```
 
 ## 토정비결 작괘
+### Facades
 ```
+use Pondol\Fortune\Facades\Manse;
+..........
 Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(); // default 당해년
 Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->>jakque(function($jakque){
   $jakque->set_year('2025');
@@ -100,4 +103,28 @@ Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->>jakque(function($jakque){
 > 결과
 ```
 "jakque":{"que":[8,6,3],"total":"863"}
+```
+## 카렌다
+### 음력달력
+#### API
+```
+YourDomain/fortune/calendar/lunar/202502
+```
+#### Facades
+```
+use Pondol\Fortune\Facades\Calendar;
+..........
+$days = Calendar::lunarCalendar($yyyymm);
+```
+
+### 24절기달력
+#### API
+```
+YourDomain/fortune/calendar/season-24/2025
+```
+#### Facades
+```
+use Pondol\Fortune\Facades\Calendar;
+..........
+$days = Calendar::season24Calendar($yyyy);
 ```
