@@ -24,8 +24,8 @@ class Samjae
     $samjaes = [];
     $samjaes['ch'] = $this->yearsofsamjae($lunar->hji);
 
-    // print_r($ji); 
-    // $samjaes['ko'] = tr_code($ji['ch'], $zodiac['ko'], $samjaes['ch']);
+  
+    $samjaes['ko'] = tr_code(JI['ch'], ZODIAC['ko'], $samjaes['ch']);
     
     return compact('type', 'samjaes');
   }

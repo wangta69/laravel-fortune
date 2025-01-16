@@ -2,6 +2,7 @@
 namespace Pondol\Fortune\Services\Calendar;
 use Carbon\Carbon;
 use Pondol\Fortune\Facades\Lunar;
+use Pondol\Fortune\Facades\Manse;
 // use Pondol\Fortune\Facades\Manse;
 
 /**
@@ -30,6 +31,22 @@ class Calendar
     return $season24Calendar->cal($yyyy);
   }
 
+  /**
+   * 월별 이사택일
+   */
+  public function move($manse, $yyyymm) {
+    $moveCalendar = new MoveCalendar;
+    return $moveCalendar->cal($manse, $yyyymm);
+  }
+
+  /**
+   * 월별 결혼 택일
+   */
+  public function marriage($manse, $yyyymm) {
+    $marriageCalendar = new MarriageCalendar;
+    return $marriageCalendar->cal($manse, $yyyymm);
+  }
+  
   /**
    *  특정년의 3재 출력
    */

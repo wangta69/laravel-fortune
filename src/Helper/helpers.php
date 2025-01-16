@@ -1,4 +1,9 @@
 <?php
+
+function pad_zero1() {
+  return ji;
+}
+
 if (!function_exists('pad_zero')) {
   function pad_zero($no, $digit=2) {
     return str_pad($no, $digit, '0', STR_PAD_LEFT);
@@ -42,15 +47,36 @@ if (!function_exists('arr_reverse_rotate')) {
   }
 }
 
+// 년도의의 뒷자리를 기준으로 색상 가져오기
+if (!function_exists('zodiac_color')) {
+  function zodiac_color($h) {
+    switch($h) {
+      case '甲': case '乙':// 갑 을'', '', '', '', '', '', '', ', '', ''
+        return '푸른'; // 청
+      case '丙': case '丁': // 병정
+        return '붉은'; // 적
+      case '戊': case '己': // 무기
+        return '황금'; // 황
+      case '庚': case '辛': // 경신
+        return '하얀'; // 백
+      case '壬': case '癸': // 임계
+        return '검은'; // 흑
+    }
+    
+  }
+}
+
 // 특정글자의 위치를 얻어와서 다른 언어의 동일 위치의 값을 가져온다.  
 if (!function_exists('tr_code')) {
   function tr_code($from, $to, $val) {
+
     $val_type = gettype($val);
 
     if($val_type == 'array') {
       $rtn = [];
       foreach($val as $v) {
-        $key = array_keys($from, $v);
+        // echo $v;
+        $key = array_keys($from, $v)[0];
         if($key) {
           array_push($rtn, $to[$key]);
         } else {
@@ -59,7 +85,7 @@ if (!function_exists('tr_code')) {
       }
       return $rtn;
     } else { // string
-      $key = array_keys($from, $val);
+      $key = array_keys($from, $val)[0];
       if($key) {
         return $to[$key];
       }
@@ -144,11 +170,11 @@ if (!function_exists('calgabja')) {
 * 양력 연도로 내 나이를 계산
 *@param $yyyy 양력 생년
 */
-// if (!function_exists('korean_age')) {
-//   function korean_age($yyyy) {
-//     return  date('Y') - $yyyy + 1;
-//   }
-// }
+if (!function_exists('korean_age')) {
+  function korean_age($yyyy) {
+    return  date('Y') - $yyyy + 1;
+  }
+}
 
 
   // function array_rotate($array, $distance = 1) {

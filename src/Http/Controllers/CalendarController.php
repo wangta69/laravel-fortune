@@ -4,6 +4,7 @@ namespace Pondol\Fortune\Http\Controllers;
 
 use Pondol\Fortune\Facades\Calendar;
 use App\Http\Controllers\Controller;
+use Pondol\Fortune\Facades\Manse;
 
 class CalendarController extends Controller
 {
@@ -29,11 +30,29 @@ class CalendarController extends Controller
   }
 
   /**
+   * 이사택일
+   */
+  public function move($yyyymm) {
+    $manse = Manse::ymdhi('197210071730')->sl('lunar')->create();
+    $move = Calendar::move($manse, $yyyymm);
+    return response()->json($move, 200, [], JSON_UNESCAPED_UNICODE); 
+  }
+
+  /**
+   * 결혼택일
+   */
+  public function marriage($yyyymm) {
+    $manse = Manse::ymdhi('197210071730')->sl('lunar')->create();
+    $move = Calendar::marriage($manse, $yyyymm);
+    return response()->json($move, 200, [], JSON_UNESCAPED_UNICODE); 
+  }
+
+  /**
    * 3재
    */
   public function samjae($yyyy) {
     $samjae = Calendar::samjae($yyyy);
-    print_r($samjae);
+    return response()->json($samjae, 200, [], JSON_UNESCAPED_UNICODE); 
   }
 }
 

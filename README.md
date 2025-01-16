@@ -128,3 +128,16 @@ use Pondol\Fortune\Facades\Calendar;
 ..........
 $days = Calendar::season24Calendar($yyyy);
 ```
+
+### 삼재
+> 특정해의 삼재를 가져옮
+#### API
+```
+YourDomain/fortune/calendar/samjae/2025
+```
+#### Facades
+```
+use Pondol\Fortune\Facades\Calendar;
+..........
+$samjae = Calendar::samjae($yyyy);
+```

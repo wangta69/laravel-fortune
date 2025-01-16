@@ -2,7 +2,7 @@
 namespace Pondol\Fortune\Services\Calendar;
 use Carbon\Carbon;
 use Pondol\Fortune\Facades\Lunar;
-
+use Pondol\Fortune\Traits\Calendar;
 /**
  * 12실살을 제외한 기타 길신 및 흉신 구하기
  * 일지기준으로 하면 집안일
@@ -11,58 +11,36 @@ use Pondol\Fortune\Facades\Lunar;
 
 class LunarCalendar
 {
-
+  use Calendar {
+    _create as calendar_create;
+  }
   /**
    * 음력달력출력
    * @param String $yyyymm 202501 (2025년 01월)
    */
   public function cal($yyyymm) {
 
-    preg_match('/^([0-9]{4})([0-9]{2})$/', trim ($yyyymm), $match);
-    list (, $year, $month) = $match;
-
-    $c_date = mktime(0, 0, 0, $month, 1, $year);
-    $start_week = date('w', $c_date); // 1. 시작 요일
-    $total_day = date('t', $c_date); // 2. 현재 달의 총 날짜
-    // $this->total_week = ceil(($total_day + $start_week) / 7);  // 3. 현재 달의 총 주차
-    $w = $start_week;
-
+    // 중간일정도를 대입하여 이전/이후 절의 중간점을 찾는다
     $season_24 = Lunar::seasonal_division($yyyymm.'20');
-    // echo $yyyymm.'20';
-    // print_r($season_24);
+
     $season_24->seasonArr = $this->season_24_to_array($season_24);
-    // print_r($season_24);
 
-    $daily = [];
+    $calendar = $this->calendar_create($yyyymm);
+
     // 시작하는 요일 이전의 것은 공백처리
-    for ($i=0; $i < $w; $i++) {
-      array_push($daily, new Day);
-    }
-    for($i = 0; $i<$total_day; $i++) {
-      $data = new Day;
-
-      $data->fillInfo($yyyymm, $i + 1, $season_24);
-      array_push($daily, $data);
+    foreach($calendar->days as $c) {
+      if($c->day) {
+        $data = new Day;
+        $data->fillInfo($yyyymm, $c->day, $season_24);
+        $c->setObject($data);       
+      }
     }
 
-    // 날짜가 끝나는 마지막 요일 까지 공백 처리
-    $mod = 7 - count($daily) % 7;
-    for ($i = 0; $i < $mod; $i++) {
-      array_push($daily, new Day);
-    }
-
-
-    // 데이타를 주별로 나누기
-    $collection = collect($daily);
-    $split = count($daily) / 7; // 데이타를 7일 씩 자름
-    $this->daily = $collection->split($split);
-
-    return $this->daily;
+    return $calendar->splitPerWeek();
   }
 
 
   private function season_24_to_array($season_24) {
-
     return [
       $season_24->center->year.pad_zero($season_24->center->month).pad_zero($season_24->center->day) => $season_24->center->name,
       $season_24->ccenter->year.pad_zero($season_24->ccenter->month).pad_zero($season_24->ccenter->day) => $season_24->ccenter->name,
@@ -90,6 +68,7 @@ class Day {
     $this->season24 = $this->season24($season_24);
     $this->tune = Lunar::dayfortune($this->solar);
 
+    
     preg_match('/^([0-9]{4})([0-9]{2})$/', trim ($yyyymm), $match);
     list (, $year, $month) = $match;
 

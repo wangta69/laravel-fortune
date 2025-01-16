@@ -1,7 +1,7 @@
 <?php
 namespace Pondol\Fortune\Services;
 use Pondol\Fortune\Facades\Manse;
-
+// 귀인 뜻 풀이 참조 : https://blog.naver.com/ahendufrhd/223059645477
  /**
    * 12실살을 제외한 기타 길신 및 흉신 구하기
    * 일지기준으로 하면 집안일
@@ -491,16 +491,38 @@ class Sinsal
   /**
    * $my_e 생월지
    */
-  private function hasWolduk($my_e, $h) {
+  static function hasWolduk($my_e, $h) {
+    // (($my_e == '卯')&&($day_e == '申')) 도 월덕합으로 보년 경향이 있음
     switch($my_e){
       case '亥': case '卯': case '未': // 해 묘 미
-        if ($h == '甲') { return true;} // (月德貴)break;
+        if ($h == '甲') { return true;} break; // (月德貴)break;
       case '寅': case '午': case '戌': // 인 오 술
-        if ($h == '丙') { return true;} //break;
+        if ($h == '丙') { return true;}  break;
       case '巳': case '酉': case '丑': // 사 유 축
-        if ($h == '庚') { return true;} //
+        if ($h == '庚') { return true;} break; //
       case '申': case '子': case '辰': // 신 자 진
-        if ($h == '壬') { return true;} //
+        if ($h == '壬') { return true;} break; //
+    }
+    return false;
+  }
+
+  /**
+   * 월덕합
+   * 월지에 연월일시 천간을 대조하여 판단
+   */
+  static function hasWoldukHap($my_e, $h) {
+    //  (($month_e == '卯')&&($day_e == '巳'))||
+    // (($month_e == '未')&&($day_e == '巳'))||
+    // (($month_e == '亥')&&($day_e == '巳'))||
+    switch($my_e){
+      case '亥': case '卯': case '未': // 해 묘 미
+        if ($h == '己') { return true;} break; // (月德貴)break;
+      case '寅': case '午': case '戌': // 인 오 술
+        if ($h == '辛') { return true;}  break;
+      case '巳': case '酉': case '丑': // 사 유 축
+        if ($h == '乙') { return true;} break; //
+      case '申': case '子': case '辰': // 신 자 진
+        if ($h == '丁') { return true;} break; //
     }
     return false;
   }
@@ -526,34 +548,72 @@ class Sinsal
   }
 
   /**
-   * @$my_e : 생월지
+   * @$my_e : 생월지 
    */
-  private function hasChunduk($my_e, $h, $e) {
+  static function hasChunduk($my_e, $h, $e) {
     switch($my_e) {
       case '子':
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '丑':
-        if ($h == '庚') { return true;}
+        if ($h == '庚') { return true;} break;
       case '寅':
-        if ($h == '丁') { return true;}
+        if ($h == '丁') { return true;} break;
       case '卯':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '辰':
-        if ($h == '壬') { return true;}
+        if ($h == '壬') { return true;} break;
       case '巳':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '午':
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
       case '未':
-        if ($h == '甲') { return true;}
+        if ($h == '甲') { return true;} break;
       case '申':
-        if ($h == '癸') { return true;}
+        if ($h == '癸') { return true;} break;
       case '酉':
-        if ($e== '寅') { return true;}
+        if ($e== '寅') { return true;} break;
       case '戌':
-        if ($h == '丙') { return true;}
+        if ($h == '丙') { return true;} break;
       case '亥':
-        if ($h == '乙') { return true;} 
+        if ($h == '乙') { return true;}  break;
+    }
+    return false;
+  }
+
+    /**
+   * 천덕합 (월지에 연월일시의 지지를 대조하여 판단)
+  */
+  static function hasChendukhap($my_e, $h) {
+    // 아래와 같이 e도 고려하는 경우가 있음
+    // (($month_e == '卯')&&($day_e == '巳'))||
+    // (($month_e == '午')&&($day_e == '寅'))||
+    // (($month_e == '申')&&($day_e == '戌'))||
+    //  (($month_e == '酉')&&($day_e == '亥'))||
+    switch ($my_e) {
+      case "子":
+        if ($h== '申') return true; break;
+      case "丑":
+        if ($h== '乙') return true; break;
+      case "寅":
+        if ($h== '壬') return true; break;
+      case "卯":
+        if ($h== '巳') return true; break;
+      case "辰":
+        if ($h== '丁') return true; break;
+      case "巳":
+        if ($h== '丙') return true; break;
+      case "午":
+        if ($h== '寅') return true; break;
+      case "未":
+        if ($h== '己') return true; break;
+      case "申":
+        if ($h== '戊') return true; break;
+      case "酉":
+        if ($h== '亥') return true; break;
+      case "戌":
+        if ($h== '辛') return true; break;
+      case "亥":
+        if ($h== '庚') return true; break;
     }
     return false;
   }
@@ -577,7 +637,7 @@ class Sinsal
     }
   }
 
-  private function hasChene($month_e, $e) {
+  static function hasChene($month_e, $e) {
     $str = $month_e.$e;
     $arr = ['寅丑','卯寅','辰卯','巳辰','午巳','未午','申未','酉甲','戌酉','亥戌','子亥','丑子'];
     return in_array($str, $arr);
@@ -731,8 +791,10 @@ class Sinsal
     switch($my_h){
       case '庚': 
         if ($e == '辰' || $e == '戌') return true; 
+        break;
       case '壬': 
         if ($e == '辰' || $e == '戌') return true;
+        break;
     }
     return false;
   }
@@ -884,13 +946,13 @@ class Sinsal
   private function hasGosinsal($my_e, $e) {
     switch($my_e){
       case '寅': case '卯': case '辰':
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '巳': case '午': case '未':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '申': case '酉': case '戌':
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
       case '亥': case '子': case '丑':
-        if ($e == '寅') { return true;} // (喪門殺)
+        if ($e == '寅') { return true;} break;// (喪門殺)
     }
     return false;
   }
@@ -905,13 +967,13 @@ class Sinsal
   private function hasGuasuksall($my_e, $e) {
     switch($e){
       case '寅': case '卯': case '辰':
-        if ($e == '丑') { return true;}
+        if ($e == '丑') { return true;} break;
       case '巳': case '午': case '未':
-        if ($e == '辰') { return true;}
+        if ($e == '辰') { return true;} break;
       case '申': case '酉': case '戌':
-        if ($e == '未') { return true;}
+        if ($e == '未') { return true;} break;
       case '亥': case '子': case '丑':
-        if ($e == '戌') { return true;} // (喪門殺)
+        if ($e == '戌') { return true;} break;// (喪門殺)
     }
     return false;
   }
@@ -978,13 +1040,13 @@ class Sinsal
   private function hasPagun($my_e, $e) {
     switch($my_e){
       case '子': case '辰': case '申':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '丑': case '巳': case '酉':
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '寅') { return true;}
+        if ($e == '寅') { return true;} break;
       case '卯': case '未': case '丑':
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
     }
     return false;
   }
@@ -1075,10 +1137,30 @@ class Sinsal
     return in_array($str, $arr);
   }
 
+  /**
+   * 하괴 (흉신)
+   * $my_e : 생년지
+   * @e: 오늘의 년지
+   */
+  static function hasHague($my_e, $e) {
+    $str = $my_e.$e;
+    $arr = ['寅亥','卯午','辰丑','巳申','午卯','未戌','申巳','酉子','戌未','亥寅','子酉','丑辰'];
+    return in_array($str, $arr);
+  }
+
+  /**
+   * 생기 (길신)
+   */
+  static function hasSengi($my_e, $e) {
+    $str = $my_e.$e;
+    $arr = ['寅戌','卯亥','辰子','巳丑','午寅','未卯','申辰','酉巳','戌午','亥未','子申','丑酉'];
+    return in_array($str, $arr);
+  }
+
 
   /**
    * 단교관살
-   * 월지를 기준으로 일시를 비교하는 경우도 있으나 일지를 기준으로 보는 경향이 많습니다.
+   * 월지파를 기준으로 일시를 비교하는 경우도 있으나 일지를 기준으로 보는 경향이 많습니다.
    * 월지 일지 비교
    * 일지를 기준
    */
@@ -1133,17 +1215,17 @@ class Sinsal
   private function hasEumyangsal($my_h, $e) {
     switch($my_h){
       case '丙':
-        if ($e == '子' || $e == '午') { return true;}
+        if ($e == '子' || $e == '午') { return true;} break;
       case '丁':
-        if ($e == '丑' || $e == '未') { return true;}
+        if ($e == '丑' || $e == '未') { return true;} break;
       case '戊':
-        if ($e == '寅' || $e == '申') { return true;}
+        if ($e == '寅' || $e == '申') { return true;} break;
       case '辛':
-        if ($e == '卯' || $e == '酉') { return true;}
+        if ($e == '卯' || $e == '酉') { return true;} break;
       case '壬':
-        if ($e == '辰' || $e == '戌') { return true;}
+        if ($e == '辰' || $e == '戌') { return true;} break;
       case '癸':
-        if ($e == '巳' || $e == '亥') { return true;}
+        if ($e == '巳' || $e == '亥') { return true;} break;
     }
     return false;
   }
@@ -1192,13 +1274,13 @@ class Sinsal
   private function calGepgaksal($month_e, $e) {
     switch($month_e){
       case '寅': case '卯': case '辰':
-        if ($e == '亥' || $e == '子') { return '급각살';}
+        if ($e == '亥' || $e == '子') { return '급각살';} break;
       case '巳': case '午': case '未':
-        if ($e == '卯' || $e == '未') { return '급각살';}
+        if ($e == '卯' || $e == '未') { return '급각살';} break;
       case '申': case '酉': case '戌':
-        if ($e == '寅' || $e == '戌') { return '급각살';}
+        if ($e == '寅' || $e == '戌') { return '급각살';} break;
       case '亥': case '子': case '丑':
-        if ($e == '丑' || $e == '辰') { return '급각살';}
+        if ($e == '丑' || $e == '辰') { return '급각살';} break;
     }
     return null;
   }
@@ -1211,13 +1293,13 @@ class Sinsal
   private function hasJisal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '寅') { return true;}
+        if ($e == '寅') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
     }
     return false;
   }
@@ -1231,13 +1313,13 @@ class Sinsal
   private function hasYeunsall($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '酉') { return true;}
+        if ($e == '酉') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '卯') { return true;}
+        if ($e == '卯') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '午') { return true;}
+        if ($e == '午') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '子') { return true;}
+        if ($e == '子') { return true;} break;
     }
     return false;
   }
@@ -1250,13 +1332,13 @@ class Sinsal
   private function hasWolsal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰': // 신자진
-        if ($e == '戌') { return true;}
+        if ($e == '戌') { return true;} break;
       case '巳': case '酉': case '丑': // 사유축
-        if ($e == '未') { return true;}
+        if ($e == '未') { return true;} break;
       case '寅': case '午': case '戌': // 인오술
-        if ($e == '辰') { return true;}
+        if ($e == '辰') { return true;} break;
       case '亥':case '卯': case '未': // 해묘미
-        if ($e == '丑') { return true;}
+        if ($e == '丑') { return true;} break;
     }
     return false;
   }
@@ -1269,13 +1351,13 @@ class Sinsal
   private function hasMangsinsal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '寅') { return true;}
+        if ($e == '寅') { return true;} break;
     }
     return false;
   }
@@ -1288,13 +1370,13 @@ class Sinsal
   private function hasJangsungsal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '子') { return true;}
+        if ($e == '子') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '午') { return true;}
+        if ($e == '午') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '酉') { return true;}
+        if ($e == '酉') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '卯') { return true;}
+        if ($e == '卯') { return true;} break;
     }
     return false;
   }
@@ -1307,13 +1389,13 @@ class Sinsal
   private function hasBanansal($my_e, $date_e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($date_e == '丑') { return true;}
+        if ($date_e == '丑') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($date_e == '未') { return true;}
+        if ($date_e == '未') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($date_e == '戌') { return true;}
+        if ($date_e == '戌') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($date_e == '辰') { return true;}
+        if ($date_e == '辰') { return true;} break;
     }
     return false;
   }
@@ -1340,13 +1422,13 @@ class Sinsal
   private function hasYeokmasal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰': // 신자진
-        if ($e == '寅') { return true;}
+        if ($e == '寅') { return true;} break;
       case '寅': case '午': case '戌': // 인오술
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '巳': case '酉': case '丑':  // 사유축
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
       case '亥':case '卯': case '未': // 해묘미
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
     }
     return false;
   }
@@ -1359,13 +1441,13 @@ class Sinsal
   private function hasYukhaesal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '卯') { return true;}
+        if ($e == '卯') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '酉') { return true;}
+        if ($e == '酉') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '子') { return true;}
+        if ($e == '子') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '午') { return true;}
+        if ($e == '午') { return true;} break;
     }
     return false;
   }
@@ -1378,13 +1460,13 @@ class Sinsal
   private function hasWhagaesal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '辰') { return true;}
+        if ($e == '辰') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '戌') { return true;}
+        if ($e == '戌') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '丑') { return true;}
+        if ($e == '丑') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '未') { return true;}
+        if ($e == '未') { return true;} break;
     }
     return false;
   }
@@ -1398,13 +1480,13 @@ class Sinsal
   private function hasGubsal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '寅') { return true;}
+        if ($e == '寅') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
     }
     return false;
   }
@@ -1418,13 +1500,13 @@ class Sinsal
   private function hasJaesal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '午') { return true;}
+        if ($e == '午') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '子') { return true;}
+        if ($e == '子') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '卯') { return true;}
+        if ($e == '卯') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '酉') { return true;}
+        if ($e == '酉') { return true;} break;
     }
     return false;
   }
@@ -1437,13 +1519,13 @@ class Sinsal
   private function hasCheunsal($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '未') { return true;}
+        if ($e == '未') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '丑') { return true;}
+        if ($e == '丑') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '辰') { return true;}
+        if ($e == '辰') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '戌') { return true;}
+        if ($e == '戌') { return true;} break;
     }
     return false;
   }
@@ -1457,13 +1539,13 @@ class Sinsal
   private function hasSamjae1($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '寅') { return true;}
+        if ($e == '寅') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '巳') { return true;}
+        if ($e == '巳') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '申') { return true;}
+        if ($e == '申') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '亥') { return true;}
+        if ($e == '亥') { return true;} break;
     }
     return false;
   }
@@ -1476,13 +1558,13 @@ class Sinsal
   private function hasSamjae2($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '卯') { return true;}
+        if ($e == '卯') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '午') { return true;}
+        if ($e == '午') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '酉') { return true;}
+        if ($e == '酉') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '子') { return true;}
+        if ($e == '子') { return true;} break;
     }
     return false;
   }
@@ -1495,13 +1577,13 @@ class Sinsal
   private function hasSamjae3($my_e, $e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($e == '辰') { return true;}
+        if ($e == '辰') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($e == '未') { return true;}
+        if ($e == '未') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($e == '戌') { return true;}
+        if ($e == '戌') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($e == '丑') { return true;}
+        if ($e == '丑') { return true;} break;
     }
     return false;
   }
@@ -1514,13 +1596,13 @@ class Sinsal
   private function hasDowhasal($my_e, $date_e) {
     switch($my_e){
       case '申': case '子': case '辰':
-        if ($date_e == '酉') { return true;}
+        if ($date_e == '酉') { return true;} break;
       case '亥':case '卯': case '未':
-        if ($date_e == '子') { return true;}
+        if ($date_e == '子') { return true;} break;
       case '寅': case '午': case '戌':
-        if ($date_e == '卯') { return true;}
+        if ($date_e == '卯') { return true;} break;
       case '巳': case '酉': case '丑': 
-        if ($date_e == '午') { return true;}
+        if ($date_e == '午') { return true;} break;
     }
     return false;
   }
@@ -1528,52 +1610,13 @@ class Sinsal
  /**
    * 천강(흉신)
    */
-  private function hasChengang($month_e, $e) {
+  static function hasChengang($month_e, $e) {
     $str = $month_e.$e;
     $arr = ['寅巳','卯子','辰未','巳寅','午酉','未辰','申亥','酉午','戌丑','亥申','子卯','丑戌'];
     return in_array($str, $arr);
   }
 
-  /**
-   * 천덕합
-  
-  public function chap($my_month_e, $umyear_h) {
-      $chap = array_fill(0, 10, '');
-      foreach($umyear_h as $k=>$v) {
-          // if($type == 'code') {
-          //     $v = e_code_ch($v);
-          // }
 
-          switch ($my_month_e) {
-              case "子":
-                  if ($v== '申') $chap[$k] = '천합'; break;
-              case "丑":
-                  if ($v== '乙') $chap[$k] = '천합'; break;
-              case "寅":
-                  if ($v== '壬') $chap[$k] = '천합'; break;
-              case "卯":
-                  if ($v== '巳') $chap[$k] = '천합'; break;
-              case "辰":
-                  if ($v== '丁') $chap[$k] = '천합'; break;
-              case "巳":
-                  if ($v== '丙') $chap[$k] = '천합'; break;
-              case "午":
-                  if ($v== '寅') $chap[$k] = '천합'; break;
-              case "未":
-                  if ($v== '己') $chap[$k] = '천합'; break;
-              case "申":
-                  if ($v== '戊') $chap[$k] = '천합'; break;
-              case "酉":
-                  if ($v== '亥') $chap[$k] = '천합'; break;
-              case "戌":
-                  if ($v== '辛') $chap[$k] = '천합'; break;
-              case "亥":
-                  if ($v== '庚') $chap[$k] = '천합'; break;
 
-          }
-      }
-      return $chap;
-  }
 
- */
 }
