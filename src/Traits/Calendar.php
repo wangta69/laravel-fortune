@@ -1,16 +1,26 @@
 <?php
 namespace Pondol\Fortune\Traits;
+use Pondol\Fortune\Facades\Lunar;
 
 trait Calendar {
+  public $date = '';
+  // public $lunar;
   public $days = [];
+  
+  // 각각의 새해를 보는 입장이 다르므로 년도는 양력기준으로 월/일은 명리학을 기준으로 표기
 
+
+  // public $dateinfo = []; // soloar(양력 1월 1일) lunar(음력 1월 1일), myungli(입춘)
+  
   public function _create($yyyymm) {
     preg_match('/^([0-9]{4})([0-9]{2})$/', trim ($yyyymm), $match);
     list (, $year, $month) = $match;
 
-    $c_date = mktime(0, 0, 0, $month, 1, $year);
-    $start_week = date('w', $c_date); // 1. 시작 요일
-    $total_day = date('t', $c_date); // 2. 현재 달의 총 날짜
+    $this->date = mktime(0, 0, 0, $month, 1, $year);
+   
+
+    $start_week = date('w', $this->date); // 1. 시작 요일
+    $total_day = date('t', $this->date); // 2. 현재 달의 총 날짜
     // $this->total_week = ceil(($total_day + $start_week) / 7);  // 3. 현재 달의 총 주차
     $w = $start_week;
 
@@ -35,8 +45,11 @@ trait Calendar {
   public function splitPerWeek() {
     $collection = collect($this->days);
     $split = count($this->days) / 7; // 데이타를 7일 씩 자름
-    return $collection->split($split);
+    $this->days = $collection->split($split);
+    return $this;
   }
+
+
 
 }
 

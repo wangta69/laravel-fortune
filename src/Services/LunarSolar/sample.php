@@ -39,7 +39,7 @@ try {
     # 1일의 음력 정보
     $z = $lunar->tolunar ($target);
     # 이번달의 세차/월간/일진 정보
-    $tune = $lunar->dayfortune ($target);
+    $tune = $lunar->gabja ($target);
     # 1일의 음력월에 대한 합삭/망 정보
     $moon = $lunar->moonstatus ($target);
     # 1일의 28수 정보

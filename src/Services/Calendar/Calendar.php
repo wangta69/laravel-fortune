@@ -34,7 +34,7 @@ class Calendar
   /**
    * 월별 이사택일
    */
-  public function move($manse, $yyyymm) {
+  public function moveCalendar($manse, $yyyymm) {
     $moveCalendar = new MoveCalendar;
     return $moveCalendar->cal($manse, $yyyymm);
   }
@@ -42,9 +42,9 @@ class Calendar
   /**
    * 월별 결혼 택일
    */
-  public function marriage($manse, $yyyymm) {
+  public function marriage($manse, $p_manse, $yyyymm) {
     $marriageCalendar = new MarriageCalendar;
-    return $marriageCalendar->cal($manse, $yyyymm);
+    return $marriageCalendar->cal($manse, $p_manse, $yyyymm);
   }
   
   /**

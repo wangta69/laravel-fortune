@@ -4,8 +4,7 @@ namespace Pondol\Fortune\Services;
 use Pondol\Fortune\Facades\Lunar;
 use Pondol\Fortune\Facades\Manse;
 
-// 참조 : https://blog.naver.com/om3000 
-// https://m.blog.naver.com/om3000/221733589586
+
 class TojungJakque
 {
   private $taewolil = 	// 태세수, 월건수, 일진수
@@ -42,14 +41,18 @@ class TojungJakque
   public function create($manse) {
 
     $this->now_year == $this->now_year ?? date('Y');
+
+
     // 오늘의 만세력을 구한다. 입춘을 기준으로 띠가 변경되므로 대략 3월을 올해의 기준점으로 잡는다.
     // $this->now = Manse::refresh()->ymdhi(date('Y').'0301')->create();
     // $this->now_lunar_year = substr($this->now->lunar, 0, 4);
 
     // 올해(토정비결을 보는해)의 년도에  음력생월일을 대입하여 올해생월일에 대햔 만세력을 구한다.
-    $this_year_ymd = $this->now_year.substr($manse->lunar, 4, 2).substr($manse->lunar, 6, 2);
-    $this->now = Manse::refresh()->ymdhi($this_year_ymd)->sl('lunar')->create();
+    list ($year, $month, $day)  = explode('-', $manse->lunar);
+    // $this_year_ymd = $this->now_year.substr($manse->lunar, 4, 2).substr($manse->lunar, 6, 2);
+    $this_year_ymd = $this->now_year.'-'.$month.'-'.$day;
 
+    $this->now = Manse::refresh()->ymdhi($this_year_ymd)->sl('lunar')->create();
     // print_r($this->now);
 
     ## 상괘 
@@ -81,6 +84,8 @@ class TojungJakque
 
     // 토정을 보는 해의 60갑자를 가져와 태세수를 구하고 나이와 더한후 8로 나눈다.
     $gabja = $this->taewolil[$this->now->get_he('year')];
+
+    // echo "this->now->get_he('year')".$this->now->get_he('year').PHP_EOL;
     $this->taese_su = $gabja[0];  // 태세수 구하기
     return mod_zero_to_mod(($this->age + $this->taese_su), 8);
   }
@@ -95,7 +100,9 @@ class TojungJakque
   private function jungque($manse) {
 
     // 달수 구하기 (태어날 달의 대소(30, 29) 구하기)
-    $lunar = Lunar::tolunar($manse->solar);
+    // echo "this->now->solar:".$this->now->solar.PHP_EOL;
+    $lunar = Lunar::ymd($this->now->solar)->tolunar()->create();
+
     if ($lunar->largemonth) { // 없으면 29
       $this->dal_su = 30;
     }else{
@@ -126,7 +133,9 @@ class TojungJakque
 
     $gabja = $this->taewolil[$this->now->get_he('day')];
     $this->iljin_su = $gabja[2];// 일진수 구하기
-    return mod_zero_to_mod((substr($manse->lunar, 6, 2) + $this->iljin_su), 3);
+
+    list (,,$day) = explode('-', $manse->lunar);
+    return mod_zero_to_mod(($day + $this->iljin_su), 3);
   }
 
   /**

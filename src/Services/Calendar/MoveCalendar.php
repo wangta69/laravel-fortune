@@ -4,6 +4,7 @@ namespace Pondol\Fortune\Services\Calendar;
 use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 use Pondol\Fortune\Traits\Calendar;
 use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Lunar;
 // 택일 카렌다 모양 참조 : https://lancer.tistory.com/323
 // http://saju.sajuplus.net/?acmode=b_s&curjong=saju001001&no=41586&page=11&orgcstyle=&cstyle=4
 /**
@@ -29,6 +30,15 @@ class MoveCalendar
    */
   public function cal($manse, $yyyymm) {
     
+    $this->year = Lunar::cal_gabja_year_from_year(substr($yyyymm, 0, 4));
+    $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->gabja()
+      ->seasonal_division($yyyymm.'20')
+      ->create();
+
+       // 현재 달의 절기 정보를 가져와서 배열로 맵핑
+    // $season_24 = $this->info->seasons;
+    // $season_24->seasonArr = $this->season_24_to_array($season_24);
+
     // Calendar._create
     $calendar = $this->_create($yyyymm);
 
@@ -59,7 +69,7 @@ class Day {
 
     // 1. 이사하는 시기의 나이 구하기
     $selected_year = substr($yyyymmdd, 0, 4);
-    $my_age = $selected_year - $manse->solar + 1 ;
+    $my_age = $selected_year - substr($manse->solar, 0, 4) + 1 ;
 
     $direction = $this->_direction($my_age, $manse->gender);
 
@@ -68,15 +78,15 @@ class Day {
 
     // $good_he = _good_he($toyear_e);
     // 당해의 지간과 합이 좋은 갑자를 구한다.
-    $good_he = $this->_good_he($now->get_e('year'));
-    $titles['color'] = 'black';
+    // $good_he = $this->_good_he($now->get_e('year'));
+    // $titles['color'] = 'black';
 
 
-    if(in_array($now->get_he('day'), $good_he))
-    {
-        $titles['color'] = 'blue';
-        $scores['color'] = 20;
-    }
+    // if(in_array($now->get_he('day'), $good_he))
+    // {
+    //     $titles['color'] = 'blue';
+    //     $scores['color'] = 20;
+    // }
 
     // 생기복덕 구하기
 
@@ -175,8 +185,8 @@ class Day {
     // 축음양불장길일
     $this->_chuk($now->get_e('month'), $now->get_he('day'), $titles, $scores);
 
-    //  헌집/새집 길일
-    $this->_singu($now->get_he('day'), $titles, $scores);
+    //  (이사)  헌집/새집 길일
+    // $this->_singu($now->get_he('day'), $titles, $scores);
 
 
     // 월기일 매월 초5일 14일 23 일

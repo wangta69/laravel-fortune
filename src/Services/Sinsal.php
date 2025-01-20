@@ -1475,6 +1475,7 @@ class Sinsal
   * 겁살(劫殺) 구하기 (12신살)
   *@param String $my_e 생년지(혹은 생일지)
   *@param String $e : 올해의 년지
+  * 삼살은 겁살, 재살, 천살을 의미
   */
 
   private function hasGubsal($my_e, $e) {

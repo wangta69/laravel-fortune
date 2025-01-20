@@ -22,8 +22,8 @@ class Season24Calendar
     for ($i = 0; $i < 12; $i++) {
       $j = substr('0'+ ($i+1), -2);
       $j = pad_zero($i+1, 2);
-      $season = Lunar::seasonal_division($year.$j.'01');
-      foreach($season as $v) {
+      $season = Lunar::seasonal_division($year.$j.'01')->create();
+      foreach($season->seasons as $v) {
         if(!in_array($v, $season24) && $v->year == $year) {
           $season24[$v->name] = $v;
         }

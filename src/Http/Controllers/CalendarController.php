@@ -1,16 +1,13 @@
 <?php
 namespace Pondol\Fortune\Http\Controllers;
 
-
 use Pondol\Fortune\Facades\Calendar;
-use App\Http\Controllers\Controller;
 use Pondol\Fortune\Facades\Manse;
+
+use App\Http\Controllers\Controller;
 
 class CalendarController extends Controller
 {
-  public function __construct()
-  {
-  }
 
   /**
    * @param String $yyyymm  양력 202501
@@ -33,7 +30,8 @@ class CalendarController extends Controller
    * 이사택일
    */
   public function move($yyyymm) {
-    $manse = Manse::ymdhi('197210071730')->sl('lunar')->create();
+    $user = ['ymdhi'=>'200005051730', 'sl'=>'lunar'];
+    $manse = Manse::ymdhi($user['ymdhi'])->sl($user['sl'])->create(); // 본인의 생년월일 생시
     $move = Calendar::move($manse, $yyyymm);
     return response()->json($move, 200, [], JSON_UNESCAPED_UNICODE); 
   }
@@ -42,8 +40,11 @@ class CalendarController extends Controller
    * 결혼택일
    */
   public function marriage($yyyymm) {
-    $manse = Manse::ymdhi('197210071730')->sl('lunar')->create();
-    $move = Calendar::marriage($manse, $yyyymm);
+    $user = ['ymdhi'=>'200005051730', 'sl'=>'lunar'];
+    $partner = ['ymdhi'=>'200005051730', 'sl'=>'lunar'];
+    $manse = Manse::ymdhi($user['ymdhi'])->sl($user['sl'])->create(); // 본인의 생년월일 생시
+    $p_manse = Manse::ymdhi($partner['ymdhi'])->sl($partner['sl'])->create(); // 상대방의 생년월일 생시
+    $move = Calendar::marriage($manse, $p_manse, $yyyymm);
     return response()->json($move, 200, [], JSON_UNESCAPED_UNICODE); 
   }
 

@@ -18,11 +18,13 @@ class Samjae
    */
   public function cal($year) {
 
-    $lunar = Lunar::tolunar($year.'0301');
+    $lunar = Lunar::ymd($year.'0301')->tolunar()->setAttributes(function($lunar){
+      $lunar->zodiac = mb_substr($lunar->gabja->year->ch, 1, 1);
+    })->create();
 
-    $type = $this->type($lunar->hji);
+    $type = $this->type($lunar->zodiac);
     $samjaes = [];
-    $samjaes['ch'] = $this->yearsofsamjae($lunar->hji);
+    $samjaes['ch'] = $this->yearsofsamjae($lunar->zodiac);
 
   
     $samjaes['ko'] = tr_code(JI['ch'], ZODIAC['ko'], $samjaes['ch']);

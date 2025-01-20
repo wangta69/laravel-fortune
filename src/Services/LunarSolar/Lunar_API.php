@@ -64,38 +64,40 @@ namespace Pondol\Fortune\Services\LunarSolar;
  * @filesource
  */
 Class Lunar_API {
-  protected $month = array (
+  //  입춘을 0으로 잡고 각절기까지의 평균 분(최근 10여년간 역서의 절기시간)을 분으로 계산
+ // protected $month = [
+  protected $season_24_interval = [
     0, 21355, 42843, 64498, 86335, 108366, 130578, 152958,
     175471, 198077, 220728, 243370, 265955, 288432, 310767,
     332928, 354903, 376685, 398290, 419736, 441060, 462295,
     483493, 504693, 525949
-  );
+  ];
 
   /**
    * 십간(十干) 데이터
    * @var array 
    */
-  protected $gan = array ('갑', '을', '병', '정', '무', '기', '경', '신', '임', '계');
-  /**
-   * 십간(十干) 한자 데이터
-   * @var array 
-   */
-  protected $hgan = array ('甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸');
-  /**
-   * 십이지(十二支) 데이터
-   * @var array 
-   */
-  protected $ji = array ('자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해');
-  /**
-   * 십이지(十二支) 한자 데이터
-   * @var array 
-   */
-  protected $hji = array ('子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥');
+  // protected $gan = array ('갑', '을', '병', '정', '무', '기', '경', '신', '임', '계');
+  // /**
+  //  * 십간(十干) 한자 데이터
+  //  * @var array 
+  //  */
+  // protected $hgan = array ('甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸');
+  // /**
+  //  * 십이지(十二支) 데이터
+  //  * @var array 
+  //  */
+  // protected $ji = array ('자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해');
+  // /**
+  //  * 십이지(十二支) 한자 데이터
+  //  * @var array 
+  //  */
+  // protected $hji = array ('子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥');
   /**
    * 띠 데이터
    * @var array 
    */
-  protected $ddi = array ('쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양', '원숭이', '닭', '개', '돼지');
+  // protected $ddi = array ('쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양', '원숭이', '닭', '개', '돼지');
 
   /**
    * 병자년 경인월 신미일 기해시 입춘 데이터
@@ -155,79 +157,7 @@ Class Lunar_API {
   protected $unitmsec   = 0;
   protected $moonlength = 42524;
 
-  /**
-   * 절기 데이터
-   * @var array 
-   */
-  protected $month_st = array (
-    '입춘', '우수', '경칩', '춘분', '청명', '곡우',
-    '입하', '소만', '망종', '하지', '소서', '대서',
-    '입추', '처서', '백로', '추분', '한로', '상강',
-    '입동', '소설', '대설', '동지', '소한', '대한',
-    '입춘'
-  );
 
-  /**
-   * 절기(한자) 데이터
-   * @var array 
-   */
-  protected $hmonth_st = array (
-    '立春', '雨水', '驚蟄', '春分', '淸明', '穀雨',
-    '立夏', '小滿', '芒種', '夏至', '小暑', '大暑',
-    '立秋', '處暑', '白露', '秋分', '寒露', '霜降',
-    '立冬', '小雪', '大雪', '冬至', '小寒', '大寒',
-    '立春'
-  );
-
-  /**
-   * 60간지 데이터
-   * @var array 
-   */
-  protected $ganji = array (
-    '갑자', '을축', '병인', '정묘', '무진', '기사', '경오', '신미', '임신', '계유', '갑술', '을해',
-    '병자', '정축', '무인', '기묘', '경진', '신사', '임오', '계미', '갑신', '을유', '병술', '정해', 
-    '무자', '기축', '경인', '신묘', '임진', '계사', '갑오', '을미', '병신', '정유', '무술', '기해', 
-    '경자', '신축', '임인', '계묘', '갑진', '을사', '병오', '정미', '무신', '기유', '경술', '신해',
-    '임자', '계축', '갑인', '을묘', '병진', '정사', '무오', '기미', '경신', '신유', '임술', '계해'
-  );
-  /**
-   * 60간지 한자 데이터
-   * @var array 
-   */
-  protected $hganji = array (
-    '甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥',
-    '丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥',
-    '戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥',
-    '庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥',
-    '壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥'
-  );
-
-  /**
-   * 요일 데이터
-   * @var array 
-   */
-  protected $week = array ('일','월','화','수','목','금','토');
-  /**
-   * 요일 한자 데이터
-   * @var array 
-   */
-  protected $hweek = array ('日','月','火','水','木','金','土');
-  /**
-   * 28일 데이터
-   * @var array 
-   */
-  protected $s28days = array (
-    '角','亢','氐','房','心','尾','箕',
-    '斗','牛','女','虛','危','室','壁',
-    '奎','婁','胃','昴','畢','觜','參',
-    '井','鬼','柳','星','張','翼','軫'
-  );
-  protected $s28days_hangul = array (
-    '각', '항', '저', '방', '심', '미', '기',
-    '두', '우', '녀', '허', '위', '실', '벽',
-    '규', '수', '위', '묘', '필', '자', '삼',
-    '정', '귀', '류', '성', '장', '익', '진'
-  );
 
   /**
    * 정수 몫을 반환
@@ -534,7 +464,7 @@ Class Lunar_API {
 
     for ( $i=0; $i<=11; $i++ ) {
       $j = $i * 2;
-      if ( ($this->month[$j] <= $monthmin100) && ($monthmin100 < $this->month[$j+2]))
+      if ( ($this->season_24_interval[$j] <= $monthmin100) && ($monthmin100 < $this->season_24_interval[$j+2]))
         $so24month = $i;
     };
 
@@ -657,12 +587,13 @@ Class Lunar_API {
     if ( $i == -2 ) $i = 10;
     else if ( $i == -1 ) $i = 11;
 
-    $inginame  = $i * 2 ;
-    $midname   = $i * 2 + 1;
-    $outginame = $i * 2 + 2;
+    // 절기명은 배열에 24까지 들어가있으므로 24가 되는 것을 피한다.
+    $inginame  = ($i * 2) % 24 ;
+    $midname   = ($i * 2 + 1) % 24;
+    $outginame = ($i * 2 + 2) % 24;
 
     $j = $i * 2;
-    $tmin = $displ2min + ($monthmin100 - $this->month[$j]);
+    $tmin = $displ2min + ($monthmin100 - $this->season_24_interval[$j]);
 
     list ($y1, $mo1, $d1, $h1, $mi1) =
       $this->getdatebymin ($tmin, $this->unityear, $this->unitmonth, $this->unitday, $this->unithour, $this->unitmin);
@@ -673,7 +604,7 @@ Class Lunar_API {
     $ingihour  = $h1;
     $ingimin   = $mi1;
 
-    $tmin = $displ2min + ($monthmin100 - $this->month[$j+1]);
+    $tmin = $displ2min + ($monthmin100 - $this->season_24_interval[$j+1]);
     list ($y1, $mo1, $d1, $h1, $mi1) =
       $this->getdatebymin ($tmin, $this->unityear, $this->unitmonth, $this->unitday, $this->unithour, $this->unitmin);
 
@@ -683,7 +614,7 @@ Class Lunar_API {
     $midhour  = $h1;
     $midmin   = $mi1;
 
-    $tmin = $displ2min + ($monthmin100 - $this->month[$j+2]);
+    $tmin = $displ2min + ($monthmin100 - $this->season_24_interval[$j+2]);
     list ($y1, $mo1, $d1, $h1, $mi1) =
       $this->getdatebymin ($tmin, $this->unityear, $this->unitmonth, $this->unitday, $this->unithour, $this->unitmin);
 
@@ -944,7 +875,7 @@ Class Lunar_API {
     $midname2 = $midname1 + 2;
     if ( $midname2 > 24 )
       $midname2=1;
-    $s0 = $this->month[$midname2] - $this->month[$midname1];
+    $s0 = $this->season_24_interval[$midname2] - $this->season_24_interval[$midname1];
     if ( $s0 < 0 )
       $s0 += 525949;
     $s0 *= -1;
@@ -1042,7 +973,7 @@ Class Lunar_API {
       = $this->solortoso24 ($lyear,2,15,0,0);
 
     $midname = $lmonth * 2 - 1 ;
-    $tmin = $this->month[$midname] * -1;
+    $tmin = $this->season_24_interval[$midname] * -1;
     list ($midyear, $midmonth, $midday, $midhour, $midmin) 
       = $this->getdatebymin ($tmin, $ingiyear, $ingimonth, $ingiday, $ingihour, $ingimin);
 

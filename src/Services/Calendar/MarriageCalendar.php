@@ -4,7 +4,6 @@ namespace Pondol\Fortune\Services\Calendar;
 use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 use Pondol\Fortune\Traits\Calendar;
 use Pondol\Fortune\Facades\Manse;
-// 택일 카렌다 모양 참조 : https://lancer.tistory.com/323
 // http://saju.sajuplus.net/?acmode=b_s&curjong=saju001001&no=41586&page=11&orgcstyle=&cstyle=4
 /**
 * 모든 계산법이 이사택일과 같으나 이사택일은 singu_jumsu  가 결혼택일은 dae_jumsu 가 마지막에 드러간다.
@@ -25,9 +24,11 @@ class MarriageCalendar
   // }
 
   /**
-   * 이사택일 구하기
+   * 결혼택일 구하기
+   * @params Object $manse : 본인의 사주
+   * @parmas Object $p_manse : 상대의 사주
    */
-  public function cal($manse, $yyyymm) {
+  public function cal($manse, $p_manse, $yyyymm) {
     
     // Calendar._create
     $calendar = $this->_create($yyyymm);
@@ -35,7 +36,7 @@ class MarriageCalendar
     foreach($calendar->days as $c) {
       if($c->day) {
         $data = new Day;
-        $data->cal($manse, $yyyymm.pad_zero($c->day));
+        $data->cal($manse, $p_manse, $yyyymm.pad_zero($c->day));
         $c->setObject($data);       
       }
     }
@@ -53,7 +54,7 @@ class MarriageCalendar
 class Day {
   use t_selectDay;
 
-  public function cal($manse, $yyyymmdd) {
+  public function cal($manse, $p_manse, $yyyymmdd) {
 
     $now = Manse::refresh()->ymdhi($yyyymmdd)->create();
 
@@ -172,18 +173,23 @@ class Day {
     $this->_hongsasal($now->get_e('month'), $now->get_e('day'), $titles, $scores);
 
 
+    //(결혼) 대리월 방모씨 방옹고 방녀부모 방부주 방녀신
+    if ($manse->gender == 'M') {
+      $choice_year_e = $p_manse->get_e('year');
+    }else{
+      $choice_year_e = $manse->get_e('year');
+    }
+    $this->_dae($choice_year_e, $manse->get_e('month'), $titles, $scores);
+
     // 축음양불장길일
     $this->_chuk($now->get_e('month'), $now->get_he('day'), $titles, $scores);
 
-    //  헌집/새집 길일
-    $this->_singu($now->get_he('day'), $titles, $scores);
 
-
-    // 월기일 매월 초5일 14일 23 일
+     // 월기일 매월 초5일 14일 23 일
     $this->_wolgi(substr($now->lunar, 6, 2), $titles, $scores);
 
     // 인동일
-   $this-> _indong(substr($now->lunar, 6, 2), $titles, $scores);
+    $this-> _indong(substr($now->lunar, 6, 2), $titles, $scores);
 
 
     // 가취대흉일

@@ -21,16 +21,23 @@ class Manse {
    * @param $ymdhi = yyyymmddhhii
    */
   public function ymdhi($ymdhi) {
+    // echo 'ymdhi:'.$ymdhi.PHP_EOL;
+    $ymdhi = str_replace(['-', ':'], '', $ymdhi);
     $len = strlen($ymdhi);
+    $typeof = gettype($ymdhi);
+    // echo 'typeof: '.$typeof;
     switch($len) {
-      case 8: $this->ymd = $ymdhi; break;
+      case 8: $ymd = $ymdhi; break;
       case 12: 
         preg_match ('/^([0-9]{8})([0-9]{4})$/', trim ($ymdhi), $match);
         list (, $ymd, $hi) = $match;
-        $this->ymd = $ymd;
         $this->hi = $hi;
         break;
     }
+    preg_match ('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', trim ($ymd), $match);
+    list (, $y, $m, $d) = $match;
+    $this->ymd = $y.'-'.$m.'-'.$d;
+
     return $this;
   }
 
@@ -58,47 +65,34 @@ class Manse {
   }
 
   public function create() {
+
     switch($this->sl) {
       case 'solar': 
         $this->solar = $this->ymd; 
-        $manse = Lunar::tolunar($this->ymd);
+        $manse = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->gabja()->create();
+        $this->lunar = $manse->lunar; 
         break;
       case 'lunar': 
         $this->lunar = $this->ymd; 
-        $manse = Lunar::toSolar($this->ymd, $this->leap);
+        $manse = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->gabja()->create();
+        $this->solar = $manse->solar; 
+        
         break;
     }
-    // manse를 이용하여 양/음력 날짜 세팅
-    $this->set_solar_or_lunar($manse);
-    // $this->year($manse->year)->month($manse->month)->day($manse->day);
+    
 
-   
-    // echo 'this->solar: '.$this->solar.PHP_EOL;
-    $dayfortune = Lunar::dayfortune ($this->solar, $this->hi);
+    $this->year = $manse->gabja->year;
+    $this->month = $manse->gabja->month;
+    $this->day = $manse->gabja->day;
+    $this->hour = $manse->gabja->hour;
 
-    // print_r($dayfortune);
-    $this->year = (object)['ch'=>$dayfortune->hyear, 'ko'=>$dayfortune->year];
-    $this->month = (object)['ch'=>$dayfortune->hmonth, 'ko'=>$dayfortune->month];
-    $this->day = (object)['ch'=>$dayfortune->hday, 'ko'=>$dayfortune->day];
-    $this->hour = (object)['ch'=>$dayfortune->hhour, 'ko'=>$dayfortune->hour];
     $this->korean_age = date('Y') - substr($this->solar, 0, 4) + 1;
     return $this;
   }
 
-  public function set_solar_or_lunar($manse) {
-    $ymd = pad_zero($manse->year, 4)
-      .pad_zero($manse->month)
-      .pad_zero($manse->day);
-    // print_r($manse);
-    // $this->largemonth = $manse->largemonth;
-    switch($this->sl) {
-      case 'solar': $this->lunar = $ymd ; break;
-      case 'lunar': $this->solar = $ymd ; break;
-    }
-  }
 
   public function seasonal_division($ymd) {
-    return Lunar::seasonal_division($ymd);
+    return Lunar::seasonal_division($ymd)->create();
   }
 
   /** 만세에서  천간 가져오기 
