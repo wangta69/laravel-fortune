@@ -7,3 +7,7 @@ Route::get('calendar/season-24/{yyyy}/', array('uses'=>'CalendarController@seaso
 Route::get('calendar/move/{yyyymm}/', array('uses'=>'CalendarController@move'))->name('calendar.move');
 Route::get('calendar/marriage/{yyyymm}/', array('uses'=>'CalendarController@marriage'))->name('calendar.marriage');
 Route::get('calendar/samjae/{yyyy}/', array('uses'=>'CalendarController@samjae'))->name('calendar.samjae');
+
+
+Route::get('term-update', array('uses'=>'TermController@update'))->name('term.update');
+Route::get('term/{term}', array('uses'=>'TermController@term'))->name('term');

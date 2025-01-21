@@ -11,39 +11,66 @@ use Pondol\Fortune\Facades\Manse;
 class Sinsal
 {
 
-  // [길신]
-  // public $cheneul = []; // 길신 > 천을귀인
-  // public $chenju = []; // 길신 > 천주귀인
-  // public $chenguan = []; // 길신 > 천관귀인
-  // public $chenbok = []; // 길신 > 천복귀인
-  // public $taeguk = [];  // 길신 > 태극귀인
-  // public $wolduk = []; // 길신 > 월덕귀인
-  // public $chunduk = []; // 길신 > 천덕귀인
-  // public $munchang = []; // 길신 >  문창성(문창귀인)
+  private $trans = [
+    '천을귀인'=>['ch'=>'天乙貴人'],
+    '천주귀인'=>['ch'=>'天廚貴人'],
+    '천관귀인'=>['ch'=>'天官貴人'],
+    '천복귀인'=>['ch'=>'天福貴人'],
+    '태극귀인'=>['ch'=>'太極貴人'],
+    '월덕귀인'=>['ch'=>'月德貴人'],
+    '천덕귀인'=>['ch'=>'天德貴人'],
+    '문창귀인'=>['ch'=>'天廚貴人'], // 문창성
+    '문곡성'=>['ch'=>''],
+    '관귀학관'=>['ch'=>''],
+    '황은대사'=>['ch'=>'皇恩大赦'],
+    '암록'=>['ch'=>''],
+    '금여록'=>['ch'=>'金與祿'],
+    '학당'=>['ch'=>'學堂'], // 學堂貴人
+    '천의성'=>['ch'=>'天醫)'],
+    '괴강살'=>['ch'=>''],
+    '백호살'=>['ch'=>''],
+    '원진살'=>['ch'=>''],
+    '귀문관살'=>['ch'=>''],
+    '홍염살'=>['ch'=>'紅艶殺'],
+    '양인살'=>['ch'=>''],
+    '공망'=>['ch'=>''],
+    '단교관살'=>['ch'=>''],
+    '상문살'=>['ch'=>''],
+    '상문조객살'=>['ch'=>'喪門弔客殺'],
+    '수옥살'=>['ch'=>''], // 12신살의 재살
+    '급각살'=>['ch'=>''],
+    '고신살'=>['ch'=>'孤神殺'],
+    '과숙살'=>['ch'=>'寡宿殺'],
+    '상처살'=>['ch'=>'喪妻殺'],
+    '상부살'=>['ch'=>'喪夫殺'],
+    '천모살'=>['ch'=>'天耗殺'],
+    '지모살'=>['ch'=>'地耗殺'],
+    '대모소모살'=>['ch'=>'大耗小耗殺'],
+    '소모살'=>['ch'=>'小耗殺'],
+    '반음살'=>['ch'=>'返吟殺'],
+    '병부살'=>['ch'=>'病符殺'],
+    '관부살'=>['ch'=>'官符殺'],
+    '세파살'=>['ch'=>'歲破殺'],
+    '비염살'=>['ch'=>'飛廉殺'],
+    '탕화살'=>['ch'=>'湯火殺'],
+    '유하살'=>['ch'=>'流霞殺'],
+    '비인살'=>['ch'=>'飛刃殺'],
+    '음양착살'=>['ch'=>'陰陽錯殺'],
+    '지살'=>['ch'=>'地殺'], // 12신살
+    '도화살'=>['ch'=>'桃花煞'], // 12신살, 연살(年殺)
+    '월살'=>['ch'=>'月殺'], // 12신살
+    '망신살'=>['ch'=>'亡身殺'], // 12신살
+    '장성살'=>['ch'=>'將星殺'], // 12신살
+    '반안살'=>['ch'=>'攀鞍殺'], // 12신살
+    '역마살'=>['ch'=>'驛馬殺'], // 12신살
+    '육해살'=>['ch'=>'六害殺'], // 12신살
+    '화개살'=>['ch'=>'華蓋殺'], // 12신살
+    '겁살'=>['ch'=>'劫殺'], // 12신살
+    '재살'=>['ch'=>'劫殺'], // 12신살, 수옥살
+    '천살'=>['ch'=>'天殺'], // 12신살,
+  ];
 
-
-  // public $mungok = []; // 문곡성
-  // public $guangui = []; // 관귀학관
-  // public $amrok = []; // 암록
-  // public $gumrok = []; // 금여록
-  // public $hakdang = []; // 학당
-  // public $chene = []; // 천의성
-
-  // public $guegangsal = []; // 괴강살
-  // public $bekhosal = []; // 백호살
-  // public $wonjinsal = []; // 원진살(일지로 검색)
-  // public $guimunsal = []; // 귀문관살(일지로 검색)
-  // public $hongsal = []; // 홍염살(일간으로 검색)
-  // public $yanginsal = []; // 양인살(일간으로 검색)
-  // public $gongmangsal = []; // 기타살 >공망구하기
-  // // public $dangyogansal = []; // 기타살 >단교관살
-  // public $sangmunsal = []; // 상문살(일지,년지으로 검색)
-  // public $suoksal = []; // // 수옥살(일지,년지으로 검색)
-  // public $gepgaksal = [];  // 급각살
-  // public $gosinsal = []; // 고신살  월만 조내
-
-
-  private $hour, $day, $month, $year, $hour_h, $day_h, $month_h, $year_h, $hour_e, $day_e, $month_e, $year_e;
+  private $gender, $hour, $day, $month, $year, $hour_h, $day_h, $month_h, $year_h, $hour_e, $day_e, $month_e, $year_e;
 
   public function withManse($manse) {
     $this->hour = $manse->hour->ch;
@@ -63,67 +90,46 @@ class Sinsal
     return $this;
   }
 
-  public function all() {
-    // 천을귀인
-    $this->cheneul();
-    // 천주귀인
-    $this->chenju();
-    // 천관귀인
-    $this->chenguan();
-    // 천복귀인
-    $this->chenbok();
-    // 태극귀인
-    $this->taeguk();
-    // 월덕귀인
-    $this->wolduk();
-    // 천덕귀인
-    $this->chunduk();
-    // 문창성
-    $this->munchang();
-    // 문곡성
-    $this->mungok();
-    // 관귀학관
-    $this->guangui();
-    // 암록
-    $this->amrok();
-    // 금여록
-    $this->gumrok();
-    // 학당
-    $this->hakdang();
-    // 천의성
-    $this->chene();
+  public function goodbadsin() {
+    // 길신
+    $this->cheneul(); // 천을귀인
+    $this->taeguk(); // 태극귀인
+    $this->chenguan(); // 천관귀인
+    $this->wolduk(); // 월덕귀인 
+    $this->chunduk(); // 천덕귀인
+    $this->munchang(); // 문창성 (문창귀인)
+    $this->woldukHap(); // 월덕합
+    $this->chundukHap(); // 천덕합
+    $this->boksung(); // 복성귀인
+    $this->chenju(); // 천주귀인
+    $this->chenbok(); // 천복귀인
+    $this->mungok(); // 문곡성(문곡귀인)
+    $this->guangui(); // 관귀학관
+    $this->amrok(); // 암록
+    $this->gumrok(); // 금여록
+    $this->hakdang(); // 학당
+    $this->chene(); // 천의성
 
-    // 괴강살
-    $this->guegangsal();
-    // 백호살
-    $this->bekhosal();
-    // 원진살(일지로 검색)
-    $this->wonjinsal();
+    
+    $this->guegangsal(); // 괴강살
+    $this->bekhosal(); // 백호살
+    $this->wonjinsal(); // 원진살(일지로 검색)
 
-    // 귀문관(일지로 검색)
     //자유(子酉), 오축(午丑), 인미(寅未), 묘신(卯申), 진해(辰亥), 사술(巳戌)
-    $this->guimunsal();
-  
+    $this->guimunsal(); // 귀문관(일지로 검색)
     // $this->yeokmasal();
     // 
     // 단교관살
     // $this->dangyogansal']['d'] = $this->dangyogansal($month_e, $day_e);
 
-    // 홍염살(일간으로 검색)
-    $this->hongsal();
-
-    // 양인살(일간으로 검색)
-    $this->yanginsal();
-    // 공망구하기
-    // $now = false;
-    // if ($now) {
-      $this->gongmangsal();
-    // }
+    $this->hongsal(); // 홍염살(일간으로 검색)
+    $this->yanginsal(); // 양인살(일간으로 검색)
+    $this->gongmangsal(); // 공망구하기
 
     // 상문살(일지,년지으로 검색)=>먼저 일지를 중심으로 3지를 보고 다음 연지를 중심으로 일지만 본다(연일지를 둘다보는 경우는 이렇게 처리하도록한다.)
     $this->sangmunsal();
-    // 수옥살(일지,년지으로 검색)
-    $this->suoksal();
+    
+    // $this->jaesal(); // 재살(수옥살)(일지,년지으로 검색)
     // 급각살
     //1, 2, 3월생이 해(亥)나 자(子), 4, 5, 6월생이 묘(卯)나 미(未), 7, 8, 9월생이 인(寅)이나 술(戌),
     //10, 11, 12월생이 축(丑)이나 진(辰)을
@@ -137,15 +143,47 @@ class Sinsal
     //신유술(申酉戌) 생이 미(未), 해자축(亥子丑) 생이 술(戌)을 만나면 상부살(喪夫煞)이라고 한다.
     if ($this->gender == 'M'){
       if($this->hasGosinsal($this->year_e, $this->month_e)) {
-        $this->gosinsal['m'] = '상처살(喪妻殺)';
+        $this->gosinsal['m'] = '상처살';
       }
     } else if ($gender == 'W'){
       if($this->hasGuasuksall($this->year_e, $this->month_e)) {
-        $this->guasuksal['m'] = '상부살(喪夫殺)';
+        $this->guasuksal['m'] = '상부살';
       }
     }
 
     return $this;
+  }
+
+  /**
+   * year / month / day / hour 로 검색된 모든 신살을 배열로 처리
+   */
+  public function create() {
+    $result = json_decode(json_encode($this));
+
+    $return = (object)['y'=>[],'m'=>[],'d'=>[],'h'=>[]];
+    foreach($result as $val) {
+      foreach($val as $k => $v ) {
+        if($v) {
+          $ch = array_key_exists($v, $this->trans) ? $this->trans[$v]['ch']: null;
+          // $ch = in_array(trim($v), $this->trans) ? ']+++++++++++++': null;
+
+          // print_
+          // if(in_array('천을귀인', $this->trans)) {
+          //   echo 'adfadfadfafeds';
+          // }
+          // // echo $this->trans[$v]['ch'];
+          // echo $v.PHP_EOL;
+          // echo trim($v).PHP_EOL;
+          // // print_r($this->trans);
+          // echo '============='.$ch.in_array($v, $this->trans).PHP_EOL;
+          array_push($return->{$k}, (object)['ko'=>$v, 'ch'=>$ch]);
+        }
+      }
+      // print_r($v);
+    }
+
+    // print_r($return);
+    return $return;
   }
  
 
@@ -173,15 +211,15 @@ class Sinsal
   private function hasCheneul($day_h, $e) {
     switch($day_h){
       case '甲': case '戊': case '庚': // 갑 무 경
-        if (($e == '丑') || ($e == '未')) { return true;} // (天乙貴);
+        if (($e == '丑') || ($e == '未')) { return true;} break;// (天乙貴);
       case '乙': case '己': // 을기
-        if (($e == '子') || ($e == '申')) { return true;}
+        if (($e == '子') || ($e == '申')) { return true;} break;
       case '丙': case '丁': // 병정
-        if (($e == '酉') || ($e == '亥')) { return true;}
+        if (($e == '酉') || ($e == '亥')) { return true;} break;
       case '辛':
-        if (($e == '寅') || ($e == '午')) { return true;}
+        if (($e == '寅') || ($e == '午')) { return true;} break;
       case '壬': case '癸': // 임 계
-        if (($e == '卯') || ($e == '巳')) { return true;}
+        if (($e == '卯') || ($e == '巳')) { return true;} break;
     }
     return false;
   }
@@ -287,15 +325,15 @@ class Sinsal
   private function hasTaeguk($day_h, $e) {
     switch($day_h){
       case '甲': case '乙': // 갑 을
-        if ($e == '子' || $e == '午' ) { return true;} // (太極貴)
+        if ($e == '子' || $e == '午' ) { return true;} break;// (太極貴)
       case '丙': case '丁': // 병 정
-        if ($e == '卯' || $e == '酉' ) { return true;} //
+        if ($e == '卯' || $e == '酉' ) { return true;} break;//
       case '戊': case '己': // 무 기
-        if ($e == '辰' || $e == '戌' || $e == '丑' || $e == '未' ) { return true;} //
+        if ($e == '辰' || $e == '戌' || $e == '丑' || $e == '未' ) { return true;} break;//
       case '庚': case '辛': // 경신
-        if ($e == '寅' || $e == '亥' ) { return true;} //
+        if ($e == '寅' || $e == '亥' ) { return true;} break;//
       case '壬': case '癸': // 임계
-        if ($e == '巳' || $e == '申' ) { return true;} //
+        if ($e == '巳' || $e == '申' ) { return true;} break;//
     }
     return false;
   }
@@ -303,6 +341,34 @@ class Sinsal
 
 
   /**
+  * 복성귀인 구하기
+  *@param String $day_h 생일 일간
+  *@param String $e : 사주중 지지
+  */
+  public function boksung() {
+    $this->boksung['y'] = $this->calBoksung($this->day_h, $this->year_e);
+    $this->boksung['m'] = $this->calBoksung($this->day_h, $this->month_e);
+    $this->boksung['d'] = $this->calBoksung($this->day_h, $this->day_e);
+    $this->boksung['h'] = $this->calBoksung($this->day_h, $this->hour_e);
+  }
+
+  private function calBoksung($day_h, $e) {
+    if($this->hasBoksung($day_h, $e)) {
+      return '복성귀인';
+    } else {
+      return null;
+    }
+  }
+
+  private function hasBoksung($day_h, $e) {
+    $str = $day_h.$e;
+    $arr = ['甲寅','乙丑','丙子','丁酉','戊申','己未','庚午','辛巳','壬辰','癸卯'];
+    return in_array($str, $arr);
+  }
+
+
+
+/**
   * 문장구하기(문창귀인)
   *@param String $day_h 생일 일간
   *@param String $e : 사주중 지지
@@ -327,6 +393,8 @@ class Sinsal
     $arr = ['甲巳','乙午','丙申','丁酉','戊申','己酉','庚亥','辛子','壬寅','癸卯'];
     return in_array($str, $arr);
   }
+
+
 
   /**
   * 문곡구하기
@@ -510,11 +578,26 @@ class Sinsal
    * 월덕합
    * 월지에 연월일시 천간을 대조하여 판단
    */
-  static function hasWoldukHap($my_e, $h) {
+  public function woldukHap() {
+    $this->wolduk['y'] = $this->calWoldukHap($this->month_e, $this->year_h);
+    $this->wolduk['m'] = $this->calWoldukHap($this->month_e, $this->month_h);
+    $this->wolduk['d'] = $this->calWoldukHap($this->month_e, $this->day_h);
+    $this->wolduk['h'] = $this->calWoldukHap($this->month_e, $this->hour_h);
+  }
+
+  private function calWoldukHap($month_e, $h) {
+    if($this->hasWoldukHap($month_e, $h)) {
+      return '월덕합';
+    } else {
+      return null;
+    }
+  }
+
+  static function hasWoldukHap($month_e, $h) {
     //  (($month_e == '卯')&&($day_e == '巳'))||
     // (($month_e == '未')&&($day_e == '巳'))||
     // (($month_e == '亥')&&($day_e == '巳'))||
-    switch($my_e){
+    switch($month_e){
       case '亥': case '卯': case '未': // 해 묘 미
         if ($h == '己') { return true;} break; // (月德貴)break;
       case '寅': case '午': case '戌': // 인 오 술
@@ -580,42 +663,32 @@ class Sinsal
     return false;
   }
 
-    /**
+  /**
    * 천덕합 (월지에 연월일시의 지지를 대조하여 판단)
-  */
-  static function hasChendukhap($my_e, $h) {
+   */
+  public function chundukHap() {
+    $this->chunduk['y'] = $this->calChundukHap($this->month_e, $this->year_e);
+    $this->chunduk['m'] = $this->calChundukHap($this->month_e, $this->month_e);
+    $this->chunduk['d'] = $this->calChundukHap($this->month_e, $this->day_e);
+    $this->chunduk['h'] = $this->calChundukHap($this->month_e, $this->hour_e);
+  }
+
+  private function calChundukHap($month_e, $e) {
+    if ($this->hasChendukhap($month_e, $e)) {
+      return '천덕합';
+    } else {
+      return null;
+    }
+  }
+  static function hasChendukhap($month_e, $e) {
     // 아래와 같이 e도 고려하는 경우가 있음
     // (($month_e == '卯')&&($day_e == '巳'))||
     // (($month_e == '午')&&($day_e == '寅'))||
     // (($month_e == '申')&&($day_e == '戌'))||
     //  (($month_e == '酉')&&($day_e == '亥'))||
-    switch ($my_e) {
-      case "子":
-        if ($h== '申') return true; break;
-      case "丑":
-        if ($h== '乙') return true; break;
-      case "寅":
-        if ($h== '壬') return true; break;
-      case "卯":
-        if ($h== '巳') return true; break;
-      case "辰":
-        if ($h== '丁') return true; break;
-      case "巳":
-        if ($h== '丙') return true; break;
-      case "午":
-        if ($h== '寅') return true; break;
-      case "未":
-        if ($h== '己') return true; break;
-      case "申":
-        if ($h== '戊') return true; break;
-      case "酉":
-        if ($h== '亥') return true; break;
-      case "戌":
-        if ($h== '辛') return true; break;
-      case "亥":
-        if ($h== '庚') return true; break;
-    }
-    return false;
+    $str = $month_e.$e;
+    $arr = ['子申','丑乙','寅壬','卯巳','辰丁','巳丙','午寅','未己','申"戊','酉亥','戌辛','亥庚'];
+    return in_array($str, $arr);
   }
 
   /**
@@ -767,19 +840,23 @@ class Sinsal
   }
 
   private function calGuegangsal($gabja) {
-    switch($gabja){
-      case '壬辰': // 임진
-        return '괴강살'; // 魁罡殺
-      case '壬戌': // 임술
-        return '괴강살';
-      case '戊戌': // 무술 (무술년을 괘강살로 안하는 경우도 있음)
-        return '괴강살';
-      case '庚辰': //경진
-        return '괴강살';
-      case '庚戌': //경술
-        return '괴강살';
-    }
-    return null;
+    $arr = ['壬辰','壬戌','戊戌','庚辰','庚戌'];
+    // 임진, 임술, 무술 (무술년을 괘강살로 안하는 경우도 있음), 경진, 경술
+    return in_array($gabja, $arr);
+
+    // switch($gabja){
+    //   case '壬辰': // 임진
+    //     return '괴강살'; // 魁罡殺
+    //   case '壬戌': // 임술
+    //     return '괴강살';
+    //   case '戊戌': // 무술 (무술년을 괘강살로 안하는 경우도 있음)
+    //     return '괴강살';
+    //   case '庚辰': //경진
+    //     return '괴강살';
+    //   case '庚戌': //경술
+    //     return '괴강살';
+    // }
+    // return null;
   }
 
   /**
@@ -1231,32 +1308,7 @@ class Sinsal
   }
 
 
-  /**
-  * 수옥살 구하기
-  * 수옥살(일지,년지으로 검색)=>먼저 일지를 중심으로 3지를 보고 다음 연지를 중심으로 일지만 본다(연일지를 둘다보는 경우는 이렇게 처리하도록한다.)
-  *@param String $day_e 생월 일지 (일지에 대한 수옥살을 구할경우 $day_e 에 $year_e가 온다)
-  *@param String $e : 일지를 제외한 지지
-  */
-  public function suoksal() {
-    $this->suoksal['y'] = $this->calSuoksal($this->day_e, $this->year_e);
-    $this->suoksal['m'] = $this->calSuoksal($this->day_e, $this->month_e);
-    $this->suoksal['d'] = $this->calSuoksal($this->year_e, $this->day_e);
-    $this->suoksal['h'] = $this->calSuoksal($this->day_e, $this->hour_e);
-  }
-
-  private function calSuoksal($day_h, $e) {
-    if($this->hasSuoksal($day_h, $e)) {
-      return '수옥살';
-    } else {
-      return null;
-    }
-  }
-
-  private function hasSuoksal($day_e, $e) {
-    $str = $day_e.$e;
-    $arr = ['子午','丑卯','寅子','卯酉','辰午','巳卯','午子','未酉','申午','酉卯','戌子','亥酉'];
-    return in_array($str, $arr);
-  }
+  
 
   /**
   * 급각살 구하기
@@ -1498,8 +1550,23 @@ class Sinsal
   *@param String $e : 현재의 년지
   */
 
-  private function hasJaesal($my_e, $e) {
-    switch($my_e){
+  public function jaesal() {
+    $this->jaesal['y'] = $this->calJaesal($this->day_e, $this->year_e);
+    $this->jaesal['m'] = $this->calJaesal($this->day_e, $this->month_e);
+    $this->jaesal['d'] = $this->calJaesal($this->year_e, $this->day_e);
+    $this->jaesal['h'] = $this->calJaesal($this->day_e, $this->hour_e);
+  }
+
+  private function calJaesal($day_e, $e) {
+    if($this->hasJaesal($day_e, $e)) {
+      return '재살'; // 수옥살
+    } else {
+      return null;
+    }
+  }
+
+  private function hasJaesal($day_e, $e) {
+    switch($day_e){
       case '申': case '子': case '辰':
         if ($e == '午') { return true;} break;
       case '寅': case '午': case '戌':
@@ -1511,6 +1578,36 @@ class Sinsal
     }
     return false;
   }
+
+  /**
+  * 수옥살 구하기 (위의 재살과 동일)
+  * @deprecated
+  * 수옥살(일지,년지으로 검색)=>먼저 일지를 중심으로 3지를 보고 다음 연지를 중심으로 일지만 본다(연일지를 둘다보는 경우는 이렇게 처리하도록한다.)
+  *@param String $day_e 생월 일지 (일지에 대한 수옥살을 구할경우 $day_e 에 $year_e가 온다)
+  *@param String $e : 일지를 제외한 지지
+  */
+  /*
+  public function suoksal() {
+    $this->suoksal['y'] = $this->calSuoksal($this->day_e, $this->year_e);
+    $this->suoksal['m'] = $this->calSuoksal($this->day_e, $this->month_e);
+    $this->suoksal['d'] = $this->calSuoksal($this->year_e, $this->day_e);
+    $this->suoksal['h'] = $this->calSuoksal($this->day_e, $this->hour_e);
+  }
+
+  private function calSuoksal($day_h, $e) {
+    if($this->hasSuoksal($day_h, $e)) {
+      return '수옥살';
+    } else {
+      return null;
+    }
+  }
+
+  private function hasSuoksal($day_e, $e) {
+    $str = $day_e.$e;
+    $arr = ['子午','申午','辰午','寅子','午子','戌子','酉卯','丑卯','巳卯','未酉','亥酉','卯酉'];
+    return in_array($str, $arr);
+  }
+  */
   
   /**
   * 천살(天殺) 구하기 (12신살) // select day chensal 과 다름 나중에 확인 요망
@@ -1590,23 +1687,23 @@ class Sinsal
   }
 
 /**
-  * 도화살(桃花殺)
+  * 도화살(桃花殺) (년살)
   *@param String $month_e 생월 월지
   *@param String $e : 일지를 제외한 지지
   */
-  private function hasDowhasal($my_e, $date_e) {
-    switch($my_e){
-      case '申': case '子': case '辰':
-        if ($date_e == '酉') { return true;} break;
-      case '亥':case '卯': case '未':
-        if ($date_e == '子') { return true;} break;
-      case '寅': case '午': case '戌':
-        if ($date_e == '卯') { return true;} break;
-      case '巳': case '酉': case '丑': 
-        if ($date_e == '午') { return true;} break;
-    }
-    return false;
-  }
+  // private function hasDowhasal($my_e, $date_e) {
+  //   switch($my_e){
+  //     case '申': case '子': case '辰':
+  //       if ($date_e == '酉') { return true;} break;
+  //     case '亥':case '卯': case '未':
+  //       if ($date_e == '子') { return true;} break;
+  //     case '寅': case '午': case '戌':
+  //       if ($date_e == '卯') { return true;} break;
+  //     case '巳': case '酉': case '丑': 
+  //       if ($date_e == '午') { return true;} break;
+  //   }
+  //   return false;
+  // }
 
  /**
    * 천강(흉신)
@@ -1616,8 +1713,5 @@ class Sinsal
     $arr = ['寅巳','卯子','辰未','巳寅','午酉','未辰','申亥','酉午','戌丑','亥申','子卯','丑戌'];
     return in_array($str, $arr);
   }
-
-
-
 
 }

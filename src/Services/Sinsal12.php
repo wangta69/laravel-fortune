@@ -2,7 +2,7 @@
 namespace Pondol\Fortune\Services;
 
 /**
- * 12 신살 구하기
+ * 12 신살 구하기 (년지를 기준으로 년월일시의 지지를 비교)
  * 12신살은 년지(年支)나 일지(日支)을 기준으로 삼는데, 인(寅)의 경우를 남겨봅니다. 
  * 출생년의 년지(年支=띠)로 보고, 
  * 출생일의 일지(日支)를 보는 것도 참고하셔야만 합니다.  
@@ -25,6 +25,9 @@ class Sinsal12
     return $this;
   }
 
+  /**
+   * 년지를 기준으로 년월일시의 지지를 비교
+   */
   private  function cal($default_e, $e) {
     switch($default_e) {
       case '巳': case '酉': case '丑':

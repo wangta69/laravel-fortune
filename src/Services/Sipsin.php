@@ -31,15 +31,34 @@ class Sipsin
     ]
   ];
 
+  public function withManse($manse) {
+    $this->hour = (object)[
+      'h' => $this->cal($manse->get_h('day'), $manse->get_h('hour'), 'h'),
+      'e' => $this->cal($manse->get_h('day'), $manse->get_e('hour'), 'e')
+    ];
+    $this->day = (object)[
+      'h' => '일원',
+      'e' => $this->cal($manse->get_h('day'), $manse->get_e('day'), 'e')
+    ];
+    $this->month = (object)[
+      'h' => $this->cal($manse->get_h('day'), $manse->get_h('month'), 'h'),
+      'e' => $this->cal($manse->get_h('day'), $manse->get_e('month'), 'e')
+    ];
+    $this->year = (object)[
+      'h' => $this->cal($manse->get_h('day'), $manse->get_h('year'), 'h'),
+      'e' => $this->cal($manse->get_h('day'), $manse->get_e('year'), 'e')
+    ];
+    return $this;
+  }
 
-    /**
-    *@param string $day_h : 출생일의 일간
-    *@param string $he : 천간 혹은 지지
-    *@param string $flag : h: 천간  e: 지지
-    */
-    static function cal($day_h, $he, $flag) {
-      return self::$sipsin[$flag][$day_h][$he];
-    }
+  /**
+  *@param string $day_h : 출생일의 일간
+  *@param string $he : 천간 혹은 지지
+  *@param string $flag : h: 천간  e: 지지
+  */
+  static function cal($day_h, $he, $flag) {
+    return self::$sipsin[$flag][$day_h][$he];
+  }
    /*
     static function sipsin2($day_h, $he, $flag) {
         $sipsin = '';

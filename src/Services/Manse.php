@@ -146,8 +146,17 @@ class Manse {
     return $this;
   }
 
-  /**
+   /**
    * 10신 구하기
+   */
+  public function sipsin() {
+    $sipsin = new Sipsin();
+    $this->sipsin = $sipsin->withManse($this);
+    return $this;
+  }
+
+  /**
+   * 지장간 구하기
    */
   public function zizangan() {
     $zizangan = new Zizangan();
@@ -158,10 +167,20 @@ class Manse {
    /**
    * 신살 구하기
    */
-  public function sinsal() {
+  // public function sinsal() {
+  //   $sinsal = new Sinsal();
+  //   // $this->sinsal = $sinsal->withManse($this)->cheneul();
+  //   $this->sinsal = $sinsal->withManse($this)->all()->create();
+  //   return $this;
+  // }
+
+  /**
+   * 길신/흉신 구하기
+   * 위의 신살 구하기에서 결과를 받아와서 년월일시로 배열을 재정리
+   */
+  public function goodbadsin() {
     $sinsal = new Sinsal();
-    // $this->sinsal = $sinsal->withManse($this)->cheneul();
-    $this->sinsal = $sinsal->withManse($this)->all();
+    $this->goodbadsin = $sinsal->withManse($this)->goodbadsin()->create();
     return $this;
   }
 

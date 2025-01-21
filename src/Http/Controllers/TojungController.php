@@ -14,8 +14,6 @@ class TojungController extends Controller
    * @param String $sl : solar | lunar
    */
   public function create($ymdhi, $sl='solar', $leap=false) {
-    // $manse = Manse::create($sl, $ymdhi, $leap);
-    // $manse = Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque();
     $manse = Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(function($jakque){
       $jakque->set_year(date('Y'));
     });
