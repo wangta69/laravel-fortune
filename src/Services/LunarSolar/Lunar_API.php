@@ -120,7 +120,7 @@ Class Lunar_API {
   /***/
 
   /**
-   * 경인년 데이터
+   * 경인월 데이터
    * @var integer
    */
   protected $umgan = 6;
@@ -181,6 +181,10 @@ Class Lunar_API {
    * @param  int 일
    */
   protected function disptimeday ($year, $month, $day) {
+    $year = (int) $year;
+    $month = (int) $month;
+    $day = (int) $day;
+    // echo 'disptimeday:'.$year.', '.$month.', '.$day.PHP_EOL;
     $e = $i = 0;
 
     for ( $i=1; $i<$month; $i++ ) {
@@ -469,6 +473,7 @@ Class Lunar_API {
     };
 
     // 월주 구하기
+    // echo 'so24month:'.$so24month.PHP_EOL;
     $i = $so24month;
     $t = $so24year % 10 ;
     $t %= 5 ;

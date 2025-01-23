@@ -22,12 +22,21 @@ class LunarCalendar
 
     // 중간일정도를 대입하여 이전/이후 절의 중간점을 찾는다
     // 편의를위해 양력 1월 1일의 갑자를 음력 1월 1일의 갑자로 본다.
-    // $lunar = Lunar::ymd($yyyymm.'01')->tosolar()->gabja()->create();
-    // print_r($lunar);
-    $this->year = Lunar::cal_gabja_year_from_year(substr($yyyymm, 0, 4));
-    $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->gabja()
+    // 양력의 갑자년도 구하기
+  
+    // $this->month = Lunar::gabja_month(substr($yyyymm, 0, 4), substr($yyyymm, 4, 2));
+    $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->sajugabja()
       ->seasonal_division($yyyymm.'20')
       ->create();
+
+    // 양력에 대한 갑자 년월 구하기 
+    list($year, $month) = Lunar::to_gabja($yyyymm);
+    $this->info->solarInfo = (object)['year'=>$year, 'month'=>$month];
+   
+    // 음력에 대한 갑자 년월 구하기
+    $lunar_yyyymm = date('Ym', strtotime($this->info->lunar));
+    list($year, $month) = Lunar::to_gabja($lunar_yyyymm);
+    $this->info->lunarInfo = (object)['year'=>$year, 'month'=>$month];
 
     // 현재 달의 절기 정보를 가져와서 배열로 맵핑
     $season_24 = $this->info->seasons;
@@ -37,7 +46,9 @@ class LunarCalendar
     $calendar = $this->calendar_create($yyyymm);
 
     // print_r($calendar);
-
+    // list ($so24, $so24year, $so24month, $so24day, $so24hour) =
+    // list ($so24, $so24year, $so24month, $so24day, $so24hour) = Lunar::test (2025, 1, 1, 12, 30);
+    // echo GANJI['ko'][$so24year].','.GANJI['ko'][$so24month].','.GANJI['ko'][$so24day];
     // 시작하는 요일 이전의 것은 공백처리
     foreach($calendar->days as $c) {
       if($c->day) {
@@ -71,7 +82,7 @@ class Day {
 
     
     $this->day = $day;
-    $lunar = Lunar::ymd($yyyymm.pad_zero($day))->tolunar()->gabja()->create();
+    $lunar = Lunar::ymd($yyyymm.pad_zero($day))->tolunar()->sajugabja()->create();
 
     // $this->lunar = $lunar->year.pad_zero($lunar->month).pad_zero($lunar->day);
     $this->solar = $lunar->solar;

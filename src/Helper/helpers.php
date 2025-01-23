@@ -23,6 +23,38 @@ if (!function_exists('mod_zero_to_mod')) {
   }
 }
 
+
+if (!function_exists('user_date_format')) {
+  /**
+   * @params String $date 2020-20, 202020, 2020-20-20, 2020.20
+   * @params String $format []: return as array,, -, null, . 
+   */
+  function str_date_format($date, $format=null) {
+
+    if(gettype($date) == 'array') {
+      
+      foreach($date as $v) {
+        $v = pad_zero($v, 2);
+      }
+
+      $val = $date;
+    } else if ( preg_match ('|^([0-9]{1,4})[-.]?([0-9]{1,2})[-.]?([0-9]{1,2})?$|', trim ($date), $match) ) {
+      @list(,$y,$m,$d) = $match;
+      
+      $val = [];
+      array_push($val, $y);
+      array_push($val, pad_zero($m, 2));
+      $d ? array_push($val, pad_zero($d, 2)) : null;
+    } else {
+      return false;
+    }
+
+    switch($format) {
+      case '[]': return $val;
+      default: return implode($format, $val);
+    }
+  }
+}
 /**
  * 맨 앞을 맨뒤로 보낸다.
  */

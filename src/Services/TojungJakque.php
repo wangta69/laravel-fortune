@@ -135,7 +135,7 @@ class TojungJakque
     $this->iljin_su = $gabja[2];// 일진수 구하기
 
     list (,,$day) = explode('-', $manse->lunar);
-    return mod_zero_to_mod(($day + $this->iljin_su), 3);
+    return mod_zero_to_mod(((int)$day + $this->iljin_su), 3);
   }
 
   /**

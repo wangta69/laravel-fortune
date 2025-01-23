@@ -30,8 +30,8 @@ class MoveCalendar
    */
   public function cal($manse, $yyyymm) {
     
-    $this->year = Lunar::cal_gabja_year_from_year(substr($yyyymm, 0, 4));
-    $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->gabja()
+    $this->year = Lunar::to_gabja($yyyymm);
+    $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->sajugabja()
       ->seasonal_division($yyyymm.'20')
       ->create();
 

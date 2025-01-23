@@ -21,11 +21,11 @@ class Manse {
    * @param $ymdhi = yyyymmddhhii
    */
   public function ymdhi($ymdhi) {
-    // echo 'ymdhi:'.$ymdhi.PHP_EOL;
-    $ymdhi = str_replace(['-', ':'], '', $ymdhi);
+    $ymdhi = str_replace(['-', ':'], '', trim($ymdhi));
     $len = strlen($ymdhi);
     $typeof = gettype($ymdhi);
-    // echo 'typeof: '.$typeof;
+
+    
     switch($len) {
       case 8: $ymd = $ymdhi; break;
       case 12: 
@@ -69,12 +69,12 @@ class Manse {
     switch($this->sl) {
       case 'solar': 
         $this->solar = $this->ymd; 
-        $manse = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->gabja()->create();
+        $manse = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->sajugabja()->create();
         $this->lunar = $manse->lunar; 
         break;
       case 'lunar': 
         $this->lunar = $this->ymd; 
-        $manse = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->gabja()->create();
+        $manse = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->sajugabja()->create();
         $this->solar = $manse->solar; 
         
         break;

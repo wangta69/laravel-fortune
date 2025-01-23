@@ -149,7 +149,7 @@ Class Lunar extends Lunar_API {
       }
 
       // 넘어온 날자가 음력일 경우 아래가 실행되면 측정 날자가 달라질 수 있다.
-      if ( ! $lunar && $y > 1969 && $y < 2038 ) {
+      if ( ! $lunar && $y > 1969 ) {
         $fixed = mktime (0, 0, 0, $m, $d, $y);
         $y = (int) date ('Y', $fixed);
         $m = (int) date ('m', $fixed);
@@ -224,15 +224,15 @@ Class Lunar extends Lunar_API {
    */
   private function regdate ($v) {
     list ($year, $month, $day) = $v;
-
-    return sprintf (
-      '%d-%s%d-%s%d',
-      $year,
-      ($month < 10 ) ? '0' : '',
-      (int) $month,
-      ($day < 10 ) ? '0' : '',
-      (int) $day
-    );
+    return  str_date_format($year.'-'.$month.'-'.$day, '-').PHP_EOL;
+    // return sprintf (
+    //   '%d-%s%d-%s%d',
+    //   $year,
+    //   ($month < 10 ) ? '0' : '',
+    //   (int) $month,
+    //   ($day < 10 ) ? '0' : '',
+    //   (int) $day
+    // );
   }
 
   /**
@@ -314,19 +314,19 @@ Class Lunar extends Lunar_API {
       $v = $this->cal2jd (array ($y, $m, $d));
     }
 
-    if ( extension_loaded ('calendar') ) {
-      $r = (object) cal_from_jd ($v, CAL_JULIAN);
-      if ( $r->year < 0 )
-        $r->year++;
+    // if ( extension_loaded ('calendar') ) {
+    //   $r = (object) cal_from_jd ($v, CAL_JULIAN);
+    //   if ( $r->year < 0 )
+    //     $r->year++;
 
-      return (object) array (
-        'fmt'   => $this->regdate (array ($r->year, $r->month, $r->day)),
-        'year'  => $r->year,
-        'month' => $r->month,
-        'day'   => $r->day,
-        'week'  => $r->dow
-      );
-    }
+    //   return (object) array (
+    //     'fmt'   => $this->regdate (array ($r->year, $r->month, $r->day)),
+    //     'year'  => $r->year,
+    //     'month' => $r->month,
+    //     'day'   => $r->day,
+    //     'week'  => $r->dow
+    //   );
+    // }
 
     if ( is_float ($v) ) {
       list ($Z, $F) = preg_split ('/\./', $v);
@@ -393,19 +393,19 @@ Class Lunar extends Lunar_API {
       $jd = $this->cal2jd (array ($y, $m, $d), true);
     }
 
-    if ( extension_loaded ('calendar') && $pure == false ) {
-      $r = (object) cal_from_jd ($jd, CAL_GREGORIAN);
-      if ( $r->year < 0 )
-          $r->year++;
+    // if ( extension_loaded ('calendar') && $pure == false ) {
+    //   $r = (object) cal_from_jd ($jd, CAL_GREGORIAN);
+    //   if ( $r->year < 0 )
+    //       $r->year++;
 
-      return (object) array (
-          'fmt'   => $this->regdate (array ($r->year, $r->month, $r->day)),
-          'year'  => $r->year,
-          'month' => $r->month,
-          'day'   => $r->day,
-          'week'  => $r->dow
-      );
-    }
+    //   return (object) array (
+    //       'fmt'   => $this->regdate (array ($r->year, $r->month, $r->day)),
+    //       'year'  => $r->year,
+    //       'month' => $r->month,
+    //       'day'   => $r->day,
+    //       'week'  => $r->dow
+    //   );
+    // }
 
     // https://en.wikipedia.org/wiki/Julian_day#Gregorian_calendar_from_Julian_day_number
     // 01-01-02 부터 이전은 맞지 않는다 --;
@@ -558,7 +558,7 @@ Class Lunar extends Lunar_API {
    * @param string data format (YYYY-MM-DD HH:II:SS)
    */
   private function to_utc_julian ($v) {
-    $buf = $this->toutc ($v);
+    $buf = $this->toutc($v);
     list ($y, $m, $d, $h, $i, $s) = $this->split_date ($buf);
 
     $chk = $y . $m . $d;
@@ -586,11 +586,8 @@ Class Lunar extends Lunar_API {
    * @param int day
    */
   private function fix_calendar ($y, $m, $d) {
-    if ( $m < 10 )
-      $m = '0' . $m;
-    if ( $d < 10 )
-      $d = '0' . $d;
-
+    $m = pad_zero($m, 2);
+    $d = pad_zero($d, 2);
     # 1582-10-05 ~ 1582-10-14 까지는 gregorian calendar에서는 존재 하지 않는다. 
     # 따라서 이 기간의 날자는 julian calendar 와 매치되는 날자로 변경한다. (10씩 빼준다.
 
@@ -670,45 +667,8 @@ Class Lunar extends Lunar_API {
    *    - null data (현재 시간)
    *    - 1582년 10월 15일 이전의 날자는 율리우스력의 날자로 취급함.
    */
-  // public function tolunar($v = null) {
-  //   list ($y, $m, $d) = $this->toargs ($v);
-
-  //   list ($y, $m, $d) = $this->fix_calendar ($y, $m, $d);
-  //     #printf ("%4s.%2s.%2s<br>", $y, $m, $d);
-
-  //   $r = $this->solartolunar ($y, $m, $d);
-  //   list ($year, $month, $day, $leap, $lmonth) = $r;
-
-  //   $w = $this->getweekday($y, $m, $d);
-
-
-
-  //   return (object) array (
-  //     'solar' => $y.'-'.$m.'-'.$d,
-  //     'lunar'   => $this->regdate ($r),
-  //     'dangi'   => $year + 2333,
-  //     'leap'       => $leap,
-  //     'largemonth' => $lmonth,
-  //     'week'       => (object)['ko' => WEEK['ko'][$w], 'ch'=>WEEK['ch'][$w]],
-  //     'gabja' => $this->gabja($y.'-'.$m.'-'.$d),
-  //     // 'zodiac' => (object)['ko' => ZODIAC['ko'][$w]],
-  //     // 'hweek'      => $this->hweek[$w],
-      
-  //     // 'ganji'      => $this->gan[$k1] . $this->ji[$k2],
-  //     // 'hganji'     => $this->hgan[$k1] . $this->hji[$k2],
-  //     // 'gan'        => $this->gan[$k1],
-  //     // 'hgan'       => $this->hgan[$k1],
-  //     // 'ji'         => $this->ji[$k2],
-  //     // 'hji'        => $this->hji[$k2],
-  //     // 'ddi2'        => $this->ddi[$k2]
-  //   );
-  // }
-
-
-
   public function tolunar() {
     // list ($y, $m, $d) = $this->toargs ($v);
-
     list ($y, $m, $d) = $this->fix_calendar ($this->year, $this->month, $this->day);
       #printf ("%4s.%2s.%2s<br>", $y, $m, $d);
 
@@ -718,25 +678,64 @@ Class Lunar extends Lunar_API {
     $w = $this->getweekday($y, $m, $d);
 
     $this->solar = $y.'-'.$m.'-'.$d;
+
     $this->lunar = $this->regdate($r);
     $this->dangi = $year + 2333;
     $this->leap = $leap;
     $this->largemonth = $lmonth;
     $this->week = (object)['ko' => WEEK['ko'][$w], 'ch'=>WEEK['ch'][$w]];
-    // $this->gabja = $this->gabja($y.'-'.$m.'-'.$d);
     return $this;
   }
-  
+
+  /**
+   * 현재 년월을 갑자로 변경
+   * 일, 시는 기존 sydtoso24yd 을 이용해서 구한다.
+   */
+  public function to_gabja($ym) {
+    list ($y, $m) = str_date_format($ym, '[]');
+    $year = $this->gabja_year($y);
+    $month = $this->gabja_month($year, $m);
+    return [$year, $month];
+  }
   /** 
    * 년도를 이용하여 갑자년 구하기
    */
-  public function cal_gabja_year_from_year($year){
+  private function gabja_year($year){
     $k1 = ($year + 6) % 10;
     $k2 = ($year + 8) % 12;
 
     if ( $k1 < 0 ) $k1 += 10;
     if ( $k2 < 0 ) $k2 += 12;
     return GAN['ch'][$k1].JI['ch'][$k2];
+  }
+  
+  /**
+   * 갑자월구하기
+   * '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥','子', '丑' 각각 1~12월
+   */
+  private function gabja_month($year, $month) 
+  {
+    $month_no = ($month + 1) % 12;
+    $year_h = mb_substr($year, 0, 1);
+    switch($year_h) {
+      case '甲': case '己': // 丙
+        $year_hs = arr_forward_rotate(GAN['ch'], 2);
+        break;
+      case '乙': case '庚': // 戊
+        $year_hs = arr_forward_rotate(GAN['ch'], 4);
+        break;
+      case '丙': case '辛': // 庚
+        $year_hs = arr_forward_rotate(GAN['ch'], 6);
+        break;
+      case '丁': case '壬': // 壬
+        $year_hs = arr_forward_rotate(GAN['ch'], 8);
+        break;
+      case '戊': case '癸': // 甲
+        $year_hs = arr_forward_rotate(GAN['ch'], 0);
+        break;
+    }
+
+    return $year_hs[($month-1)%10].JI['ch'][$month_no];
   }
 
   /**
@@ -790,69 +789,8 @@ Class Lunar extends Lunar_API {
    * @param bool 윤달여부
    */
 
-  /*
-  public function tosolar ($v = null, $leap = false) {
-
-  // public function tosolar ($leap = false) {
-    // $this->leap = $leap;
-   list ($y, $m, $d) = $this->toargs ($v, true);
-
-    // $kasi = false;
-    // $cdate = preg_replace ('/-/', '', $v);
-
-      $r = $this->lunartosolar ($y, $m, $d, $leap);
-      // echo "=======================".PHP_EOL;
-      // print_r($r);
-      list ($year, $month, $day) = $r;
-
-      $w = $this->getweekday ($year, $month, $day);
-
-      $jdate = $this->cal2jd ($r);
-      //$julian = $this->gregorian2julian ($r);
-      $julian = $this->gregorian2julian ($jdate);
-      $jfmt   = $julian->fmt;
-      $gfmt   = $this->regdate ($r);
-      $fmt = ($jdate < 2299161) ? $jfmt : $gfmt;
-    // }
-
-    $k1 = ($y + 6) % 10;
-    $k2 = ($y + 8) % 12;
-
-    if ( $k1 < 0 ) $k1 += 10;
-    if ( $k2 < 0 ) $k2 += 12;
-
-    // list ($so24, $year, $month, $day, $hour) = $this->sydtoso24yd ($y, $m, $d, $h, $i);
-    // print_r($this->sydtoso24yd ($year, $month, $day, '12', '0'));
-    return (object) array (
-      'jd'         => $jdate,
-      'fmt'        => $fmt,
-      'gregory'    => $gfmt,
-      'julian'     => $jfmt,
-      'dangi'      => $year + 2333,
-      // 'hyear'      => $this->human_year ($year),
-      'year'       => $year,
-      'month'      => $month,
-      'day'        => $day,
-      'week'       => (object)['ko' => WEEK['ko'][$w], 'ch' => WEEK['ch'][$w]],
-      // 'hweek'      => $this->hweek[$w],
-      // 'unixstamp'  => mktime (0, 0, 0, $month, $day, $year),
-      // 'ganji'      => $this->gan[$k1] . $this->ji[$k2],
-      'hganji'     => $this->hgan[$k1] . $this->hji[$k2],
-      'gan'        => $this->gan[$k1],
-      'hgan'       => $this->hgan[$k1],
-     // 'ji'         => $this->ji[$k2],
-      'hji'        => $this->hji[$k2],
-      // 'ddi'        => $this->ddi[$k2]
-    );
-  }
-*/
   public function tosolar ($leap = false) {
     $this->leap = $leap;
-    // list ($y, $m, $d) = $this->toargs ($v, true);
-
-    // $kasi = false;
-    // $cdate = preg_replace ('/-/', '', $v);
-    // $this->lunar = this->year
      $this->lunar = $this->regdate ([$this->year, $this->month, $this->day]);
       $r = $this->lunartosolar ($this->year, $this->month, $this->day, $this->leap);
       $this->solar = $this->regdate ($r);
@@ -864,39 +802,23 @@ Class Lunar extends Lunar_API {
       $jdate = $this->cal2jd ($r);
       //$julian = $this->gregorian2julian ($r);
       $julian = $this->gregorian2julian ($jdate);
-      $jfmt   = $julian->fmt;
-      $gfmt   = $this->regdate ($r);
+      $jfmt = $julian->fmt;
+      $gfmt = $this->regdate ($r);
       $fmt = ($jdate < 2299161) ? $jfmt : $gfmt;
     // }
 
 
-    $ganji = $this->cal_gabja_year_from_year($this->year);
+    $ganji = $this->to_gabja($this->year.$this->month);
 
     // list ($so24, $year, $month, $day, $hour) = $this->sydtoso24yd ($y, $m, $d, $h, $i);
-    // print_r($this->sydtoso24yd ($year, $month, $day, '12', '0'));
-    // return (object) array (
-    $this->jd         = $jdate;
-    $this->fmt        = $fmt;
-    $this->gregory    = $gfmt;
-    $this->julian     = $jfmt;
-    $this->dangi      = $this->year + 2333;
-      // 'hyear'      => $this->human_year ($year),
-    // $this->year       = $year;
-    // $this->month      = $month;
-    // $this->day        = $day;
-    $this->week       = (object)['ko' => WEEK['ko'][$w], 'ch' => WEEK['ch'][$w]];
-      // 'hweek'      => $this->hweek[$w],
-      // 'unixstamp'  => mktime (0, 0, 0, $month, $day, $year),
-      // 'ganji'      => $this->gan[$k1] . $this->ji[$k2],
+    $this->jd = $jdate;
+    $this->fmt = $fmt;
+    $this->gregory = $gfmt;
+    $this->julian = $jfmt;
+    $this->dangi = $this->year + 2333;
+    $this->week = (object)['ko' => WEEK['ko'][$w], 'ch' => WEEK['ch'][$w]];
+    $this->ganji = [ 'ko'=>tr_code(GANJI['ch'], GANJI['ko'], $ganji),'ch'=>$ganji];
 
-      // echo GAN['ch'][$k1] . JI['ch'][$k2];
-    $this->ganji     = [ 'ko'=>tr_code(GANJI['ch'], GANJI['ko'], $ganji),'ch'=>$ganji];
-    // $this->gan        = GAN['ko'][$k1];
-    // $this->hgan       = GAN['ch'][$k1];
-    //  // 'ji'         => $this->ji[$k2];
-    // $this->hji        = JI['ch'][$k2];
-      // 'ddi'        => $this->ddi[$k2]
-    // );
 
     return $this;
   }
@@ -973,7 +895,7 @@ Class Lunar extends Lunar_API {
   /**
    * 양력을 받아서 gabja 처리
    */
-  public function gabja () {
+  public function sajugabja () {
 
     if(isset($this->hi)) {
       if ( preg_match ('/^([0-9]{1,2})([0-9]{2})$/', trim ($this->hi), $match) ) {
@@ -1001,6 +923,10 @@ Class Lunar extends Lunar_API {
 
     return $this;
 
+  }
+
+  public function test($y, $m, $d, $h, $i) {
+    return $this->sydtoso24yd ($y, $m, $d, $h, $i);
   }
 
 
