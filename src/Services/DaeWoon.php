@@ -1,7 +1,7 @@
 <?php
 namespace Pondol\Fortune\Services;
 use Carbon\Carbon;
-use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 
 /**
  * 12실살을 제외한 기타 길신 및 흉신 구하기
@@ -18,15 +18,15 @@ class DaeWoon
   *
   *@param String $gender : W, M (from profile)
   *@param String $birth_ym : hhmm (from profile)
-  *@param string $lunar_ymd  음력 생년월일 (from manse)
+  *@param string $lunar_ymd  음력 생년월일 (from saju)
   */
   // function daeun($gender, $birth_time, $lunar_ymd, $month_h, $year_h, $month_e){ //
-  function withManse($manse){ //
+  function withSaju($saju){ //
 
-    $this->month_h = $manse->get_h('month');
-    $this->year_h = $manse->get_h('year');
-    $this->month_e = $manse->get_e('month');
-    $this->gender = $manse->gender;
+    $this->month_h = $saju->get_h('month');
+    $this->year_h = $saju->get_h('year');
+    $this->month_e = $saju->get_e('month');
+    $this->gender = $saju->gender;
 
 
     $this->direction = $this->get_direction();
@@ -57,29 +57,29 @@ class DaeWoon
     }
 
      // 대운 나이 구하기
-    $this->daeunAge($manse); // $this->daeunAge($lunar_ymd, $birth_time, $direction)
+    $this->daeunAge($saju); // $this->daeunAge($lunar_ymd, $birth_time, $direction)
 
-    $this->sipsin_e = $this->sipsin_e($manse);
-    $this->woonsung_e = $this->woonsung_e($manse);
+    $this->sipsin_e = $this->sipsin_e($saju);
+    $this->woonsung_e = $this->woonsung_e($saju);
     return $this;
   }
 
   // 대운의 지지 10성 구하기
-  private function sipsin_e($manse) {
+  private function sipsin_e($saju) {
     $sipsin_e = [];
     foreach($this->daeun_e  as $k => $v) {
       // 지지의 10성
-      $sipsin_e[$k]= SipSin::cal($manse->get_h('day'), $v, 'e');
+      $sipsin_e[$k]= SipSin::cal($saju->get_h('day'), $v, 'e');
     }
     return $sipsin_e;
   }
 
   // 대운의 지지 12운성 구하기
-  private function woonsung_e($manse) {
+  private function woonsung_e($saju) {
     $woonsung_e = [];
     foreach($this->daeun_e  as $k => $v) {
       // 지지의 12운성
-      $woonsung_e[$k]= Woonsung12::cal($manse->get_h('day'), $v);
+      $woonsung_e[$k]= Woonsung12::cal($saju->get_h('day'), $v);
     }
     return $woonsung_e;
   }
@@ -110,23 +110,23 @@ class DaeWoon
   /**
   * 대운은 10년마다 한번씩 온다.
   */
-  private function daeunAge($manse) { // $lunar_ymd, $birth_time, $direction
+  private function daeunAge($saju) { // $lunar_ymd, $birth_time, $direction
 
     // 절기는 태양력을 기준으로 처리한다.
     // 생월의 절입시간을 구한다.
-    $seasonal_division = $manse->seasonal_division($manse->solar);
+    $seasonal_division = $saju->seasonal_division($saju->solar);
     $enter_sd = $seasonal_division->ccenter; // 절입 (입력된 날짜 기준 이전 절입)
     $next_sd = $seasonal_division->nenter; // 절입 (입력된 날짜 기준 이후 절입)
 
     // 입력된 날짜가 절기와 같은 경우 시간에 따라서 절입이 endter, next에 존재할 수 있으므로 두개를 동시에 비교해 준다.
     $enter_jeolip_ymd = $enter_sd->year.pad_zero($enter_sd->month).pad_zero($enter_sd->day);
     $enter_jeolip_hm = pad_zero($enter_sd->hour).pad_zero($enter_sd->min);
-    $enter_has_jeolip = $manse->solar == $enter_jeolip_ymd ? true : false;
+    $enter_has_jeolip = $saju->solar == $enter_jeolip_ymd ? true : false;
 
     $next_jeolip_ymd = $next_sd->year.pad_zero($next_sd->month).pad_zero($next_sd->day);
     $next_jeolip_hm = pad_zero($next_sd->hour).pad_zero($next_sd->min);
 
-    $next_has_jeolip = $manse->solar == $next_jeolip_ymd ? true : false;
+    $next_has_jeolip = $saju->solar == $next_jeolip_ymd ? true : false;
 
     $has_jeolip = false;
     $jeolip_hm = '';
@@ -140,12 +140,12 @@ class DaeWoon
 
     // 나의 양력 생일이 절입에 포한된 경우 절입시간까지 고려한다.
     if (
-      ($has_jeolip && ($manse->hi < $jeolip_hm) && ($this->direction == 'forward')) ||
-      ($has_jeolip && ($manse->hi > $jeolip_hm) && ($this->direction == 'reverse'))) 
+      ($has_jeolip && ($saju->hi < $jeolip_hm) && ($this->direction == 'forward')) ||
+      ($has_jeolip && ($saju->hi > $jeolip_hm) && ($this->direction == 'reverse'))) 
     {
       $mok = 1;
     } else {
-      $solar_ymd = Carbon::createFromFormat('Ymd', $manse->solar);
+      $solar_ymd = Carbon::createFromFormat('Ymd', $saju->solar);
       if ($this->direction == 'forward') {
         $jeolip_ymd = Carbon::createFromFormat('Ymd', $next_jeolip_ymd);
         $gap = $jeolip_ymd->diffInDays($solar_ymd);;
@@ -160,7 +160,7 @@ class DaeWoon
     }
 
     $age[0] = $mok;
-    $year[0] = substr($manse->solar, 0, 4) + $mok - 1;
+    $year[0] = substr($saju->solar, 0, 4) + $mok - 1;
 
     for($i=1; $i < 10; $i++) {
       $j = $i * 10;

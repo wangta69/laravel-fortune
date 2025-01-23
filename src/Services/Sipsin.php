@@ -31,22 +31,22 @@ class Sipsin
     ]
   ];
 
-  public function withManse($manse) {
+  public function withSaju($saju) {
     $this->hour = (object)[
-      'h' => $this->cal($manse->get_h('day'), $manse->get_h('hour'), 'h'),
-      'e' => $this->cal($manse->get_h('day'), $manse->get_e('hour'), 'e')
+      'h' => $this->cal($saju->get_h('day'), $saju->get_h('hour'), 'h'),
+      'e' => $this->cal($saju->get_h('day'), $saju->get_e('hour'), 'e')
     ];
     $this->day = (object)[
       'h' => '일원',
-      'e' => $this->cal($manse->get_h('day'), $manse->get_e('day'), 'e')
+      'e' => $this->cal($saju->get_h('day'), $saju->get_e('day'), 'e')
     ];
     $this->month = (object)[
-      'h' => $this->cal($manse->get_h('day'), $manse->get_h('month'), 'h'),
-      'e' => $this->cal($manse->get_h('day'), $manse->get_e('month'), 'e')
+      'h' => $this->cal($saju->get_h('day'), $saju->get_h('month'), 'h'),
+      'e' => $this->cal($saju->get_h('day'), $saju->get_e('month'), 'e')
     ];
     $this->year = (object)[
-      'h' => $this->cal($manse->get_h('day'), $manse->get_h('year'), 'h'),
-      'e' => $this->cal($manse->get_h('day'), $manse->get_e('year'), 'e')
+      'h' => $this->cal($saju->get_h('day'), $saju->get_h('year'), 'h'),
+      'e' => $this->cal($saju->get_h('day'), $saju->get_e('year'), 'e')
     ];
     return $this;
   }

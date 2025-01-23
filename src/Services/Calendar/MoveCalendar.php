@@ -3,7 +3,7 @@ namespace Pondol\Fortune\Services\Calendar;
 
 use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 use Pondol\Fortune\Traits\Calendar;
-use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 use Pondol\Fortune\Facades\Lunar;
 // 택일 카렌다 모양 참조 : https://lancer.tistory.com/323
 // http://saju.sajuplus.net/?acmode=b_s&curjong=saju001001&no=41586&page=11&orgcstyle=&cstyle=4
@@ -19,7 +19,7 @@ class MoveCalendar
 
 
   /**
-   * 결혼택일은 본인과 상대방의 manse가 들어가야 한다.
+   * 결혼택일은 본인과 상대방의 saju가 들어가야 한다.
    */
   // public function marrage() {
   //   $this->calMarrageDay($targetdate, $sajuwha, $profile, $p_sajuwha, $p_profile); //
@@ -28,7 +28,7 @@ class MoveCalendar
   /**
    * 이사택일 구하기
    */
-  public function cal($manse, $yyyymm) {
+  public function cal($saju, $yyyymm) {
     
     $this->year = Lunar::to_gabja($yyyymm);
     $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->sajugabja()
@@ -45,33 +45,27 @@ class MoveCalendar
     foreach($calendar->days as $c) {
       if($c->day) {
         $data = new Day;
-        $data->cal($manse, $yyyymm.pad_zero($c->day));
+        $data->cal($saju, $yyyymm.pad_zero($c->day));
         $c->setObject($data);       
       }
     }
     return $calendar->splitPerWeek();
-    // $this->calMoveDay($manse, $yyyymm); //
   }
 
-  /**
-   * @param $yymmdd : 이사일
-   */
-  // public function calMoveDay($manse, $yyyymm) {
-  // }
 }
 
 class Day {
   use t_selectDay;
 
-  public function cal($manse, $yyyymmdd) {
+  public function cal($saju, $yyyymmdd) {
 
-    $now = Manse::refresh()->ymdhi($yyyymmdd)->create();
+    $now = Saju::refresh()->ymdhi($yyyymmdd)->create();
 
     // 1. 이사하는 시기의 나이 구하기
     $selected_year = substr($yyyymmdd, 0, 4);
-    $my_age = $selected_year - substr($manse->solar, 0, 4) + 1 ;
+    $my_age = $selected_year - substr($saju->solar, 0, 4) + 1 ;
 
-    $direction = $this->_direction($my_age, $manse->gender);
+    $direction = $this->_direction($my_age, $saju->gender);
 
     $titles = [];
     $scores = [];
@@ -90,7 +84,7 @@ class Day {
 
     // 생기복덕 구하기
 
-    $senggiBokdukCheneu = $this->_senggiBokdukCheneu($my_age, $manse->gender);
+    $senggiBokdukCheneu = $this->_senggiBokdukCheneu($my_age, $saju->gender);
     if (in_array($now->get_e('day'), $senggiBokdukCheneu['senggi'])) {$titles['senggi'] = '생기'; $scores['sbc'] = 30;}
     if (in_array($now->get_e('day'), $senggiBokdukCheneu['bokduk'])) {$titles['bokduk'] = '복덕'; $scores['sbc'] = 30;}
     if (in_array($now->get_e('day'), $senggiBokdukCheneu['cheneu'])) {$titles['cheneu'] = '천의'; $scores['sbc'] = 30;}

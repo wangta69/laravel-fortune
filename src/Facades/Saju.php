@@ -11,4 +11,11 @@ class Saju extends Facade
   {
     return 'saju';
   }
+
+  public static function refresh()
+  {
+    static::clearResolvedInstance(static::getFacadeAccessor());
+
+    return static::getFacadeRoot();
+  }
 }

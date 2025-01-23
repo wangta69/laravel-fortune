@@ -3,7 +3,7 @@ namespace Pondol\Fortune\Services\Calendar;
 
 use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 use Pondol\Fortune\Traits\Calendar;
-use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 // http://saju.sajuplus.net/?acmode=b_s&curjong=saju001001&no=41586&page=11&orgcstyle=&cstyle=4
 /**
 * 모든 계산법이 이사택일과 같으나 이사택일은 singu_jumsu  가 결혼택일은 dae_jumsu 가 마지막에 드러간다.
@@ -17,7 +17,7 @@ class MarriageCalendar
 
 
   /**
-   * 결혼택일은 본인과 상대방의 manse가 들어가야 한다.
+   * 결혼택일은 본인과 상대방의 saju 들어가야 한다.
    */
   // public function marrage() {
   //   $this->calMarrageDay($targetdate, $sajuwha, $profile, $p_sajuwha, $p_profile); //
@@ -25,10 +25,10 @@ class MarriageCalendar
 
   /**
    * 결혼택일 구하기
-   * @params Object $manse : 본인의 사주
-   * @parmas Object $p_manse : 상대의 사주
+   * @params Object $saju : 본인의 사주
+   * @parmas Object $p_saju : 상대의 사주
    */
-  public function cal($manse, $p_manse, $yyyymm) {
+  public function cal($saju, $p_saju, $yyyymm) {
     
     // Calendar._create
     $calendar = $this->_create($yyyymm);
@@ -36,33 +36,29 @@ class MarriageCalendar
     foreach($calendar->days as $c) {
       if($c->day) {
         $data = new Day;
-        $data->cal($manse, $p_manse, $yyyymm.pad_zero($c->day));
+        $data->cal($saju, $p_saju, $yyyymm.pad_zero($c->day));
         $c->setObject($data);       
       }
     }
     return $calendar->splitPerWeek();
-    // $this->calMoveDay($manse, $yyyymm); //
+
   }
 
-  /**
-   * @param $yymmdd : 이사일
-   */
-  // public function calMoveDay($manse, $yyyymm) {
-  // }
+
 }
 
 class Day {
   use t_selectDay;
 
-  public function cal($manse, $p_manse, $yyyymmdd) {
+  public function cal($saju, $p_saju, $yyyymmdd) {
 
-    $now = Manse::refresh()->ymdhi($yyyymmdd)->create();
+    $now = Saju::refresh()->ymdhi($yyyymmdd)->create();
 
     // 1. 이사하는 시기의 나이 구하기
     $selected_year = substr($yyyymmdd, 0, 4);
-    $my_age = $selected_year - $manse->solar + 1 ;
+    $my_age = $selected_year - $saju->solar + 1 ;
 
-    $direction = $this->_direction($my_age, $manse->gender);
+    $direction = $this->_direction($my_age, $saju->gender);
 
     $titles = [];
     $scores = [];
@@ -81,7 +77,7 @@ class Day {
 
     // 생기복덕 구하기
 
-    $senggiBokdukCheneu = $this->_senggiBokdukCheneu($my_age, $manse->gender);
+    $senggiBokdukCheneu = $this->_senggiBokdukCheneu($my_age, $saju->gender);
     if (in_array($now->get_e('day'), $senggiBokdukCheneu['senggi'])) {$titles['senggi'] = '생기'; $scores['sbc'] = 30;}
     if (in_array($now->get_e('day'), $senggiBokdukCheneu['bokduk'])) {$titles['bokduk'] = '복덕'; $scores['sbc'] = 30;}
     if (in_array($now->get_e('day'), $senggiBokdukCheneu['cheneu'])) {$titles['cheneu'] = '천의'; $scores['sbc'] = 30;}
@@ -174,12 +170,12 @@ class Day {
 
 
     //(결혼) 대리월 방모씨 방옹고 방녀부모 방부주 방녀신
-    if ($manse->gender == 'M') {
-      $choice_year_e = $p_manse->get_e('year');
+    if ($saju->gender == 'M') {
+      $choice_year_e = $saju->get_e('year');
     }else{
-      $choice_year_e = $manse->get_e('year');
+      $choice_year_e = $saju->get_e('year');
     }
-    $this->_dae($choice_year_e, $manse->get_e('month'), $titles, $scores);
+    $this->_dae($choice_year_e, $saju->get_e('month'), $titles, $scores);
 
     // 축음양불장길일
     $this->_chuk($now->get_e('month'), $now->get_he('day'), $titles, $scores);

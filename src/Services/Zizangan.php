@@ -30,11 +30,11 @@ class Zizangan
   ];
 
 
-  public function withManse($manse) {
-    $this->hour = $this->cal($this->zizangan[$manse->get_e('hour')],  $manse->get_h('day'));
-    $this->day = $this->cal($this->zizangan[$manse->get_e('day')], $manse->get_h('day'));
-    $this->month = $this->cal($this->zizangan[$manse->get_e('month')], $manse->get_h('day'));
-    $this->year = $this->cal($this->zizangan[$manse->get_e('year')], $manse->get_h('day'));
+  public function withSaju($saju) {
+    $this->hour = $this->cal($this->zizangan[$saju->get_e('hour')],  $saju->get_h('day'));
+    $this->day = $this->cal($this->zizangan[$saju->get_e('day')], $saju->get_h('day'));
+    $this->month = $this->cal($this->zizangan[$saju->get_e('month')], $saju->get_h('day'));
+    $this->year = $this->cal($this->zizangan[$saju->get_e('year')], $saju->get_h('day'));
     return $this;
   }
 

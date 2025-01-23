@@ -2,8 +2,7 @@
 namespace Pondol\Fortune\Services\Calendar;
 use Carbon\Carbon;
 use Pondol\Fortune\Facades\Lunar;
-use Pondol\Fortune\Facades\Manse;
-// use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 
 /**
  * 12실살을 제외한 기타 길신 및 흉신 구하기
@@ -34,17 +33,17 @@ class Calendar
   /**
    * 월별 이사택일
    */
-  public function moveCalendar($manse, $yyyymm) {
+  public function moveCalendar($saju, $yyyymm) {
     $moveCalendar = new MoveCalendar;
-    return $moveCalendar->cal($manse, $yyyymm);
+    return $moveCalendar->cal($saju, $yyyymm);
   }
 
   /**
    * 월별 결혼 택일
    */
-  public function marriage($manse, $p_manse, $yyyymm) {
+  public function marriage($saju, $p_saju, $yyyymm) {
     $marriageCalendar = new MarriageCalendar;
-    return $marriageCalendar->cal($manse, $p_manse, $yyyymm);
+    return $marriageCalendar->cal($saju, $p_saju, $yyyymm);
   }
   
   /**

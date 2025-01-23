@@ -13,15 +13,15 @@ class Oheng
   public $hour_h;
   public $hour_e;
  
-  public function withManse($manse) {
-    $this->year_h = $this->oheng($manse->get_h('year'));
-    $this->year_e = $this->oheng($manse->get_e('year'));
-    $this->month_h = $this->oheng($manse->get_h('month'));
-    $this->month_e = $this->oheng($manse->get_e('month'));
-    $this->day_h = $this->oheng($manse->get_h('day'));
-    $this->day_e = $this->oheng($manse->get_e('day'));
-    $this->hour_h = $this->oheng($manse->get_h('hour'));
-    $this->hour_e = $this->oheng($manse->get_e('hour'));
+  public function withSaju($saju) {
+    $this->year_h = $this->oheng($saju->get_h('year'));
+    $this->year_e = $this->oheng($saju->get_e('year'));
+    $this->month_h = $this->oheng($saju->get_h('month'));
+    $this->month_e = $this->oheng($saju->get_e('month'));
+    $this->day_h = $this->oheng($saju->get_h('day'));
+    $this->day_e = $this->oheng($saju->get_e('day'));
+    $this->hour_h = $this->oheng($saju->get_h('hour'));
+    $this->hour_e = $this->oheng($saju->get_e('hour'));
 
     return $this;
   }

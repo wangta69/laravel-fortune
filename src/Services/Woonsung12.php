@@ -29,11 +29,11 @@ class Woonsung12
     '癸' => ['건록', '관대', '목욕', '장생', '양', '태', '절', '묘', '사', '병', '쇠', '제왕'] // 계
   ];
  
-  public function withManse($manse) {
-    $this->hour_e = self::cal($manse->get_h('day'), $manse->get_e('hour'));
-    $this->day_e = self::cal($manse->get_h('day'), $manse->get_e('day'));
-    $this->month_e = self::cal($manse->get_h('day'), $manse->get_e('month'));
-    $this->year_e = self::cal($manse->get_h('day'), $manse->get_e('year'));
+  public function withSaju($saju) {
+    $this->hour_e = self::cal($saju->get_h('day'), $saju->get_e('hour'));
+    $this->day_e = self::cal($saju->get_h('day'), $saju->get_e('day'));
+    $this->month_e = self::cal($saju->get_h('day'), $saju->get_e('month'));
+    $this->year_e = self::cal($saju->get_h('day'), $saju->get_e('year'));
     return $this;
   }
 

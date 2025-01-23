@@ -16,11 +16,11 @@ class Sinsal12
   public $day_e;
   public $hour_e;
  
-  public function withManse($manse) {
-    $this->hour_e = $this->cal($manse->get_e('year'), $manse->get_e('hour'));
-    $this->day_e = $this->cal($manse->get_e('year'), $manse->get_e('day'));
-    $this->month_e = $this->cal($manse->get_e('year'), $manse->get_e('month'));
-    $this->year_e = $this->cal($manse->get_e('year'), $manse->get_e('year'));
+  public function withSaju($saju) {
+    $this->hour_e = $this->cal($saju->get_e('year'), $saju->get_e('hour'));
+    $this->day_e = $this->cal($saju->get_e('year'), $saju->get_e('day'));
+    $this->month_e = $this->cal($saju->get_e('year'), $saju->get_e('month'));
+    $this->year_e = $this->cal($saju->get_e('year'), $saju->get_e('year'));
 
     return $this;
   }

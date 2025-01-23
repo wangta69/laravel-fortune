@@ -1,7 +1,7 @@
 <?php
 namespace Pondol\Fortune\Http\Controllers;
 
-use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 use App\Http\Controllers\Controller;
 
 class TojungController extends Controller
@@ -14,9 +14,9 @@ class TojungController extends Controller
    * @param String $sl : solar | lunar
    */
   public function create($ymdhi, $sl='solar', $leap=false) {
-    $manse = Manse::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(function($jakque){
+    $saju = Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(function($jakque){
       $jakque->set_year(date('Y'));
     });
-    return response()->json($manse, 200, [], JSON_UNESCAPED_UNICODE);
+    return response()->json($saju, 200, [], JSON_UNESCAPED_UNICODE);
   }
 }

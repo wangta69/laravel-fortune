@@ -23,9 +23,11 @@ class Season24Calendar
       $j = substr('0'+ ($i+1), -2);
       $j = pad_zero($i+1, 2);
       $season = Lunar::seasonal_division($year.$j.'01')->create();
+
+      // print_r($season);
       foreach($season->seasons as $v) {
-        if(!in_array($v, $season24) && $v->year == $year) {
-          $season24[$v->name] = $v;
+        if(!in_array($v, $season24)) { //  && $v->year == $year
+          $season24[$v->name->ko] = $v;
         }
       }
     }

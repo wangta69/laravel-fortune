@@ -184,7 +184,6 @@ Class Lunar_API {
     $year = (int) $year;
     $month = (int) $month;
     $day = (int) $day;
-    // echo 'disptimeday:'.$year.', '.$month.', '.$day.PHP_EOL;
     $e = $i = 0;
 
     for ( $i=1; $i<$month; $i++ ) {

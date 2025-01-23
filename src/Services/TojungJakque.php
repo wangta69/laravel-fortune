@@ -2,7 +2,7 @@
 // 작괘 구하기
 namespace Pondol\Fortune\Services;
 use Pondol\Fortune\Facades\Lunar;
-use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 
 
 class TojungJakque
@@ -44,7 +44,7 @@ class TojungJakque
 
 
     // 오늘의 만세력을 구한다. 입춘을 기준으로 띠가 변경되므로 대략 3월을 올해의 기준점으로 잡는다.
-    // $this->now = Manse::refresh()->ymdhi(date('Y').'0301')->create();
+    // $this->now = Saju::refresh()->ymdhi(date('Y').'0301')->create();
     // $this->now_lunar_year = substr($this->now->lunar, 0, 4);
 
     // 올해(토정비결을 보는해)의 년도에  음력생월일을 대입하여 올해생월일에 대햔 만세력을 구한다.
@@ -52,7 +52,7 @@ class TojungJakque
     // $this_year_ymd = $this->now_year.substr($manse->lunar, 4, 2).substr($manse->lunar, 6, 2);
     $this_year_ymd = $this->now_year.'-'.$month.'-'.$day;
 
-    $this->now = Manse::refresh()->ymdhi($this_year_ymd)->sl('lunar')->create();
+    $this->now = Saju::refresh()->ymdhi($this_year_ymd)->sl('lunar')->create();
     // print_r($this->now);
 
     ## 상괘 

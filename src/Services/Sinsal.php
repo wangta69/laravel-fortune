@@ -1,6 +1,6 @@
 <?php
 namespace Pondol\Fortune\Services;
-use Pondol\Fortune\Facades\Manse;
+use Pondol\Fortune\Facades\Saju;
 // 귀인 뜻 풀이 참조 : https://blog.naver.com/ahendufrhd/223059645477
  /**
    * 12실살을 제외한 기타 길신 및 흉신 구하기
@@ -72,20 +72,20 @@ class Sinsal
 
   private $gender, $hour, $day, $month, $year, $hour_h, $day_h, $month_h, $year_h, $hour_e, $day_e, $month_e, $year_e;
 
-  public function withManse($manse) {
-    $this->hour = $manse->hour->ch;
-    $this->day = $manse->day->ch;
-    $this->month = $manse->month->ch;
-    $this->year = $manse->year->ch;
-    $this->hour_h = $manse->get_h('hour');
-    $this->day_h = $manse->get_h('day');
-    $this->month_h = $manse->get_h('month');
-    $this->year_h = $manse->get_h('year');
-    $this->hour_e = $manse->get_e('hour');
-    $this->day_e = $manse->get_e('day');
-    $this->month_e = $manse->get_e('month');
-    $this->year_e = $manse->get_e('year');
-    $this->gender = $manse->gender;
+  public function withSaju($saju) {
+    $this->hour = $saju->hour->ch;
+    $this->day = $saju->day->ch;
+    $this->month = $saju->month->ch;
+    $this->year = $saju->year->ch;
+    $this->hour_h = $saju->get_h('hour');
+    $this->day_h = $saju->get_h('day');
+    $this->month_h = $saju->get_h('month');
+    $this->year_h = $saju->get_h('year');
+    $this->hour_e = $saju->get_e('hour');
+    $this->day_e = $saju->get_e('day');
+    $this->month_e = $saju->get_e('month');
+    $this->year_e = $saju->get_e('year');
+    $this->gender = $saju->gender;
 
     return $this;
   }
@@ -960,7 +960,7 @@ class Sinsal
 
   public function gongmangsal() {
     // 오늘의 만세력을 구한다.
-    $now = Manse::refresh()->ymdhi(date('YmdHi'))->create();
+    $now = Saju::refresh()->ymdhi(date('YmdHi'))->create();
 
     $this->gongmangsal['y'] = $this->calGongmangsal($this->year_h, $this->year_e, $now->get_e('year'));
     $this->gongmangsal['m'] = $this->calGongmangsal($this->month_h, $this->month_e, $now->get_e('month'));
