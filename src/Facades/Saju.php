@@ -6,16 +6,16 @@ use Illuminate\Support\Facades\Facade;
 class Saju extends Facade
 {
 
-  protected static $cached = false;
+  // protected static $cached = false;
   protected static function getFacadeAccessor()
   {
     return 'saju';
   }
 
-  public static function refresh()
-  {
-    static::clearResolvedInstance(static::getFacadeAccessor());
+  // public static function refresh()
+  // {
+  //   static::clearResolvedInstance(static::getFacadeAccessor());
 
-    return static::getFacadeRoot();
-  }
+  //   return static::getFacadeRoot();
+  // }
 }
