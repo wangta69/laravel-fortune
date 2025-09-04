@@ -6,6 +6,22 @@
 composer require wangta69/laravel-fortune
 ```
 
+## 세팅
+> 라라벨 7.x 이하이면 아래와 같이 config/app.php 에 등록 하여야 합니다.
+```
+'providers' => [
+    // ...
+    Pondol\Fortune\FortuneServiceProvider::class,
+];
+'aliases' => [
+    // ...
+    'Saju' => Pondol\Fortune\Facades\Saju::class,
+    'Lunar' => Pondol\Fortune\Facades\Lunar::class,
+    'Calendar' => Pondol\Fortune\Facades\Calendar::class,
+    'JamiDusu' => Pondol\Fortune\Facades\JamiDusu::class,
+];
+```
+
 
 ## 만세력  
 
@@ -218,6 +234,7 @@ $jamidusu = $this->jamidusuSvc->getdefaultData($saju->gender, $saju->lunar, $saj
 // 명궁
 $myung = $this->jamidusuSvc->jusungMyung($jamidusu);
 
+
 // 형제궁
 $hyungjae = $this->jamidusuSvc->jusungHyungjae($jamidusu);
 
@@ -251,4 +268,12 @@ $bokduk = $this->jamidusuSvc->jusungBokduk($jamidusu);
 
 // 부모궁
 $bumo = $this->jamidusuSvc->jusungBumo($jamidusu);
+```
+```
+// 각각의 결과로는 아래처럼 출력된다.
+stdClass Object
+(
+    [gung] => 亥
+    [jusung14] => 태양
+)
 ```

@@ -960,7 +960,7 @@ class Sinsal
 
   public function gongmangsal() {
     // 오늘의 만세력을 구한다.
-    $now = Saju::refresh()->ymdhi(date('YmdHi'))->create();
+    $now = Saju::ymdhi(date('YmdHi'))->create();
 
     $this->gongmangsal['y'] = $this->calGongmangsal($this->year_h, $this->year_e, $now->get_e('year'));
     $this->gongmangsal['m'] = $this->calGongmangsal($this->month_h, $this->month_e, $now->get_e('month'));

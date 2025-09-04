@@ -59,7 +59,7 @@ class Day {
 
   public function cal($saju, $yyyymmdd) {
 
-    $now = Saju::refresh()->ymdhi($yyyymmdd)->create();
+    $now = Saju::ymdhi($yyyymmdd)->create();
 
     // 1. 이사하는 시기의 나이 구하기
     $selected_year = substr($yyyymmdd, 0, 4);
