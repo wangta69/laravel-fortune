@@ -208,6 +208,19 @@ if (!function_exists('korean_age')) {
   }
 }
 
+/**
+ * 현재 나누는 값보다 클경우는 나누고 아니면 입력값을 입력
+ * 모드를 사용할 경우 0이 나오는 것을 피하기 위해
+ */
+// mod 를 보정하여 값 넘기기
+if (!function_exists('correctMod')) {
+function correctMod($mod, $number) {
+  $result = $number % $mod;
+  $result = $result ? $result : $mod;
+  return $result;
+}
+}
+
 
   // function array_rotate($array, $distance = 1) {
   //   settype($array, 'array');

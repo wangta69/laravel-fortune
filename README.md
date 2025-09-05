@@ -22,6 +22,13 @@ composer require wangta69/laravel-fortune
 ];
 ```
 
+## 데이타
+데이타는 별도 제공하지 않으며 만약 데이타가 필요하시면 wangta69@naver.com으로 문의 주시기 바랍니다.<br>
+참조사이트 : saju.onstory.fun
+### 데이타 베이스 목록
+- 토정비결
+- 당사주(초년운, 중년운, 말년운, 평생총운, 수명)
+
 
 ## 만세력  
 
@@ -168,20 +175,7 @@ $saju->zizangan();
 ->saewoon(); // 세운
 ```
 
-## 토정비결 작괘
-### Facades
-```
-use Pondol\Fortune\Facades\Saju;
-..........
-Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(); // default 당해년
-Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->>jakque(function($jakque){
-  $jakque->set_year('2025');
-}); // 특정년을 넣을 경우
-```
-> 결과
-```
-"jakque":{"que":[8,6,3],"total":"863"}
-```
+
 ## 카렌다
 ### 음력달력
 #### API
@@ -220,6 +214,39 @@ use Pondol\Fortune\Facades\Calendar;
 $samjae = Calendar::samjae($yyyy);
 ```
 
+## 토정비결 작괘
+### Facades
+```
+use Pondol\Fortune\Facades\Saju;
+..........
+Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(); // default 당해년
+Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->>jakque(function($jakque){
+  $jakque->set_year('2025');
+}); // 특정년을 넣을 경우
+```
+> 결과
+```
+"jakque":{"que":[8,6,3],"total":"863"}
+```
+
+## 당사주
+### Facades
+```
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Facades\DangSaju;
+..........
+$saju = Saju::ymdhi('200001011200')->sl('solar')->leap(false)->create();
+$star =  $this->dangsajuSvc->getDangSajuStars($saju->get_e('year'), $saju->get_e('hour'), $saju->lunar);
+```
+> 결과
+```
+(
+    [year] => 천귀
+    [month] => 천인
+    [day] => 천파
+    [hour] => 천예
+)
+```
 
 ## 자미두수
 ```

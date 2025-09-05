@@ -102,7 +102,7 @@ Class Lunar extends Lunar_API {
           list (, $y, $m, $d) = $match;
         } 
         else {
-          echo "error 1";
+          throw new \InvalidArgumentException('잘못된 날짜 형식입니다: ' . $v);
          // return false;
         }
       }
@@ -328,11 +328,22 @@ Class Lunar extends Lunar_API {
     //   );
     // }
 
-    if ( is_float ($v) ) {
-      list ($Z, $F) = preg_split ('/\./', $v);
+    if (is_float($v)) {
+      // float를 소수점 이하까지 포함하는 문자열로 명시적으로 변환합니다.
+      $v_str = (string)$v; 
+      
+      // '.' 문자를 기준으로 자릅니다.
+      $parts = explode('.', $v_str);
+      
+      // 정수 부분은 항상 존재합니다.
+      $Z = $parts[0];
+      
+      // 소수점 이하 부분이 있는지 확인하고, 있으면 할당하고 없으면 0을 할당합니다.
+      $F = isset($parts[1]) ? $parts[1] : 0;
+
     } else {
-      $Z = $v;
-      $F = 0;
+        $Z = $v;
+        $F = 0;
     }
 
     if ( $v < 2299161 )

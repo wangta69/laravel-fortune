@@ -10,6 +10,7 @@ use Pondol\Fortune\Services\LunarSolar\Lunar;
 use Pondol\Fortune\Services\Saju;
 use Pondol\Fortune\Services\Calendar\Calendar;
 use Pondol\Fortune\Services\JamiDusu; // use 문 추가
+use Pondol\Fortune\Services\DangSaju; // use 문 추가
 
 class FortuneServiceProvider extends ServiceProvider {
 
@@ -35,8 +36,12 @@ class FortuneServiceProvider extends ServiceProvider {
     $this->app->bind('saju', function () {
       return new Saju();
     });
+
+    $this->app->bind('dangsaju', function () {
+      return new DangSaju();
+    });
     
-     $this->app->bind('jamidusu', function () {
+    $this->app->bind('jamidusu', function () {
       return new JamiDusu();
     });
 
