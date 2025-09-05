@@ -33,8 +33,13 @@ class Saju {
         list (, $ymd, $hi) = $match;
         $this->hi = $hi;
         break;
+      default: // 8자리나 12자리가 아닌 모든 경우를 처리
+        throw new \Exception("Invalid date length. Expected 8 or 12 characters, but got " . $len);
     }
     preg_match ('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', trim ($ymd), $match);
+    if (count($match) < 4) { // preg_match가 실패한 경우에 대한 방어 코드
+      throw new \Exception("Failed to parse ymd: " . $ymd);
+    }
     list (, $y, $m, $d) = $match;
     $this->ymd = $y.'-'.$m.'-'.$d;
 

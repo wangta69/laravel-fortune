@@ -250,51 +250,55 @@ $star =  $this->dangsajuSvc->getDangSajuStars($saju->get_e('year'), $saju->get_e
 
 ## 자미두수
 ```
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Facades\JamiDusu;
+
+......
 $saju = Saju::ymdhi($profile->birth_ym)->sl($profile->sl)->leap($profile->flat_moon)->create();
 $today = Saju::ymdhi(date('YmdHi'))->sl('solar')->create();
 
-$myungban = $this->jamidusuSvc->myungbanData($saju, $today);
+$myungban = JamiDusu::myungbanData($saju, $today);
 
 // 자미두수 기본 데이터
-$jamidusu = $this->jamidusuSvc->getdefaultData($saju->gender, $saju->lunar, $saju->get_h('year'), $saju->get_e('hour'));
+$jamidusu = JamiDusu::getdefaultData($saju->gender, $saju->lunar, $saju->get_h('year'), $saju->get_e('hour'));
 
 // 명궁
-$myung = $this->jamidusuSvc->jusungMyung($jamidusu);
+$myung = JamiDusu::jusungMyung($jamidusu);
 
 
 // 형제궁
-$hyungjae = $this->jamidusuSvc->jusungHyungjae($jamidusu);
+$hyungjae = JamiDusu::jusungHyungjae($jamidusu);
 
 // 부부궁
-$bubu = $this->jamidusuSvc->jusungBubu($jamidusu);
+$bubu = JamiDusu::jusungBubu($jamidusu);
 
 // 자녀궁
-$janyeo = $this->jamidusuSvc->jusungJanyeo($jamidusu);
+$janyeo = JamiDusu::jusungJanyeo($jamidusu);
 
 // 재백궁
-$jaebaek = $this->jamidusuSvc->jusungJaebaek($jamidusu);
+$jaebaek = JamiDusu::jusungJaebaek($jamidusu);
 
 // 질액궁
-$jilaek = $this->jamidusuSvc->jusungJilaek($jamidusu);
+$jilaek = JamiDusu::jusungJilaek($jamidusu);
 
 // 천이궁
-$chene = $this->jamidusuSvc->jusungChene($jamidusu);
+$chene = JamiDusu::jusungChene($jamidusu);
 
 
 // 노복궁
-$nobok = $this->jamidusuSvc->jusungNobok($jamidusu);
+$nobok = JamiDusu::jusungNobok($jamidusu);
 
 // 관록궁
-$guanrok = $this->jamidusuSvc->jusungGuanrok($jamidusu);
+$guanrok = JamiDusu::jusungGuanrok($jamidusu);
 
 // 전택궁
-$jeuntaek = $this->jamidusuSvc->jusungJeuntaek($jamidusu);
+$jeuntaek = JamiDusu::jusungJeuntaek($jamidusu);
 
 // 복덕궁
-$bokduk = $this->jamidusuSvc->jusungBokduk($jamidusu);
+$bokduk = JamiDusu::jusungBokduk($jamidusu);
 
 // 부모궁
-$bumo = $this->jamidusuSvc->jusungBumo($jamidusu);
+$bumo = JamiDusu::jusungBumo($jamidusu);
 ```
 ```
 // 각각의 결과로는 아래처럼 출력된다.

@@ -803,19 +803,27 @@ Class Lunar extends Lunar_API {
   public function tosolar ($leap = false) {
     $this->leap = $leap;
      $this->lunar = $this->regdate ([$this->year, $this->month, $this->day]);
-      $r = $this->lunartosolar ($this->year, $this->month, $this->day, $this->leap);
-      $this->solar = $this->regdate ($r);
+    $r = $this->lunartosolar ($this->year, $this->month, $this->day, $this->leap);
 
-      list ($year, $month, $day) = $r;
+    if (!is_array($r) || count($r) < 3) {
+      // 문제가 발생했을 때, 어떤 날짜 때문에 문제가 생겼는지 명확히 알 수 있도록 예외를 발생시킴
+      throw new \Exception(
+        "lunartosolar() returned incomplete data for date: {$this->year}-{$this->month}-{$this->day}"
+      );
+    }
 
-      $w = $this->getweekday ($year, $month, $day);
+    $this->solar = $this->regdate ($r);
 
-      $jdate = $this->cal2jd ($r);
-      //$julian = $this->gregorian2julian ($r);
-      $julian = $this->gregorian2julian ($jdate);
-      $jfmt = $julian->fmt;
-      $gfmt = $this->regdate ($r);
-      $fmt = ($jdate < 2299161) ? $jfmt : $gfmt;
+    list ($year, $month, $day) = $r;
+
+    $w = $this->getweekday ($year, $month, $day);
+
+    $jdate = $this->cal2jd ($r);
+    //$julian = $this->gregorian2julian ($r);
+    $julian = $this->gregorian2julian ($jdate);
+    $jfmt = $julian->fmt;
+    $gfmt = $this->regdate ($r);
+    $fmt = ($jdate < 2299161) ? $jfmt : $gfmt;
     // }
 
 
@@ -862,7 +870,7 @@ Class Lunar extends Lunar_API {
    *     - 1582년 10월 15일 이전의 날자는 율리우스력의 날자로 취급함.
    *  @param string hhmm (시간 및 분)
    */
-  /*
+
   public function gabja ($v = null, $hm = null) {
 
     list ($y, $m, $d) = $this->toargs ($v);
@@ -892,7 +900,7 @@ Class Lunar extends Lunar_API {
     );
 
   }
-  */
+
   /**
    * 시분 세팅
    */

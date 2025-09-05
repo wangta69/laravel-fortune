@@ -856,9 +856,18 @@ Class Lunar_API {
    * @param int 일
    */
   protected function solartolunar ($solyear, $solmon, $solday) {
+    $lunarFirstData = $this->getlunarfirst($solyear, $solmon, $solday);
+
+    if (!is_array($lunarFirstData) || count($lunarFirstData) < 15) {
+        // 문제가 발생했을 때, 어떤 날짜 때문에 문제가 생겼는지 명확히 알 수 있도록 예외를 발생시킴
+        throw new \Exception(
+            "getlunarfirst() returned incomplete data for date: {$solyear}-{$solmon}-{$solday}"
+        );
+    }
+
     list ($smoyear, $smomonth, $smoday, $smohour, $smomin,
       $y0, $mo0, $d0, $h0, $mi0, $y1, $mo1, $d1, $h1, $mi1)
-      = $this->getlunarfirst ($solyear, $solmon, $solday);
+      = $lunarFirstData;
 
     $lday = $this->disp2days ($solyear, $solmon, $solday, $smoyear, $smomonth, $smoday)+1;
 
@@ -971,23 +980,39 @@ Class Lunar_API {
    * @param bool 음력 윤달 여부
    */
   protected function lunartosolar ($lyear, $lmonth, $lday, $leap = false) {
+
+    $solortoso24_data = $this->solortoso24 ($lyear,2,15,0,0);
+    if (!is_array($solortoso24_data) || count($solortoso24_data) < 18) {
+      throw new \Exception("solortoso24() returned incomplete data.");
+    }
+
     list ($inginame, $ingiyear, $ingimonth, $ingiday, $ingihour, $ingimin,
       $midname, $midyear, $midmonth, $midday, $midhour, $midmin,
       $outginame, $outgiyear, $outgimonth, $outgiday, $outgihour, $outgimin)
-      = $this->solortoso24 ($lyear,2,15,0,0);
+      = $solortoso24_data;
 
     $midname = $lmonth * 2 - 1 ;
     $tmin = $this->season_24_interval[$midname] * -1;
     list ($midyear, $midmonth, $midday, $midhour, $midmin) 
       = $this->getdatebymin ($tmin, $ingiyear, $ingimonth, $ingiday, $ingihour, $ingimin);
 
+    $getlunarfirst_data = $this->getlunarfirst ($midyear, $midmonth, $midday);
+    if (!is_array($getlunarfirst_data) || count($getlunarfirst_data) < 15) {
+        throw new \Exception("getlunarfirst() [call 1] returned incomplete data for date: {$midyear}-{$midmonth}-{$midday}");
+    }
+
     list ( $outgiyear, $outgimonth, $outgiday, $hour, $min,
       $yearm, $monthm1, $daym, $hourm, $minm,
       $year1, $month1, $day1, $hour1, $min1 )
-      = $this->getlunarfirst ($midyear, $midmonth, $midday);
+      = $getlunarfirst_data;
 
+    $solartolunar_data1 = $this->solartolunar ($outgiyear, $outgimonth, $outgiday);
+    if (!is_array($solartolunar_data1) || count($solartolunar_data1) < 5) {
+        throw new \Exception("solartolunar() [call 1] returned incomplete data for date: {$outgiyear}-{$outgimonth}-{$outgiday}");
+    }
+    
     list ($lyear2, $lmonth2, $lday2, $lnp, $lnp2) 
-      = $this->solartolunar ($outgiyear, $outgimonth, $outgiday);
+      = $solartolunar_data1;
 
     if ( $lyear2 == $lyear && $lmonth == $lmonth2 ) {
       // 평달, 윤달
@@ -997,8 +1022,13 @@ Class Lunar_API {
 
 
       if ( $leap ) {
+        $solartolunar_data2 = $this->solartolunar ($year1, $month1, $day1);
+        if (!is_array($solartolunar_data2) || count($solartolunar_data2) < 5) {
+            throw new \Exception("solartolunar() [call 2] returned incomplete data for date: {$year1}-{$month1}-{$day1}");
+        }
+
         list ($lyear2, $lmonth2, $lday2, $lnp, $lnp2)
-          = $this->solartolunar ($year1, $month1, $day1);
+          = $solartolunar_data2;
         if ( $lyear2==$lyear && $lmonth==$lmonth2 ) {
           $tmin = -1440 * $lday + 10;
           list ($syear, $smonth, $sday, $hour, $min)
@@ -1007,6 +1037,11 @@ Class Lunar_API {
       }
     } else {
       // ㅈ우기가 두번든 달의 전후
+      $solartolunar_data3 = $this->solartolunar ($year1, $month1, $day1);
+      if (!is_array($solartolunar_data3) || count($solartolunar_data3) < 5) {
+          throw new \Exception("solartolunar() [call 3] returned incomplete data for date: {$year1}-{$month1}-{$day1}");
+      }
+
       list ($lyear2, $lmonth2, $lday2, $lnp, $lnp2)
         = $this->solartolunar ($year1, $month1, $day1);
       if ( $lyear2 == $lyear && $lmonth == $lmonth2 ) {
