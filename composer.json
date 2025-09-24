@@ -1,7 +1,15 @@
 {
   "name": "wangta69/laravel-fortune",
   "description": "사주에 관한 laravel package",
-	"keywords": ["laravel", "사주", "토정비결", "만세력", "자미두수"],
+  "keywords": [
+    "laravel",
+    "사주",
+    "토정비결",
+    "만세력",
+    "자미두수",
+    "당사주",
+    "주역"
+  ],
   "homepage": "https://www.onstory.fun/packages/laravel-saju",
   "license": "MIT",
   "authors": [
@@ -17,9 +25,9 @@
   },
   "autoload": {
     "files": [
-        "src/Helper/constants.php",
-        "src/Helper/helpers.php"
-      ],
+      "src/Helper/constants.php",
+      "src/Helper/helpers.php"
+    ],
     "psr-4": {
       "Pondol\\Fortune\\": "src/"
     }
@@ -32,7 +40,9 @@
       "aliases": {
         "Saju": "Pondol\\Fortune\\Facades\\Saju",
         "Lunar": "Pondol\\Fortune\\Facades\\Lunar",
-        "JamiDusu": "Pondol\\Fortune\\Facades\\JamiDusu"
+        "JamiDusu": "Pondol\\Fortune\\Facades\\JamiDusu",
+        "DangSaju": "Pondol\\Fortune\\Facades\\DangSaju",
+        "Juyeok": "Pondol\\Fortune\\Facades\\Juyeok"
       }
     }
   }

@@ -90,7 +90,7 @@ class Sinsal
     return $this;
   }
 
-  public function goodbadsin() {
+  public function sinsal() {
     // 길신
     $this->cheneul(); // 천을귀인
     $this->taeguk(); // 태극귀인

@@ -9,8 +9,9 @@ use Illuminate\Support\ServiceProvider;
 use Pondol\Fortune\Services\LunarSolar\Lunar;
 use Pondol\Fortune\Services\Saju;
 use Pondol\Fortune\Services\Calendar\Calendar;
-use Pondol\Fortune\Services\JamiDusu; // use 문 추가
-use Pondol\Fortune\Services\DangSaju; // use 문 추가
+use Pondol\Fortune\Services\JamiDusu;
+use Pondol\Fortune\Services\DangSaju;
+use Pondol\Fortune\Services\Juyeok;
 
 class FortuneServiceProvider extends ServiceProvider {
 
@@ -43,6 +44,10 @@ class FortuneServiceProvider extends ServiceProvider {
     
     $this->app->bind('jamidusu', function () {
       return new JamiDusu();
+    });
+
+    $this->app->bind('juyeok', function () {
+      return new Juyeok();
     });
 
     $this->app->singleton('calendar', function () {

@@ -46,6 +46,12 @@ class Saju {
     return $this;
   }
 
+  public function ymd($ymd) {
+    return $this->ymdhi($ymd);
+  }
+
+  
+
   /**
    * 양|음력
    * @param String $sl : solar | lunar
@@ -108,11 +114,23 @@ class Saju {
     return mb_substr($this->{$str}->ch, 0, 1);
   }
 
+   public function get_h_serial($str) {
+    return $this->h_to_serial($this->get_h($str));
+  }
+
   /**
    * 만세에서 지지 가져오기
    */
   public function get_e($str) {
     return mb_substr($this->{$str}->ch, 1, 1);
+  }
+
+  public function get_e_serial($str) {
+    return $this->e_to_serial($this->get_e($str));
+  }
+
+  public function get_e_wolgun($str) {
+    return $this->e_to_wolgun($this->get_e($str));
   }
 
   /**
@@ -169,14 +187,15 @@ class Saju {
     return $this;
   }
 
+  
 
   /**
    * 길신/흉신 구하기
    * 위의 신살 구하기에서 결과를 받아와서 년월일시로 배열을 재정리
    */
-  public function goodbadsin() {
+  public function sinsal() {
     $sinsal = new Sinsal();
-    $this->goodbadsin = $sinsal->withSaju($this)->goodbadsin()->create();
+    $this->sinsal = $sinsal->withSaju($this)->sinsal()->create();
     return $this;
   }
 
@@ -210,4 +229,72 @@ class Saju {
     $this->jakque = $jakque->create($this);
     return $this;
   }
+
+  private function e_to_serial($g, $pad=false) {
+    switch($g) {
+      case '子': $no = 1; break;// 자
+      case '丑': $no = 2; break;// 축
+      case '寅': $no = 3; break; // 인
+      case '卯': $no = 4; break; // 묘
+      case '辰': $no = 5; break; // 진
+      case '巳': $no = 6; break; // 사
+      case '午': $no = 7; break; // 오
+      case '未': $no = 8; break; // 미
+      case '申': $no = 9; break; // 신
+      case '酉': $no = 10; break; //유
+      case '戌': $no = 11; break; // 술
+      case '亥': $no = 12; break; //해
+    }
+
+    if ($pad == true) {
+      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
+    }
+    return $no;
+  }
+
+  /**
+   * 월건을 볼때는 11월이 자 가 되고 1월이 인이 된다.
+   */
+  private function e_to_wolgun($g, $pad=false) {
+    switch($g) {
+      case '子': $no = 11; break;// 자
+      case '丑': $no = 12; break;// 축
+      case '寅': $no = 1; break; // 인
+      case '卯': $no = 2; break; // 묘
+      case '辰': $no = 3; break; // 진
+      case '巳': $no = 4; break; // 사
+      case '午': $no = 5; break; // 오
+      case '未': $no = 6; break; // 미
+      case '申': $no = 7; break; // 신
+      case '酉': $no = 8; break; //유
+      case '戌': $no = 9; break; // 술
+      case '亥': $no = 10; break; //해
+    }
+
+    if ($pad == true) {
+      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
+    }
+    return $no;
+  }
+
+
+  private function h_to_serial($h, $pad=false){
+    switch($h){
+      case '甲' : $no = 1; break;
+      case '乙' : $no = 2; break;
+      case '丙' : $no = 3; break;
+      case '丁' : $no = 4; break;
+      case '戊' : $no = 5; break;
+      case '己' : $no = 6; break;
+      case '庚' : $no = 7; break;
+      case '辛' : $no = 8; break;
+      case '壬' : $no = 9; break;
+      case '癸' : $no = 10; break;
+    }
+    if ($pad == true) {
+      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
+    }
+    return $no;
+  }
+
 }
