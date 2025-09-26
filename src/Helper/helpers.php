@@ -130,7 +130,7 @@ if (!function_exists('tr_code')) {
  * 지지를 시리얼로 변경 (배열처리시)
  */
 if (!function_exists('e_to_serial')) {
-  function e_to_serial($e, $digit=0) {
+  function e_to_serial($e, $pad=false) {
 
     switch($e) {
       case '子': $no = 0; break;// 자
@@ -147,10 +147,37 @@ if (!function_exists('e_to_serial')) {
       case '亥': $no = 11; break; //해
     }
 
-    if ($digit != 0 ){
-      $no = str_pad($no, $digit, '0', STR_PAD_LEFT);
+    if ($pad == true) {
+      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
     }
 
+    return $no;
+  }
+}
+
+  /**
+   * 월건을 볼때는 11월이 자 가 되고 1월이 인이 된다.
+   */
+if (!function_exists('e_to_wolgun')) {
+  function e_to_wolgun($g, $pad=false) {
+    switch($g) {
+      case '子': $no = 11; break;// 자
+      case '丑': $no = 12; break;// 축
+      case '寅': $no = 1; break; // 인
+      case '卯': $no = 2; break; // 묘
+      case '辰': $no = 3; break; // 진
+      case '巳': $no = 4; break; // 사
+      case '午': $no = 5; break; // 오
+      case '未': $no = 6; break; // 미
+      case '申': $no = 7; break; // 신
+      case '酉': $no = 8; break; //유
+      case '戌': $no = 9; break; // 술
+      case '亥': $no = 10; break; //해
+    }
+
+    if ($pad == true) {
+      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
+    }
     return $no;
   }
 }

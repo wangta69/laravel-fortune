@@ -387,9 +387,44 @@ use Pondol\Fortune\Facades\Saju;
 use Pondol\Fortune\Facades\Juyeok;
 
 ......
-$saju = Saju::ymdhi($profile->birth_ym)->sl($profile->sl)->leap($profile->flat_moon)->create();
+$saju = Saju::ymdhi('200010101000')->sl('lunar')->leap(true)->create();
 $today = Saju::ymdhi(date('YmdHi'))->sl('solar')->create();
 
 $que = Juyeok::getInnateGwe($saju, $today); // '선천괘'를 계산합니다. (매화역수)
-$que = Juyeok::getTemporalGwe($saju, $today); // 후천괘'를 계산합니다.
+$que = Juyeok::getTemporalGwe($saju, $today, $type); // 후천괘'를 계산합니다.(hour, day, month, year 등으로 시, 일, 월, 년에 대한 운세를 구한다.) default: day
+```
+
+## 육임정단
+
+```
+use Pondol\Fortune\Services\YukimService;
+
+class MyController
+{
+    private YukimService $yukimService;
+
+    public function __construct(YukimService $yukimService)
+    {
+        $this->yukimService = $yukimService;
+    }
+}
+```
+
+```
+$userSaju = Saju::ymdhi('200010101000')->sl('lunar')->leap(true)->create();
+$todaySaju = Saju::ymdhi(date('YmdHi'))->sl('solar')->create();
+// 1. 정통 720과
+$result = $this->yukimService->getReading('720gwa', $todaySaju);
+
+// 2. 지두법
+$result = $this->yukimService->getReading('jidu', $todaySaju);
+
+// 3. '본명법' 결과를 얻기 위해, 메소드, 오늘 Saju, 내 Saju를 전달합니다.
+$result = $this->yukimService->getReading('bonmyeong', $todaySaju, $userSaju);
+
+// 4. 일간과법
+$result = $this->yukimService->getReading('ilgangwa', $todaySaju);
+
+// 5. '차객법' 결과를 얻기 위해, 메소드, 오늘 Saju, 질문 타입을 전달합니다.
+$result = $this->yukimService->getReading('chaekgeok', $todaySaju);
 ```

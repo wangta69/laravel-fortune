@@ -126,11 +126,11 @@ class Saju {
   }
 
   public function get_e_serial($str) {
-    return $this->e_to_serial($this->get_e($str));
+    return e_to_serial($this->get_e($str));
   }
 
   public function get_e_wolgun($str) {
-    return $this->e_to_wolgun($this->get_e($str));
+    return e_to_wolgun($this->get_e($str));
   }
 
   /**
@@ -230,52 +230,52 @@ class Saju {
     return $this;
   }
 
-  private function e_to_serial($g, $pad=false) {
-    switch($g) {
-      case '子': $no = 1; break;// 자
-      case '丑': $no = 2; break;// 축
-      case '寅': $no = 3; break; // 인
-      case '卯': $no = 4; break; // 묘
-      case '辰': $no = 5; break; // 진
-      case '巳': $no = 6; break; // 사
-      case '午': $no = 7; break; // 오
-      case '未': $no = 8; break; // 미
-      case '申': $no = 9; break; // 신
-      case '酉': $no = 10; break; //유
-      case '戌': $no = 11; break; // 술
-      case '亥': $no = 12; break; //해
-    }
+  // private function e_to_serial($g, $pad=false) {
+  //   switch($g) {
+  //     case '子': $no = 1; break;// 자
+  //     case '丑': $no = 2; break;// 축
+  //     case '寅': $no = 3; break; // 인
+  //     case '卯': $no = 4; break; // 묘
+  //     case '辰': $no = 5; break; // 진
+  //     case '巳': $no = 6; break; // 사
+  //     case '午': $no = 7; break; // 오
+  //     case '未': $no = 8; break; // 미
+  //     case '申': $no = 9; break; // 신
+  //     case '酉': $no = 10; break; //유
+  //     case '戌': $no = 11; break; // 술
+  //     case '亥': $no = 12; break; //해
+  //   }
 
-    if ($pad == true) {
-      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
-    }
-    return $no;
-  }
+  //   if ($pad == true) {
+  //     $no = str_pad($no, 2, '0', STR_PAD_LEFT);
+  //   }
+  //   return $no;
+  // }
 
   /**
    * 월건을 볼때는 11월이 자 가 되고 1월이 인이 된다.
    */
-  private function e_to_wolgun($g, $pad=false) {
-    switch($g) {
-      case '子': $no = 11; break;// 자
-      case '丑': $no = 12; break;// 축
-      case '寅': $no = 1; break; // 인
-      case '卯': $no = 2; break; // 묘
-      case '辰': $no = 3; break; // 진
-      case '巳': $no = 4; break; // 사
-      case '午': $no = 5; break; // 오
-      case '未': $no = 6; break; // 미
-      case '申': $no = 7; break; // 신
-      case '酉': $no = 8; break; //유
-      case '戌': $no = 9; break; // 술
-      case '亥': $no = 10; break; //해
-    }
+  // private function e_to_wolgun($g, $pad=false) {
+  //   switch($g) {
+  //     case '子': $no = 11; break;// 자
+  //     case '丑': $no = 12; break;// 축
+  //     case '寅': $no = 1; break; // 인
+  //     case '卯': $no = 2; break; // 묘
+  //     case '辰': $no = 3; break; // 진
+  //     case '巳': $no = 4; break; // 사
+  //     case '午': $no = 5; break; // 오
+  //     case '未': $no = 6; break; // 미
+  //     case '申': $no = 7; break; // 신
+  //     case '酉': $no = 8; break; //유
+  //     case '戌': $no = 9; break; // 술
+  //     case '亥': $no = 10; break; //해
+  //   }
 
-    if ($pad == true) {
-      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
-    }
-    return $no;
-  }
+  //   if ($pad == true) {
+  //     $no = str_pad($no, 2, '0', STR_PAD_LEFT);
+  //   }
+  //   return $no;
+  // }
 
 
   private function h_to_serial($h, $pad=false){

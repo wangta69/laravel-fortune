@@ -69,6 +69,10 @@ class FortuneServiceProvider extends ServiceProvider {
         __DIR__ . '/config/pondol-fortune.php' => config_path('pondol-fortune.php'),
       ], 'config');  
     } 
+
+    $this->publishes([
+        __DIR__ . '/config/pondol-fortune-yukim720.php' => config_path('pondol-fortune-yukim720.php'),
+      ], 'config');  
       
     $this->mergeConfigFrom(
       __DIR__ . '/config/pondol-fortune.php',

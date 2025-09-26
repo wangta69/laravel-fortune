@@ -33,81 +33,81 @@ class Juyeok
     ];
 
     private $juyeokMap = [
-      ['code'=>'111000', 'ko'=>'지천태', 'ch'=>'地天泰', 'que8'=>['곤', ''], 'image'=>['gon', 'gun']],
-      ['code'=>'111001', 'ko'=>'산천대축', 'ch'=>'山天大畜', 'que8'=>['', ''], 'image'=>['gan', 'gun']],
-      ['code'=>'111010', 'ko'=>'수천수', 'ch'=>'水天需', 'que8'=>['', ''], 'image'=>['gam', 'gun']],
-      ['code'=>'111011', 'ko'=>'풍천소축', 'ch'=>'風天小畜', 'que8'=>['', ''], 'image'=>['son', 'gun']],
-      ['code'=>'111100', 'ko'=>'뇌천대장', 'ch'=>'雷天大壯', 'que8'=>['', ''], 'image'=>['jin', 'gun']],
-      ['code'=>'111101', 'ko'=>'화천대유', 'ch'=>'火天大有', 'que8'=>['', ''], 'image'=>['lee', 'gun']],
-      ['code'=>'111110', 'ko'=>'택천쾌', 'ch'=>'澤天夬', 'que8'=>['', ''], 'image'=>['tae', 'gun']], // 澤天快
-      ['code'=>'111111', 'ko'=>'건위천', 'ch'=>'乾爲天', 'que8'=>['', ''], 'image'=>['gun', 'gun']],
-      ['code'=>'110000', 'ko'=>'지택림', 'ch'=>'地澤臨', 'que8'=>['', ''], 'image'=>['gon', 'tae']],
-      ['code'=>'110001', 'ko'=>'산택손', 'ch'=>'山澤損', 'que8'=>['', ''], 'image'=>['gan', 'tae']],
-      ['code'=>'110010', 'ko'=>'수택절', 'ch'=>'水澤節', 'que8'=>['', ''], 'image'=>['gam', 'tae']],
-      ['code'=>'110011', 'ko'=>'풍택중부', 'ch'=>'風澤中孚', 'que8'=>['', ''], 'image'=>['son', 'tae']],
-      ['code'=>'110100', 'ko'=>'뇌택귀매', 'ch'=>'雷澤歸妹', 'que8'=>['', ''], 'image'=>['jin', 'tae']],
-      ['code'=>'110101', 'ko'=>'화택규', 'ch'=>'火澤睽', 'que8'=>['', ''], 'image'=>['lee', 'tae']],
-      ['code'=>'110110', 'ko'=>'태위택', 'ch'=>'兌爲澤', 'que8'=>['', ''], 'image'=>['tae', 'tae']],
-      ['code'=>'110111', 'ko'=>'천택리', 'ch'=>'天澤履', 'que8'=>['', ''], 'image'=>['gun', 'tae']],
-      ['code'=>'101000', 'ko'=>'지화명이', 'ch'=>'地火明夷', 'que8'=>['', ''], 'image'=>['gon', 'lee']],
-      ['code'=>'101001', 'ko'=>'산화비', 'ch'=>'山火賁', 'que8'=>['', ''], 'image'=>['gan', 'lee']],
-      ['code'=>'101010', 'ko'=>'수화기제', 'ch'=>'水火既濟', 'que8'=>['', ''], 'image'=>['gam', 'lee']], // 水火旣濟
-      ['code'=>'101011', 'ko'=>'풍화가인', 'ch'=>'風火家人', 'que8'=>['', ''], 'image'=>['son', 'lee']],
-      ['code'=>'101100', 'ko'=>'뇌화풍', 'ch'=>'雷火豊', 'que8'=>['', ''], 'image'=>['jin', 'lee']],
-      ['code'=>'101101', 'ko'=>'이위화', 'ch'=>'離爲火', 'que8'=>['', ''], 'image'=>['lee', 'lee']],
-      ['code'=>'101110', 'ko'=>'택화혁', 'ch'=>'澤火革', 'que8'=>['', ''], 'image'=>['tae', 'lee']],
-      ['code'=>'101111', 'ko'=>'천화동인', 'ch'=>'天火同人', 'que8'=>['', ''], 'image'=>['gun', 'lee']],
-      ['code'=>'100000', 'ko'=>'지뢰복', 'ch'=>'地雷復', 'que8'=>['', ''], 'image'=>['gon', 'jin']],
-      ['code'=>'100001', 'ko'=>'산뢰이', 'ch'=>'山雷頤', 'que8'=>['', ''], 'image'=>['gan', 'jin']], // 山雷滯
-      ['code'=>'100010', 'ko'=>'수뢰둔', 'ch'=>'水雷屯', 'que8'=>['', ''], 'image'=>['gam', 'jin']],
-      ['code'=>'100011', 'ko'=>'풍뇌익', 'ch'=>'風雷益', 'que8'=>['', ''], 'image'=>['son', 'jin']], // 풍뢰익
-      ['code'=>'100100', 'ko'=>'진위뢰', 'ch'=>'震爲雷', 'que8'=>['', ''], 'image'=>['jin', 'jin']],
-      ['code'=>'100101', 'ko'=>'화뢰서합', 'ch'=>'火雷噬嗑', 'que8'=>['', ''], 'image'=>['lee', 'jin']],
-      ['code'=>'100110', 'ko'=>'택뢰수', 'ch'=>'澤雷隨', 'que8'=>['', ''], 'image'=>['tae', 'jin']],
-      ['code'=>'100111', 'ko'=>'천뢰무망', 'ch'=>'天雷無妄', 'que8'=>['', ''], 'image'=>['gun', 'jin']], // 天雷无妄
-      ['code'=>'011000', 'ko'=>'지풍승', 'ch'=>'地風升', 'que8'=>['', ''], 'image'=>['gon', 'son']],
-      ['code'=>'011001', 'ko'=>'산풍고', 'ch'=>'山風蠱', 'que8'=>['', ''], 'image'=>['gan', 'son']],
-      ['code'=>'011010', 'ko'=>'수풍정', 'ch'=>'水風井', 'que8'=>['', ''], 'image'=>['gam', 'son']],
-      ['code'=>'011011', 'ko'=>'손위풍', 'ch'=>'巽爲風', 'que8'=>['', ''], 'image'=>['son', 'son']],
-      ['code'=>'011100', 'ko'=>'뇌풍항', 'ch'=>'雷風恒', 'que8'=>['', ''], 'image'=>['jin', 'son']],
-      ['code'=>'011101', 'ko'=>'화풍정', 'ch'=>'火風鼎', 'que8'=>['', ''], 'image'=>['lee', 'son']],
-      ['code'=>'011110', 'ko'=>'택풍대과', 'ch'=>'澤風大過', 'que8'=>['', ''], 'image'=>['tae', 'son']],
-      ['code'=>'011111', 'ko'=>'천풍구', 'ch'=>'天風姤', 'que8'=>['', ''], 'image'=>['gun', 'son']], // 天風垢
-      ['code'=>'010000', 'ko'=>'지수사', 'ch'=>'地水師', 'que8'=>['', ''], 'image'=>['gon', 'gam']],
-      ['code'=>'010001', 'ko'=>'산수몽', 'ch'=>'山水蒙', 'que8'=>['', ''], 'image'=>['gan', 'gam']],
-      ['code'=>'010010', 'ko'=>'감위수', 'ch'=>'坎爲水', 'que8'=>['', ''], 'image'=>['gam', 'gam']],
-      ['code'=>'010011', 'ko'=>'풍수환', 'ch'=>'風水渙', 'que8'=>['', ''], 'image'=>['son', 'gam']],
-      ['code'=>'010100', 'ko'=>'뇌수해', 'ch'=>'雷水解', 'que8'=>['', ''], 'image'=>['jin', 'gam']],
-      ['code'=>'010101', 'ko'=>'화수미제', 'ch'=>'火水未濟', 'que8'=>['', ''], 'image'=>['lee', 'gam']],
-      ['code'=>'010110', 'ko'=>'택수곤', 'ch'=>'澤水困', 'que8'=>['', ''], 'image'=>['tae', 'gam']],
-      ['code'=>'010111', 'ko'=>'천수송', 'ch'=>'天水訟', 'que8'=>['', ''], 'image'=>['gun', 'gam']],
-      ['code'=>'001000', 'ko'=>'지산겸', 'ch'=>'地山謙', 'que8'=>['', ''], 'image'=>['gon', 'gan']],
-      ['code'=>'001001', 'ko'=>'간위산', 'ch'=>'艮爲山', 'que8'=>['', ''], 'image'=>['gan', 'gan']],
-      ['code'=>'001010', 'ko'=>'수산건', 'ch'=>'水山蹇', 'que8'=>['', ''], 'image'=>['gam', 'gan']],
-      ['code'=>'001011', 'ko'=>'풍산점', 'ch'=>'風山漸', 'que8'=>['', ''], 'image'=>['son', 'gan']],
-      ['code'=>'001100', 'ko'=>'뇌산소과', 'ch'=>'雷山小過', 'que8'=>['', ''], 'image'=>['jin', 'gan']],
-      ['code'=>'001101', 'ko'=>'화산여', 'ch'=>'火山旅', 'que8'=>['', ''], 'image'=>['lee', 'gan']],
-      ['code'=>'001110', 'ko'=>'택산함', 'ch'=>'澤山咸', 'que8'=>['', ''], 'image'=>['tae', 'gan']],
-      ['code'=>'001111', 'ko'=>'천산돈', 'ch'=>'天山遯', 'que8'=>['', ''], 'image'=>['gun', 'gan']], // 天山敦
-      ['code'=>'000000', 'ko'=>'곤위지', 'ch'=>'坤爲地', 'que8'=>['', ''], 'image'=>['gon', 'gon']],
-      ['code'=>'000001', 'ko'=>'산지박', 'ch'=>'山地剝', 'que8'=>['', ''], 'image'=>['gan', 'gon']],
-      ['code'=>'000010', 'ko'=>'수지비', 'ch'=>'水地比', 'que8'=>['', ''], 'image'=>['gam', 'gon']],
-      ['code'=>'000011', 'ko'=>'풍지관', 'ch'=>'風地觀', 'que8'=>['', ''], 'image'=>['son', 'gon']],
-      ['code'=>'000100', 'ko'=>'뇌지예', 'ch'=>'雷地豫', 'que8'=>['', ''], 'image'=>['jin', 'gon']],
-      ['code'=>'000101', 'ko'=>'화지진', 'ch'=>'火地晉', 'que8'=>['', ''], 'image'=>['lee', 'gon']], // 火地晋
-      ['code'=>'000110', 'ko'=>'택지췌', 'ch'=>'澤地萃', 'que8'=>['', ''], 'image'=>['tae', 'gon']],
-      ['code'=>'000111', 'ko'=>'천지비', 'ch'=>'天地否', 'que8'=>['', ''], 'image'=>['gun', 'gon']]
-    ];
+  ['code'=>'000111', 'ko'=>'지천태', 'ch'=>'地天泰', 'que8'=>['곤', '건'], 'image'=>['gon', 'gun']],
+  ['code'=>'001111', 'ko'=>'산천대축', 'ch'=>'山天大畜', 'que8'=>['간', '건'], 'image'=>['gan', 'gun']],
+  ['code'=>'010111', 'ko'=>'수천수', 'ch'=>'水天需', 'que8'=>['감', '건'], 'image'=>['gam', 'gun']],
+  ['code'=>'011111', 'ko'=>'풍천소축', 'ch'=>'風天小畜', 'que8'=>['손', '건'], 'image'=>['son', 'gun']],
+  ['code'=>'100111', 'ko'=>'뇌천대장', 'ch'=>'雷天大壯', 'que8'=>['진', '건'], 'image'=>['jin', 'gun']],
+  ['code'=>'101111', 'ko'=>'화천대유', 'ch'=>'火天大有', 'que8'=>['이', '건'], 'image'=>['lee', 'gun']],
+  ['code'=>'110111', 'ko'=>'택천쾌', 'ch'=>'澤天夬', 'que8'=>['태', '건'], 'image'=>['tae', 'gun']],
+  ['code'=>'111111', 'ko'=>'건위천', 'ch'=>'乾爲天', 'que8'=>['건', '건'], 'image'=>['gun', 'gun']],
+  ['code'=>'000110', 'ko'=>'지택림', 'ch'=>'地澤臨', 'que8'=>['곤', '태'], 'image'=>['gon', 'tae']],
+  ['code'=>'001110', 'ko'=>'산택손', 'ch'=>'山澤損', 'que8'=>['간', '태'], 'image'=>['gan', 'tae']],
+  ['code'=>'010110', 'ko'=>'수택절', 'ch'=>'水澤節', 'que8'=>['감', '태'], 'image'=>['gam', 'tae']],
+  ['code'=>'011110', 'ko'=>'풍택중부', 'ch'=>'風澤中孚', 'que8'=>['손', '태'], 'image'=>['son', 'tae']],
+  ['code'=>'100110', 'ko'=>'뇌택귀매', 'ch'=>'雷澤歸妹', 'que8'=>['진', '태'], 'image'=>['jin', 'tae']],
+  ['code'=>'101110', 'ko'=>'화택규', 'ch'=>'火澤睽', 'que8'=>['이', '태'], 'image'=>['lee', 'tae']],
+  ['code'=>'110110', 'ko'=>'태위택', 'ch'=>'兌爲澤', 'que8'=>['태', '태'], 'image'=>['tae', 'tae']],
+  ['code'=>'111110', 'ko'=>'천택리', 'ch'=>'天澤履', 'que8'=>['건', '태'], 'image'=>['gun', 'tae']],
+  ['code'=>'000101', 'ko'=>'지화명이', 'ch'=>'地火明夷', 'que8'=>['곤', '이'], 'image'=>['gon', 'lee']],
+  ['code'=>'001101', 'ko'=>'산화비', 'ch'=>'山火賁', 'que8'=>['간', '이'], 'image'=>['gan', 'lee']],
+  ['code'=>'010101', 'ko'=>'수화기제', 'ch'=>'水火既濟', 'que8'=>['감', '이'], 'image'=>['gam', 'lee']],
+  ['code'=>'011101', 'ko'=>'풍화가인', 'ch'=>'風火家人', 'que8'=>['손', '이'], 'image'=>['son', 'lee']],
+  ['code'=>'100101', 'ko'=>'뇌화풍', 'ch'=>'雷火豊', 'que8'=>['진', '이'], 'image'=>['jin', 'lee']],
+  ['code'=>'101101', 'ko'=>'이위화', 'ch'=>'離爲火', 'que8'=>['이', '이'], 'image'=>['lee', 'lee']],
+  ['code'=>'110101', 'ko'=>'택화혁', 'ch'=>'澤火革', 'que8'=>['태', '이'], 'image'=>['tae', 'lee']],
+  ['code'=>'111101', 'ko'=>'천화동인', 'ch'=>'天火同人', 'que8'=>['건', '이'], 'image'=>['gun', 'lee']],
+  ['code'=>'000100', 'ko'=>'지뢰복', 'ch'=>'地雷復', 'que8'=>['곤', '진'], 'image'=>['gon', 'jin']],
+  ['code'=>'001100', 'ko'=>'산뢰이', 'ch'=>'山雷頤', 'que8'=>['간', '진'], 'image'=>['gan', 'jin']],
+  ['code'=>'010100', 'ko'=>'수뢰둔', 'ch'=>'水雷屯', 'que8'=>['감', '진'], 'image'=>['gam', 'jin']],
+  ['code'=>'011100', 'ko'=>'풍뇌익', 'ch'=>'風雷益', 'que8'=>['손', '진'], 'image'=>['son', 'jin']],
+  ['code'=>'100100', 'ko'=>'진위뢰', 'ch'=>'震爲雷', 'que8'=>['진', '진'], 'image'=>['jin', 'jin']],
+  ['code'=>'101100', 'ko'=>'화뢰서합', 'ch'=>'火雷噬嗑', 'que8'=>['이', '진'], 'image'=>['lee', 'jin']],
+  ['code'=>'110100', 'ko'=>'택뢰수', 'ch'=>'澤雷隨', 'que8'=>['태', '진'], 'image'=>['tae', 'jin']],
+  ['code'=>'111100', 'ko'=>'천뢰무망', 'ch'=>'天雷無妄', 'que8'=>['건', '진'], 'image'=>['gun', 'jin']],
+  ['code'=>'000011', 'ko'=>'지풍승', 'ch'=>'地風升', 'que8'=>['곤', '손'], 'image'=>['gon', 'son']],
+  ['code'=>'001011', 'ko'=>'산풍고', 'ch'=>'山風蠱', 'que8'=>['간', '손'], 'image'=>['gan', 'son']],
+  ['code'=>'010011', 'ko'=>'수풍정', 'ch'=>'水風井', 'que8'=>['감', '손'], 'image'=>['gam', 'son']],
+  ['code'=>'011011', 'ko'=>'손위풍', 'ch'=>'巽爲風', 'que8'=>['손', '손'], 'image'=>['son', 'son']],
+  ['code'=>'100011', 'ko'=>'뇌풍항', 'ch'=>'雷風恒', 'que8'=>['진', '손'], 'image'=>['jin', 'son']],
+  ['code'=>'101011', 'ko'=>'화풍정', 'ch'=>'火風鼎', 'que8'=>['이', '손'], 'image'=>['lee', 'son']],
+  ['code'=>'110011', 'ko'=>'택풍대과', 'ch'=>'澤風大過', 'que8'=>['태', '손'], 'image'=>['tae', 'son']],
+  ['code'=>'111011', 'ko'=>'천풍구', 'ch'=>'天風姤', 'que8'=>['건', '손'], 'image'=>['gun', 'son']],
+  ['code'=>'000010', 'ko'=>'지수사', 'ch'=>'地水師', 'que8'=>['곤', '감'], 'image'=>['gon', 'gam']],
+  ['code'=>'001010', 'ko'=>'산수몽', 'ch'=>'山水蒙', 'que8'=>['간', '감'], 'image'=>['gan', 'gam']],
+  ['code'=>'010010', 'ko'=>'감위수', 'ch'=>'坎爲水', 'que8'=>['감', '감'], 'image'=>['gam', 'gam']],
+  ['code'=>'011010', 'ko'=>'풍수환', 'ch'=>'風水渙', 'que8'=>['손', '감'], 'image'=>['son', 'gam']],
+  ['code'=>'100010', 'ko'=>'뇌수해', 'ch'=>'雷水解', 'que8'=>['진', '감'], 'image'=>['jin', 'gam']],
+  ['code'=>'101010', 'ko'=>'화수미제', 'ch'=>'火水未濟', 'que8'=>['이', '감'], 'image'=>['lee', 'gam']],
+  ['code'=>'110010', 'ko'=>'택수곤', 'ch'=>'澤水困', 'que8'=>['태', '감'], 'image'=>['tae', 'gam']],
+  ['code'=>'111010', 'ko'=>'천수송', 'ch'=>'天水訟', 'que8'=>['건', '감'], 'image'=>['gun', 'gam']],
+  ['code'=>'000001', 'ko'=>'지산겸', 'ch'=>'地山謙', 'que8'=>['곤', '간'], 'image'=>['gon', 'gan']],
+  ['code'=>'001001', 'ko'=>'간위산', 'ch'=>'艮爲山', 'que8'=>['간', '간'], 'image'=>['gan', 'gan']],
+  ['code'=>'010001', 'ko'=>'수산건', 'ch'=>'水山蹇', 'que8'=>['감', '간'], 'image'=>['gam', 'gan']],
+  ['code'=>'011001', 'ko'=>'풍산점', 'ch'=>'風山漸', 'que8'=>['손', '간'], 'image'=>['son', 'gan']],
+  ['code'=>'100001', 'ko'=>'뇌산소과', 'ch'=>'雷山小過', 'que8'=>['진', '간'], 'image'=>['jin', 'gan']],
+  ['code'=>'101001', 'ko'=>'화산여', 'ch'=>'火山旅', 'que8'=>['이', '간'], 'image'=>['lee', 'gan']],
+  ['code'=>'110001', 'ko'=>'택산함', 'ch'=>'澤山咸', 'que8'=>['태', '간'], 'image'=>['tae', 'gan']],
+  ['code'=>'111001', 'ko'=>'천산돈', 'ch'=>'天山遯', 'que8'=>['건', '간'], 'image'=>['gun', 'gan']],
+  ['code'=>'000000', 'ko'=>'곤위지', 'ch'=>'坤爲地', 'que8'=>['곤', '곤'], 'image'=>['gon', 'gon']],
+  ['code'=>'001000', 'ko'=>'산지박', 'ch'=>'山地剝', 'que8'=>['간', '곤'], 'image'=>['gan', 'gon']],
+  ['code'=>'010000', 'ko'=>'수지비', 'ch'=>'水地比', 'que8'=>['감', '곤'], 'image'=>['gam', 'gon']],
+  ['code'=>'011000', 'ko'=>'풍지관', 'ch'=>'風地觀', 'que8'=>['손', '곤'], 'image'=>['son', 'gon']],
+  ['code'=>'100000', 'ko'=>'뇌지예', 'ch'=>'雷地豫', 'que8'=>['진', '곤'], 'image'=>['jin', 'gon']],
+  ['code'=>'101000', 'ko'=>'화지진', 'ch'=>'火地晉', 'que8'=>['이', '곤'], 'image'=>['lee', 'gon']],
+  ['code'=>'110000', 'ko'=>'택지췌', 'ch'=>'澤地萃', 'que8'=>['태', '곤'], 'image'=>['tae', 'gon']],
+  ['code'=>'111000', 'ko'=>'천지비', 'ch'=>'天地否', 'que8'=>['건', '곤'], 'image'=>['gun', 'gon']]
+];
 
     private $binaryMap = [
-      1 => '111', // 건
-      2 => '011', // 태
-      3 => '101', // 리
-      4 => '001', // 진
-      5 => '110', // 손
-      6 => '010', // 감
-      7 => '100', // 간
-      8 => '000', // 곤
+        1 => '111', // 건(乾) ☰ (양-양-양)
+        2 => '110', // 태(兌) ☱ (양-양-음)
+        3 => '101', // 리(離) ☲ (양-음-양)
+        4 => '100', // 진(震) ☳ (양-음-음)
+        5 => '011', // 손(巽) ☴ (음-양-양)
+        6 => '010', // 감(坎) ☵ (음-양-음)
+        7 => '001', // 간(艮) ☶ (음-음-양)
+        8 => '000', // 곤(坤) ☷ (음-음-음)
     ];
 
     /**
@@ -146,11 +146,15 @@ class Juyeok
         // 4. 동효(動爻)를 계산합니다.
         $donghyo = $total_sum % 6;
         $donghyo = ($donghyo == 0) ? 6 : $donghyo;
+
+        $code = $this->binaryMap[$sangweNum] . $this->binaryMap[$hagweNum];
+        $map = $this->map('code', $code);
         
         return (object)[
             'sangwe' => $sangweNum, 
             'hagwe' => $hagweNum, 
-            'donghyo' => $donghyo
+            'donghyo' => $donghyo,
+            'map' => $map
         ];
     }
 
@@ -159,23 +163,41 @@ class Juyeok
      *
      * @param object $saju 나의 사주(體) 객체
      * @param object $today 특정 날짜(用)의 Saju 객체
+     * @param object $type hour, day, month, year 등으로 시, 일, 월, 년에 대한 운세를 구한다.
      * @return object
      */
-    public function getTemporalGwe(object $saju, object $today): object
+    public function getTemporalGwe(object $saju, object $today, string $type='day'): object
     {
-        $myIlgan = $saju->get_h('day');        // 나의 일간 (체)
-        $myIlji = $saju->get_e('day');        // 나의 일지 (체)
-        $todayIlji = $today->get_e('day');   // 오늘의 일지 (용)
+        // 1. 상괘(上卦) 계산: 나의 일간(체)과 특정 시간의 지지(용) 조합
+        $myIlgan = $saju->get_h('day');
+        $targetJi = $today->get_e($type);
+        $sangweHanja = $this->findTrigramByCombination("Gan", $myIlgan, $targetJi);
+        $sangweNum = $this->convertHanjaToNum($sangweHanja);
 
-        // 상괘 = 나의 일간(체) + 오늘의 일지(용)
-        $sangweHanja = $this->findTrigramByCombination("Gan", $myIlgan, $todayIlji);
+        // 2. 하괘(下卦) 계산: 나의 일지(체)와 특정 시간의 지지(용) 조합
+        $myIlji = $saju->get_e('day');
+        // $targetJi는 위에서 이미 정의되었으므로 재사용
+        $hagweHanja = $this->findTrigramByCombination("Ji", $myIlji, $targetJi);
+        $hagweNum = $this->convertHanjaToNum($hagweHanja);
+
+        // 3. 동효(動爻) 계산: 괘를 구성하는 모든 요소의 숫자(serial) 합
+        $total_sum = $saju->get_h_serial('day')   // 나의 일간 숫자
+                   + $saju->get_e_serial('day')   // 나의 일지 숫자
+                   + $today->get_e_serial($type); // 특정 시간의 지지 숫자
         
-        // 하괘 = 나의 일지(체) + 오늘의 일지(용)
-        $hagweHanja = $this->findTrigramByCombination("Ji", $myIlji, $todayIlji);
+        $donghyo = $total_sum % 6;
+        $donghyo = ($donghyo == 0) ? 6 : $donghyo;
 
+        // 4. 괘 코드 생성 및 맵 정보 조회
+        $code = $this->binaryMap[$sangweNum] . $this->binaryMap[$hagweNum];
+        $map = $this->map('code', $code);
+        
+        // 5. 최종 결과 객체를 getInnateGwe와 동일한 형식으로 반환
         return (object)[
-            'sangwe' => $this->convertHanjaToNum($sangweHanja), 
-            'hagwe' => $this->convertHanjaToNum($hagweHanja)
+            'sangwe' => $sangweNum, 
+            'hagwe' => $hagweNum, 
+            'donghyo' => $donghyo,
+            'map' => $map
         ];
     }
 
