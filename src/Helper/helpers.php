@@ -183,25 +183,22 @@ if (!function_exists('e_to_wolgun')) {
 }
 
 if (!function_exists('h_to_serial')) {
-  function h_to_serial($h, $digit=0) {
-
-    switch($h) {
-      case '甲': $no = 0; break;// 갑
-      case '乙': $no = 1; break;// 을
-      case '丙': $no = 2; break; // 병
-      case '丁': $no = 3; break; // 정
-      case '戊': $no = 4; break; // 무
-      case '己': $no = 5; break; // 기
-      case '庚': $no = 6; break; // 경
-      case '辛': $no = 7; break; // 신
-      case '壬': $no = 8; break; // 임
-      case '癸': $no = 9; break; // 계
+  function h_to_serial($h, $pad=false){
+    switch($h){
+      case '甲' : $no = 1; break;
+      case '乙' : $no = 2; break;
+      case '丙' : $no = 3; break;
+      case '丁' : $no = 4; break;
+      case '戊' : $no = 5; break;
+      case '己' : $no = 6; break;
+      case '庚' : $no = 7; break;
+      case '辛' : $no = 8; break;
+      case '壬' : $no = 9; break;
+      case '癸' : $no = 10; break;
     }
-
-    if ($digit != 0 ){
-      $no = str_pad($no, $digit, '0', STR_PAD_LEFT);
+    if ($pad == true) {
+      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
     }
-
     return $no;
   }
 }

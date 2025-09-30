@@ -413,18 +413,19 @@ class MyController
 ```
 $userSaju = Saju::ymdhi('200010101000')->sl('lunar')->leap(true)->create();
 $todaySaju = Saju::ymdhi(date('YmdHi'))->sl('solar')->create();
+
 // 1. 정통 720과
 $result = $this->yukimService->getReading('720gwa', $todaySaju);
 
 // 2. 지두법
 $result = $this->yukimService->getReading('jidu', $todaySaju);
 
-// 3. '본명법' 결과를 얻기 위해, 메소드, 오늘 Saju, 내 Saju를 전달합니다.
+// 3. '본명법'
 $result = $this->yukimService->getReading('bonmyeong', $todaySaju, $userSaju);
 
 // 4. 일간과법
 $result = $this->yukimService->getReading('ilgangwa', $todaySaju);
 
-// 5. '차객법' 결과를 얻기 위해, 메소드, 오늘 Saju, 질문 타입을 전달합니다.
+// 5. '차객법'
 $result = $this->yukimService->getReading('chaekgeok', $todaySaju);
 ```

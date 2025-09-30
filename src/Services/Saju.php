@@ -1,6 +1,8 @@
 <?php
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Services\Oheng;
+
 use Pondol\Fortune\Facades\Lunar;
 class Saju {
   public $sl = 'solar'; // $lunar
@@ -16,6 +18,9 @@ class Saju {
   public $gender = 'M'; //M(Man) | W(Woman)
   public $korean_age; // 한국나이
 
+
+  public $oheng; // [추가] 계산된 오행 정보를 담을 속성
+
   /**
    * 생년월일생시
    * @param $ymdhi = yyyymmddhhii
@@ -25,7 +30,6 @@ class Saju {
     $len = strlen($ymdhi);
     $typeof = gettype($ymdhi);
 
-    
     switch($len) {
       case 8: $ymd = $ymdhi; break;
       case 12: 
@@ -49,8 +53,6 @@ class Saju {
   public function ymd($ymd) {
     return $this->ymdhi($ymd);
   }
-
-  
 
   /**
    * 양|음력
@@ -115,7 +117,7 @@ class Saju {
   }
 
    public function get_h_serial($str) {
-    return $this->h_to_serial($this->get_h($str));
+    return h_to_serial($this->get_h($str));
   }
 
   /**
@@ -145,11 +147,23 @@ class Saju {
    * oheng 구하기
    */
   public function oheng() {
-    $oheng = new Oheng();
-    $this->oheng = $oheng->withSaju($this);
+    $ohengCalculator  = new Oheng();
+    $this->oheng = $ohengCalculator ->withSaju($this);
     // $callback($oheng);
     return $this;
   }
+
+  public function get_oheng(string $pillar, string $type = 'h'): string
+    {
+        if (!isset($this->oheng)) {
+            $this->oheng();
+        }
+
+        $property = $pillar . '_' . $type;
+        return $this->oheng->{$property}->ch ?? '';
+    }
+
+
 
   /**
    * 12신살 구하기
@@ -187,8 +201,6 @@ class Saju {
     return $this;
   }
 
-  
-
   /**
    * 길신/흉신 구하기
    * 위의 신살 구하기에서 결과를 받아와서 년월일시로 배열을 재정리
@@ -218,6 +230,15 @@ class Saju {
   }
 
   /**
+   * 신약신강구하기
+   */
+  public function sinyaksingang() {
+    $sinyaksingang = new SinyakSingang();
+    $this->sinyaksingang = $sinyaksingang->withSaju($this);
+    return $this;
+  }
+
+  /**
    *  토정비결용 작괘 구하기
    */
   public function jakque($callback=null) {
@@ -228,73 +249,6 @@ class Saju {
     }
     $this->jakque = $jakque->create($this);
     return $this;
-  }
-
-  // private function e_to_serial($g, $pad=false) {
-  //   switch($g) {
-  //     case '子': $no = 1; break;// 자
-  //     case '丑': $no = 2; break;// 축
-  //     case '寅': $no = 3; break; // 인
-  //     case '卯': $no = 4; break; // 묘
-  //     case '辰': $no = 5; break; // 진
-  //     case '巳': $no = 6; break; // 사
-  //     case '午': $no = 7; break; // 오
-  //     case '未': $no = 8; break; // 미
-  //     case '申': $no = 9; break; // 신
-  //     case '酉': $no = 10; break; //유
-  //     case '戌': $no = 11; break; // 술
-  //     case '亥': $no = 12; break; //해
-  //   }
-
-  //   if ($pad == true) {
-  //     $no = str_pad($no, 2, '0', STR_PAD_LEFT);
-  //   }
-  //   return $no;
-  // }
-
-  /**
-   * 월건을 볼때는 11월이 자 가 되고 1월이 인이 된다.
-   */
-  // private function e_to_wolgun($g, $pad=false) {
-  //   switch($g) {
-  //     case '子': $no = 11; break;// 자
-  //     case '丑': $no = 12; break;// 축
-  //     case '寅': $no = 1; break; // 인
-  //     case '卯': $no = 2; break; // 묘
-  //     case '辰': $no = 3; break; // 진
-  //     case '巳': $no = 4; break; // 사
-  //     case '午': $no = 5; break; // 오
-  //     case '未': $no = 6; break; // 미
-  //     case '申': $no = 7; break; // 신
-  //     case '酉': $no = 8; break; //유
-  //     case '戌': $no = 9; break; // 술
-  //     case '亥': $no = 10; break; //해
-  //   }
-
-  //   if ($pad == true) {
-  //     $no = str_pad($no, 2, '0', STR_PAD_LEFT);
-  //   }
-  //   return $no;
-  // }
-
-
-  private function h_to_serial($h, $pad=false){
-    switch($h){
-      case '甲' : $no = 1; break;
-      case '乙' : $no = 2; break;
-      case '丙' : $no = 3; break;
-      case '丁' : $no = 4; break;
-      case '戊' : $no = 5; break;
-      case '己' : $no = 6; break;
-      case '庚' : $no = 7; break;
-      case '辛' : $no = 8; break;
-      case '壬' : $no = 9; break;
-      case '癸' : $no = 10; break;
-    }
-    if ($pad == true) {
-      $no = str_pad($no, 2, '0', STR_PAD_LEFT);
-    }
-    return $no;
   }
 
 }
