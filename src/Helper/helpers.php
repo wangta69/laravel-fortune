@@ -117,10 +117,12 @@ if (!function_exists('tr_code')) {
       }
       return $rtn;
     } else { // string
-      $key = array_keys($from, $val)[0];
-      if($key) {
-        return $to[$key];
-      }
+     $key = array_search($val, $from);
+
+        // 키를 찾았는지 확인합니다 (0도 유효한 키로 처리).
+        if ($key !== false) {
+            return $to[$key];
+        }
     }
     
     return null;

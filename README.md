@@ -88,7 +88,10 @@ YourDomain/fortune/saj/{ymdhi}/{sl?}/{leap?}
 ```
 use Pondol\Fortune\Facades\Saju;
 ..........
-$saju = Saju::ymdhi($ymdhi)->create()
+$saju = Saju::ymdhi($ymdhi)->create();
+$saju = Saju::ymdhi($ymdhi)->sl('lunar')->leap(true)->create();
+
+$today = Saju::ymdhi(date('YmdHi'))->create();
 $today = Saju::ymdhi(date('YmdHi'))->sl('solar')->create(); // 오늘 날짜 기준으로 사주를 가져올경우
 ```
 
@@ -332,43 +335,18 @@ $myungban = JamiDusu::myungbanData($saju, $today);
 
 // 자미두수 기본 데이터
 $jamidusu = JamiDusu::getdefaultData($saju->gender, $saju->lunar, $saju->get_h('year'), $saju->get_e('hour'));
-
-// 명궁
-$myung = JamiDusu::jusungMyung($jamidusu);
-
-
-// 형제궁
-$hyungjae = JamiDusu::jusungHyungjae($jamidusu);
-
-// 부부궁
-$bubu = JamiDusu::jusungBubu($jamidusu);
-
-// 자녀궁
-$janyeo = JamiDusu::jusungJanyeo($jamidusu);
-
-// 재백궁
-$jaebaek = JamiDusu::jusungJaebaek($jamidusu);
-
-// 질액궁
-$jilaek = JamiDusu::jusungJilaek($jamidusu);
-
-// 천이궁
-$chene = JamiDusu::jusungChene($jamidusu);
-
-// 노복궁
-$nobok = JamiDusu::jusungNobok($jamidusu);
-
-// 관록궁
-$guanrok = JamiDusu::jusungGuanrok($jamidusu);
-
-// 전택궁
-$jeuntaek = JamiDusu::jusungJeuntaek($jamidusu);
-
-// 복덕궁
-$bokduk = JamiDusu::jusungBokduk($jamidusu);
-
-// 부모궁
-$bumo = JamiDusu::jusungBumo($jamidusu);
+JamiDusu::jusungMyung($jamidusu); // 명궁
+JamiDusu::jusungHyungjae($jamidusu); // 형제궁
+JamiDusu::jusungBubu($jamidusu); // 부부궁
+JamiDusu::jusungJanyeo($jamidusu); // 자녀궁
+JamiDusu::jusungJaebaek($jamidusu); // 재백궁
+JamiDusu::jusungJilaek($jamidusu); // 질액궁
+JamiDusu::jusungChene($jamidusu); // 천이궁
+JamiDusu::jusungNobok($jamidusu); // 노복궁
+JamiDusu::jusungGuanrok($jamidusu); // 관록궁
+JamiDusu::jusungJeuntaek($jamidusu); // 전택궁
+JamiDusu::jusungBokduk($jamidusu); // 복덕궁
+JamiDusu::jusungBumo($jamidusu); // 부모궁
 ```
 
 ```

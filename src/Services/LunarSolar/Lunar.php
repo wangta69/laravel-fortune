@@ -829,7 +829,6 @@ Class Lunar extends Lunar_API {
 
     $ganji = $this->to_gabja($this->year.$this->month);
 
-    // list ($so24, $year, $month, $day, $hour) = $this->sydtoso24yd ($y, $m, $d, $h, $i);
     $this->jd = $jdate;
     $this->fmt = $fmt;
     $this->gregory = $gfmt;
@@ -837,7 +836,6 @@ Class Lunar extends Lunar_API {
     $this->dangi = $this->year + 2333;
     $this->week = (object)['ko' => WEEK['ko'][$w], 'ch' => WEEK['ch'][$w]];
     $this->ganji = [ 'ko'=>tr_code(GANJI['ch'], GANJI['ko'], $ganji),'ch'=>$ganji];
-
 
     return $this;
   }
