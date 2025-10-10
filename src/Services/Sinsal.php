@@ -145,7 +145,7 @@ class Sinsal
       if($this->hasGosinsal($this->year_e, $this->month_e)) {
         $this->gosinsal['m'] = '상처살';
       }
-    } else if ($gender == 'W'){
+    } else if ($this->gender == 'W'){
       if($this->hasGuasuksall($this->year_e, $this->month_e)) {
         $this->guasuksal['m'] = '상부살';
       }
