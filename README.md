@@ -405,3 +405,34 @@ $result = $this->yukimService->getReading('ilgangwa', $todaySaju);
 // 5. '차객법'
 $result = $this->yukimService->getReading('chaekgeok', $todaySaju);
 ```
+
+## 택일
+
+### 이사택일
+
+```
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Facades\Calendar;
+..........
+$saju = Saju::ymdhi('200010101000')->sl('lunar')->leap(true)->create();
+$options = [
+    'moving_direction_enabled'=> true or false // 이사방향 처리
+    'moving_direction' => '동'|'서'|'남'|'북'
+
+    'family_harmony_enabled'=> true or false // 가족 구성원 생년월일
+    'family_years' => ['19901010'....]
+];
+
+$moveCalendarData = Calendar::moveCalendar($saju, $yyyymm, $options); // $yyyymm : 년월을 입력하면 년월에 해당하는 모든 일별데이타 출력
+```
+
+### 결혼택일
+
+```
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Facades\Calendar;
+..........
+$saju_male = Saju::ymdhi('200010101000')->sl('lunar')->leap(true)->create(); // 남자측 사주
+$saju_female = Saju::ymdhi('200010101000')->sl('lunar')->leap(true)->create(); // 여차측 사주
+$marriageCalendarData = Calendar::marriageCalendar($saju_male, $saju_female, $yyyymm, []); // $yyyymm : 년월을 입력하면 년월에 해당하는 모든 일별데이타 출력
+```
