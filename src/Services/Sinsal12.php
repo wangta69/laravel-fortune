@@ -1,123 +1,97 @@
 <?php
+
 namespace Pondol\Fortune\Services;
 
 /**
- * 12 신살 구하기 (년지를 기준으로 년월일시의 지지를 비교)
- * 12신살은 년지(年支)나 일지(日支)을 기준으로 삼는데, 인(寅)의 경우를 남겨봅니다. 
- * 출생년의 년지(年支=띠)로 보고, 
- * 출생일의 일지(日支)를 보는 것도 참고하셔야만 합니다.  
+ * 12신살을 전문적으로 계산하는 클래스입니다.
+ * 연지(年支)의 삼합(三合)을 기준으로 각 지지에 해당하는 12신살을 판별하여
+ * 한글과 한자를 포함한 객체 형태로 반환합니다.
  */
-
 class Sinsal12
 {
+    /**
+     * 12신살의 모든 정적 정보(한글, 한자)를 중앙에서 관리합니다.
+     */
+    private const SINSAL_DEFINITIONS = [
+        '겁살'   => ['ch' => '劫殺'],
+        '재살'   => ['ch' => '災殺'],
+        '천살'   => ['ch' => '天殺'],
+        '지살'   => ['ch' => '地殺'],
+        '도화살' => ['ch' => '桃花殺'],
+        '월살'   => ['ch' => '月殺'],
+        '망신살' => ['ch' => '亡身殺'],
+        '장성살' => ['ch' => '將星殺'],
+        '반안살' => ['ch' => '攀鞍殺'],
+        '역마살' => ['ch' => '驛馬殺'],
+        '육해살' => ['ch' => '六害殺'],
+        '화개살' => ['ch' => '華蓋殺'],
+    ];
 
-  public $year_e;
-  public $month_e;
-  public $day_e;
-  public $hour_e;
- 
-  public function withSaju($saju) {
-    $this->hour_e = $this->cal($saju->get_e('year'), $saju->get_e('hour'));
-    $this->day_e = $this->cal($saju->get_e('year'), $saju->get_e('day'));
-    $this->month_e = $this->cal($saju->get_e('year'), $saju->get_e('month'));
-    $this->year_e = $this->cal($saju->get_e('year'), $saju->get_e('year'));
+    /**
+     * 삼합 그룹별 12신살의 순서와 이름을 정의한 '지도'입니다.
+     */
+    private const SINSAL_MAP = [
+        // 신자진(申子辰) 水局 그룹
+        '申' => ['겁살' => '巳', '재살' => '午', '천살' => '未', '지살' => '申', '도화살' => '酉', '월살' => '戌', '망신살' => '亥', '장성살' => '子', '반안살' => '丑', '역마살' => '寅', '육해살' => '卯', '화개살' => '辰'],
+        '子' => ['겁살' => '巳', '재살' => '午', '천살' => '未', '지살' => '申', '도화살' => '酉', '월살' => '戌', '망신살' => '亥', '장성살' => '子', '반안살' => '丑', '역마살' => '寅', '육해살' => '卯', '화개살' => '辰'],
+        '辰' => ['겁살' => '巳', '재살' => '午', '천살' => '未', '지살' => '申', '도화살' => '酉', '월살' => '戌', '망신살' => '亥', '장성살' => '子', '반안살' => '丑', '역마살' => '寅', '육해살' => '卯', '화개살' => '辰'],
 
-    return $this;
-  }
+        // 인오술(寅午戌) 火局 그룹
+        '寅' => ['겁살' => '亥', '재살' => '子', '천살' => '丑', '지살' => '寅', '도화살' => '卯', '월살' => '辰', '망신살' => '巳', '장성살' => '午', '반안살' => '未', '역마살' => '申', '육해살' => '酉', '화개살' => '戌'],
+        '午' => ['겁살' => '亥', '재살' => '子', '천살' => '丑', '지살' => '寅', '도화살' => '卯', '월살' => '辰', '망신살' => '巳', '장성살' => '午', '반안살' => '未', '역마살' => '申', '육해살' => '酉', '화개살' => '戌'],
+        '戌' => ['겁살' => '亥', '재살' => '子', '천살' => '丑', '지살' => '寅', '도화살' => '卯', '월살' => '辰', '망신살' => '巳', '장성살' => '午', '반안살' => '未', '역마살' => '申', '육해살' => '酉', '화개살' => '戌'],
 
-  /**
-   * 년지를 기준으로 년월일시의 지지를 비교
-   */
-  private  function cal($default_e, $e) {
-    switch($default_e) {
-      case '巳': case '酉': case '丑':
-        switch($e) {
-          case '寅': $sal = '겁살'; break;
-          case '卯': $sal = '재살'; break;
-          case '辰': $sal = '천살'; break;
-          case '巳': $sal = '지살'; break;
-          case '午': $sal = '도화'; break;
-          case '未': $sal = '월살'; break;
-          case '申': $sal = '망신'; break;
-          case '酉': $sal = '장성'; break;
-          case '戌': $sal = '반안'; break;
-          case '亥': $sal = '역마'; break;
-          case '子': $sal = '육해'; break;
-          case '丑': $sal = '화개'; break;
-        }
-        break;
-      case '申': case '子': case '辰':
-        switch($e) {
-          case '寅': $sal = '역마'; break;
-          case '卯': $sal = '육해'; break;
-          case '辰': $sal = '화개'; break;
-          case '巳': $sal = '겁살'; break;
-          case '午': $sal = '재살'; break;
-          case '未': $sal = '천살'; break;
-          case '申': $sal = '지살'; break;
-          case '酉': $sal = '도화'; break;
-          case '戌': $sal = '월살'; break;
-          case '亥': $sal = '망신'; break;
-          case '子': $sal = '장성'; break;
-          case '丑': $sal = '반안'; break;
-        }
-        break;
-      case '亥': case '卯': case '未':
-        switch($e) {
-          case '寅': $sal = '망신'; break;
-          case '卯': $sal = '장성'; break;
-          case '辰': $sal = '반안'; break;
-          case '巳': $sal = '역마'; break;
-          case '午': $sal = '육해'; break;
-          case '未': $sal = '화개'; break;
-          case '申': $sal = '겁살'; break;
-          case '酉': $sal = '재살'; break;
-          case '戌': $sal = '천살'; break;
-          case '亥': $sal = '지살'; break;
-          case '子': $sal = '도화'; break;
-          case '丑': $sal = '월살'; break;
-        }
-        break;
-      case '寅': case '午': case '戌':
-        switch($e) {
-          case '寅': $sal = '지살'; break;
-          case '卯': $sal = '도화'; break;
-          case '辰': $sal = '월살'; break;
-          case '巳': $sal = '망신'; break;
-          case '午': $sal = '장성'; break;
-          case '未': $sal = '반안'; break;
-          case '申': $sal = '역마'; break;
-          case '酉': $sal = '육해'; break;
-          case '戌': $sal = '화개'; break;
-          case '亥': $sal = '겁살'; break;
-          case '子': $sal = '재살'; break;
-          case '丑': $sal = '천살'; break;
-        }
-      break;
+        // 사유축(巳酉丑) 金局 그룹 (기존 코드에 '도화'로 되어 있던 것을 '도화살'로 통일)
+        '巳' => ['겁살' => '寅', '재살' => '卯', '천살' => '辰', '지살' => '巳', '도화살' => '午', '월살' => '未', '망신살' => '申', '장성살' => '酉', '반안살' => '戌', '역마살' => '亥', '육해살' => '子', '화개살' => '丑'],
+        '酉' => ['겁살' => '寅', '재살' => '卯', '천살' => '辰', '지살' => '巳', '도화살' => '午', '월살' => '未', '망신살' => '申', '장성살' => '酉', '반안살' => '戌', '역마살' => '亥', '육해살' => '子', '화개살' => '丑'],
+        '丑' => ['겁살' => '寅', '재살' => '卯', '천살' => '辰', '지살' => '巳', '도화살' => '午', '월살' => '未', '망신살' => '申', '장성살' => '酉', '반안살' => '戌', '역마살' => '亥', '육해살' => '子', '화개살' => '丑'],
+
+        // 해묘미(亥卯未) 木局 그룹 (기존 코드에 '도화'로 되어 있던 것을 '도화살'로 통일)
+        '亥' => ['겁살' => '申', '재살' => '酉', '천살' => '戌', '지살' => '亥', '도화살' => '子', '월살' => '丑', '망신살' => '寅', '장성살' => '卯', '반안살' => '辰', '역마살' => '巳', '육해살' => '午', '화개살' => '未'],
+        '卯' => ['겁살' => '申', '재살' => '酉', '천살' => '戌', '지살' => '亥', '도화살' => '子', '월살' => '丑', '망신살' => '寅', '장성살' => '卯', '반안살' => '辰', '역마살' => '巳', '육해살' => '午', '화개살' => '未'],
+        '未' => ['겁살' => '申', '재살' => '酉', '천살' => '戌', '지살' => '亥', '도화살' => '子', '월살' => '丑', '망신살' => '寅', '장성살' => '卯', '반안살' => '辰', '역마살' => '巳', '육해살' => '午', '화개살' => '未'],
+    ];
+
+    private string $yeonji;
+
+    // [수정] 결과값이 이제 string이 아닌 object 또는 null이 됩니다.
+    public ?object $year = null;
+    public ?object $month = null;
+    public ?object $day = null;
+    public ?object $hour = null;
+
+    public function withSaju($saju): self
+    {
+        $this->yeonji = $saju->get_e('year');
+
+        $this->year = $this->calculate($saju->get_e('year'));
+        $this->month = $this->calculate($saju->get_e('month'));
+        $this->day = $this->calculate($saju->get_e('day'));
+        $this->hour = $this->calculate($saju->get_e('hour'));
+
+        return $this;
     }
-    
-    return $sal;
-  }
 
-  function kor_to_ch($kor) {
-    switch($kor) {
-        // 12 살
-        case '지살': return '地殺';
-        case '도화': return '桃花';
-        case '월살': return '月殺';
-        case '망신': return '亡身';
-        case '장성': return '將星';
-        case '반안': return '攀鞍';
-        case '역마': return '驛馬';
-        case '육해': return '六害';
-        case '화개': return '華蓋';
-        case '겁살': return '劫殺';
-        case '재살': return '災殺';
-        case '천살': return '天殺';
+    /**
+     * [수정] 핵심 엔진이 이제 string 대신 object 또는 null을 반환합니다.
+     */
+    private function calculate(string $jiji): ?object
+    {
+        if (!isset(self::SINSAL_MAP[$this->yeonji])) {
+            return null;
+        }
+
+        $sinsalGroupMap = self::SINSAL_MAP[$this->yeonji];
+        $sinsalName = array_search($jiji, $sinsalGroupMap);
+
+        // 일치하는 신살이 있을 경우, DEFINITIONS를 참조하여 객체를 생성합니다.
+        if ($sinsalName && isset(self::SINSAL_DEFINITIONS[$sinsalName])) {
+            return (object)[
+                'ko' => $sinsalName,
+                'ch' => self::SINSAL_DEFINITIONS[$sinsalName]['ch']
+            ];
+        }
+
+        return null;
     }
-  }
-
 }
-
-
-

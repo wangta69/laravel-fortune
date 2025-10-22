@@ -2,6 +2,7 @@
 namespace Pondol\Fortune\Services;
 
 use Pondol\Fortune\Facades\Lunar;
+// @deprecated
 class Manse {
   public $sl = 'solar'; // $lunar
   public $solar; // 양력
@@ -98,10 +99,10 @@ class Manse {
   /** 만세에서  천간 가져오기 
   *@param String $str hour | day | month | year 
   */
-  public function get_h($str) {
+  // public function get_h($str) {
 
-    return mb_substr($this->{$str}->ch, 0, 1);
-  }
+  //   return mb_substr($this->{$str}->ch, 0, 1);
+  // }
 
   /**
    * 만세에서 지지 가져오기
@@ -121,48 +122,48 @@ class Manse {
   /**
    * oheng 구하기
    */
-  public function oheng() {
-    $oheng = new Oheng();
-    $this->oheng = $oheng->withManse($this);
-    // $callback($oheng);
-    return $this;
-  }
+  // public function oheng() {
+  //   $oheng = new Oheng();
+  //   $this->oheng = $oheng->withManse($this);
+  //   // $callback($oheng);
+  //   return $this;
+  // }
 
   /**
    * 12신살 구하기
    */
-  public function sinsal12() {
-    $sinsal12 = new Sinsal12();
-    $this->sinsal12 = $sinsal12->withManse($this);
-    return $this;
-  }
+  // public function sinsal12() {
+  //   $sinsal12 = new Sinsal12();
+  //   $this->sinsal12 = $sinsal12->withManse($this);
+  //   return $this;
+  // }
 
   /**
    * 12운성 구하기
    */
-  public function woonsung12() {
-    $woonsung12 = new Woonsung12();
-    $this->woonsung12 = $woonsung12->withManse($this);
-    return $this;
-  }
+  // public function woonsung12() {
+  //   $woonsung12 = new Woonsung12();
+  //   $this->woonsung12 = $woonsung12->withManse($this);
+  //   return $this;
+  // }
 
    /**
    * 10신 구하기
    */
-  public function sipsin() {
-    $sipsin = new Sipsin();
-    $this->sipsin = $sipsin->withManse($this);
-    return $this;
-  }
+  // public function sipsin() {
+  //   $sipsin = new Sipsin();
+  //   $this->sipsin = $sipsin->withManse($this);
+  //   return $this;
+  // }
 
   /**
    * 지장간 구하기
    */
-  public function zizangan() {
-    $zizangan = new Zizangan();
-    $this->zizangan = $zizangan->withManse($this);
-    return $this;
-  }
+  // public function zizangan() {
+  //   $zizangan = new Zizangan();
+  //   $this->zizangan = $zizangan->withManse($this);
+  //   return $this;
+  // }
 
    /**
    * 신살 구하기

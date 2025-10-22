@@ -286,10 +286,8 @@ $samjae = Calendar::samjae($yyyy);
 ```
 use Pondol\Fortune\Facades\Saju;
 ..........
-Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->jakque(); // default 당해년
-Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create()->>jakque(function($jakque){
-  $jakque->set_year('2025');
-}); // 특정년을 넣을 경우
+$tojung = Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create();
+$jakque = $saju->tojung()->create(date('Y'));
 ```
 
 > 결과
