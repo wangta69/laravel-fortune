@@ -3,12 +3,18 @@
   "description": "사주에 관한 laravel package",
   "keywords": [
     "laravel",
+    "composer",
     "사주",
     "토정비결",
     "만세력",
     "자미두수",
     "당사주",
-    "주역"
+    "주역",
+    "택일",
+    "결혼택일",
+    "이사택일",
+    "음력달력",
+    "절기달력"
   ],
   "homepage": "https://www.onstory.fun/packages/laravel-saju",
   "license": "MIT",

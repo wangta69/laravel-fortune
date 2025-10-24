@@ -44,6 +44,15 @@ class Calendar
     }
 
     /**
+     * 설립/개업일
+     */
+    public function businessDayCalendar($saju, $yyyymm, $options = [])
+    {
+        $businessDayCalendar = new BusinessDayCalendar();
+        return $businessDayCalendar->cal($saju, $yyyymm, $options);
+    }
+
+    /**
      * 월별 결혼 택일
      * @param object $saju_male   신랑 사주 객체
      * @param object $saju_female 신부 사주 객체
