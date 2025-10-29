@@ -16,67 +16,55 @@ class Sinsal
      * 'type' => gilsin(길신), hyungsal(흉살), junglip(중립)
      */
     private const DEFINITIONS = [
-        // --- 귀인(貴人) 시리즈 (대표적인 길신) ---
-        '천을귀인' => ['ch' => '天乙貴人', 'type' => 'gilsin'],
-        '태극귀인' => ['ch' => '太極貴人', 'type' => 'gilsin'],
-        '천덕귀인' => ['ch' => '天德貴人', 'type' => 'gilsin'],
-        '월덕귀인' => ['ch' => '月德貴人', 'type' => 'gilsin'],
-        '천관귀인' => ['ch' => '天官貴人', 'type' => 'gilsin'],
-        '천복귀인' => ['ch' => '天福貴人', 'type' => 'gilsin'],
-        '천주귀인' => ['ch' => '天廚貴人', 'type' => 'gilsin'],
-        '복성귀인' => ['ch' => '福星貴人', 'type' => 'gilsin'],
+        // --- 1. 귀인(貴人): 인생의 조력자와 행운 ---
+        '천을귀인' => ['ch' => '天乙貴人', 'type' => 'gilsin', 'term_key' => 'cheoneul_gwiin'],
+        '태극귀인' => ['ch' => '太極貴人', 'type' => 'gilsin', 'term_key' => 'taegeuk_gwiin'],
+        '천덕귀인' => ['ch' => '天德貴人', 'type' => 'gilsin', 'term_key' => 'cheondeok_gwiin'],
+        '월덕귀인' => ['ch' => '月德貴人', 'type' => 'gilsin', 'term_key' => 'woldeok_gwiin'],
+        '천관귀인' => ['ch' => '天官貴人', 'type' => 'gilsin', 'term_key' => 'cheongwan_gwiin'],
+        '천복귀인' => ['ch' => '天福貴人', 'type' => 'gilsin', 'term_key' => 'cheonbok_gwiin'],
+        '천주귀인' => ['ch' => '天廚貴人', 'type' => 'gilsin', 'term_key' => 'cheonju_gwiin'],
+        '복성귀인' => ['ch' => '福星貴人', 'type' => 'gilsin', 'term_key' => 'bokseong_gwiin'],
+        '황은대사' => ['ch' => '皇恩大赦', 'type' => 'gilsin', 'term_key' => 'hwangeun_daesa'],
+        '천덕합'   => ['ch' => '天德合',   'type' => 'gilsin', 'term_key' => 'cheondeok_hap'],
+        '월덕합'   => ['ch' => '月德合',   'type' => 'gilsin', 'term_key' => 'woldeok_hap'],
 
-        // --- 학문/지혜 관련 길신 ---
-        '문창귀인' => ['ch' => '文昌貴人', 'type' => 'gilsin'],
-        '문곡귀인' => ['ch' => '文曲貴人', 'type' => 'gilsin', 'aliases' => ['문곡성']],
-        '학당귀인' => ['ch' => '學堂貴人', 'type' => 'gilsin', 'aliases' => ['학당']],
-        '관귀학관' => ['ch' => '官貴學館', 'type' => 'gilsin'],
+        // --- 2. 학문/지혜: 총명함과 배움의 복 ---
+        '문창귀인' => ['ch' => '文昌貴人', 'type' => 'gilsin', 'term_key' => 'munchang_gwiin'],
+        '문곡귀인' => ['ch' => '文曲貴人', 'type' => 'gilsin', 'aliases' => ['문곡성'], 'term_key' => 'mungok_gwiin'],
+        '학당귀인' => ['ch' => '學堂貴人', 'type' => 'gilsin', 'aliases' => ['학당'], 'term_key' => 'hakdang_gwiin'],
+        '관귀학관' => ['ch' => '官貴學館', 'type' => 'gilsin', 'term_key' => 'gwangwi_hakgwan'],
 
-        // --- 재물/명예 관련 길신 ---
-        '암록'     => ['ch' => '暗祿',     'type' => 'gilsin'],
-        '금여록'   => ['ch' => '金輿祿',   'type' => 'gilsin'],
+        // --- 3. 재물/성공: 부와 명예의 기운 ---
+        '암록'     => ['ch' => '暗祿',     'type' => 'gilsin', 'term_key' => 'amrok'],
+        '금여록'   => ['ch' => '金輿祿',   'type' => 'gilsin', 'term_key' => 'geumyeorok'],
 
-        // --- 건강/기타 길신 ---
-        '천의성'   => ['ch' => '天醫星',   'type' => 'gilsin'],
-        '황은대사' => ['ch' => '皇恩大赦', 'type' => 'gilsin'],
-        '월덕합'   => ['ch' => '月德合',   'type' => 'gilsin'],
-        '천덕합'   => ['ch' => '天德合',   'type' => 'gilsin'],
+        // --- 4. 강력한 기운(煞): 리더십과 카리스마의 양면성 ---
+        '괴강살'   => ['ch' => '魁罡殺',   'type' => 'hyungsal', 'term_key' => 'goegang_sal'],
+        '백호살'   => ['ch' => '白虎殺',   'type' => 'hyungsal', 'term_key' => 'baekho_sal'],
+        '양인살'   => ['ch' => '羊刃殺',   'type' => 'hyungsal', 'term_key' => 'yangin_sal'],
 
-        // --- 강력한 작용을 하는 주요 신살 (중립/흉살) ---
-        '괴강살'   => ['ch' => '魁罡殺',   'type' => 'hyungsal'],
-        '백호살'   => ['ch' => '白虎殺',   'type' => 'hyungsal'],
-        '양인살'   => ['ch' => '羊刃殺',   'type' => 'hyungsal'],
+        // --- 5. 인간관계/애정: 매력과 고독의 기운 ---
+        '홍염살'   => ['ch' => '紅艶殺',   'type' => 'junglip', 'term_key' => 'hongyeom_sal'],
+        '원진살'   => ['ch' => '元辰殺',   'type' => 'hyungsal', 'term_key' => 'wonjin_sal'],
+        '귀문관살' => ['ch' => '鬼門關殺', 'type' => 'hyungsal', 'term_key' => 'gwimun_gwansal'],
+        '고신살'   => ['ch' => '孤神殺',   'type' => 'hyungsal', 'term_key' => 'goshin_sal'],
+        '과숙살'   => ['ch' => '寡宿殺',   'type' => 'hyungsal', 'term_key' => 'gwasuk_sal'],
+        '상처살'   => ['ch' => '喪妻殺',   'type' => 'hyungsal', 'term_key' => 'sangcheo_sal'],
+        '상부살'   => ['ch' => '喪夫殺',   'type' => 'hyungsal', 'term_key' => 'sangbu_sal'],
+        '음양착살' => ['ch' => '陰陽錯殺', 'type' => 'hyungsal', 'term_key' => 'eumyangchak_sal'],
 
-        // --- 인간관계/감정 관련 신살 (주로 흉살) ---
-        '원진살'   => ['ch' => '元辰殺',   'type' => 'hyungsal'],
-        '귀문관살' => ['ch' => '鬼門關殺', 'type' => 'hyungsal'],
-        '홍염살'   => ['ch' => '紅艶殺',   'type' => 'junglip'],
-        '도화살'   => ['ch' => '桃花殺',   'type' => 'junglip'],
-        '고신살'   => ['ch' => '孤神殺',   'type' => 'hyungsal'],
-        '과숙살'   => ['ch' => '寡宿殺',   'type' => 'hyungsal'],
-        '상처살'   => ['ch' => '喪妻殺',   'type' => 'hyungsal'],
-        '상부살'   => ['ch' => '喪夫殺',   'type' => 'hyungsal'],
+        // --- 6. 건강/사고: 주의와 관리가 필요한 기운 ---
+        '천의성'   => ['ch' => '天醫星',   'type' => 'gilsin', 'term_key' => 'cheonui_seong'],
+        '탕화살'   => ['ch' => '湯火殺',   'type' => 'hyungsal', 'term_key' => 'tanghwa_sal'],
+        '급각살'   => ['ch' => '急脚殺',   'type' => 'hyungsal', 'term_key' => 'geupgak_sal'],
+        '단교관살' => ['ch' => '斷橋關殺', 'type' => 'hyungsal', 'term_key' => 'dangyo_gwansal'],
+        '상문살'   => ['ch' => '喪門殺',   'type' => 'hyungsal', 'term_key' => 'sangmun_sal'],
+        '유하살'   => ['ch' => '流霞殺',   'type' => 'hyungsal', 'term_key' => 'yuha_sal'],
+        '비인살'   => ['ch' => '飛刃殺',   'type' => 'hyungsal', 'term_key' => 'biin_sal'],
 
-        // --- 건강/사건사고 관련 흉살 ---
-        '탕화살'   => ['ch' => '湯火殺',   'type' => 'hyungsal'],
-        '급각살'   => ['ch' => '急脚殺',   'type' => 'hyungsal'],
-        '단교관살' => ['ch' => '斷橋關殺', 'type' => 'hyungsal'],
-        '상문살'   => ['ch' => '喪門殺',   'type' => 'hyungsal'],
-        '재살'     => ['ch' => '災殺',     'type' => 'hyungsal', 'aliases' => ['수옥살']],
-        '겁살'     => ['ch' => '劫殺',     'type' => 'hyungsal'],
-
-        // --- [추가] 개인 특성 관련 기타 신살 ---
-        '황은대사' => ['ch' => '皇恩大赦', 'type' => 'gilsin'],
-        '월덕합'   => ['ch' => '月德合',   'type' => 'gilsin'],
-        '천덕합'   => ['ch' => '天德合',   'type' => 'gilsin'],
-        '탕화살'   => ['ch' => '湯火殺',   'type' => 'hyungsal'],
-        '단교관살' => ['ch' => '斷橋關殺', 'type' => 'hyungsal'],
-        '유하살'   => ['ch' => '流霞殺',   'type' => 'hyungsal'],
-        '비인살'   => ['ch' => '飛刃殺',   'type' => 'hyungsal'],
-        '음양착살' => ['ch' => '陰陽錯殺', 'type' => 'hyungsal'],
-
-        // --- 기타 신살 ---
-        '공망'     => ['ch' => '空亡',     'type' => 'hyungsal'],
+        // --- 7. 기타 특수 작용 ---
+        '공망'     => ['ch' => '空亡',     'type' => 'hyungsal', 'term_key' => 'gongmang'],
     ];
 
     private array $saju = [];
@@ -155,6 +143,7 @@ class Sinsal
                         'ko'   => $name,
                         'ch'   => $def['ch'],
                         'type' => $def['type'] ?? 'junglip',
+                        'term_key' => $def['term_key'] ?? '',
                     ];
                 }
             }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Pondol\Fortune\Services;
 
 /**
@@ -46,13 +47,13 @@ class SinyakSingang
         'hour_jiji'  => 15, // 시지 (자식궁의 도움)
         'cheon_gan'  => 10  // 천간 (득세: 주변의 도움)
     ];
-    
+
     /**
      * 신강과 신약을 나누는 기준 점수
      * @var int
      */
     private const THRESHOLD = 50;
-    
+
     /**
      * 사주 객체를 받아 분석을 준비합니다.
      * @param Saju $saju 분석할 사주 객체
@@ -61,17 +62,17 @@ class SinyakSingang
     public function withSaju(Saju $saju): self
     {
         $this->saju = $saju;
-        
+
         // 사주의 주인공인 일간(日干)의 오행을 찾습니다.
         $this->dayMaster = $this->convertCharToOhaeng($saju->get_h('day'));
-        
+
         // 오행의 상생 관계를 정의합니다. (예: 水生木 -> '木'을 돕는 것은 '水')
         $generationCycle = ['木' => '水', '火' => '木', '土' => '火', '金' => '土', '水' => '金'];
-        
+
         // 일간을 돕는 세력(아군과 지원군)을 설정합니다.
         $this->myAllyElement = $this->dayMaster;
         $this->mySupporterElement = $generationCycle[$this->dayMaster] ?? '';
-        
+
         return $this;
     }
 
@@ -83,7 +84,7 @@ class SinyakSingang
     {
         $allyScores = $this->calculateAllyScores(); // 일간을 돕는 오행들의 총점 계산
         $totalScore = array_sum($allyScores);
-        
+
         // 기준 점수(THRESHOLD)를 넘으면 '신강', 아니면 '신약'으로 판단
         $result = ($totalScore >= self::THRESHOLD) ? '신강' : '신약';
         // 기준점 근처(±10)에 있으면 '중화' 사주로 판단하여 더 세밀한 결과를 제공
@@ -99,7 +100,7 @@ class SinyakSingang
             'day_master'  => $this->dayMaster,
         ];
     }
-    
+
     /**
      * 사주 전체 오행의 세력 점수를 계산하여 반환합니다. (용신 보정 시 사용)
      * @return array
@@ -112,13 +113,17 @@ class SinyakSingang
             // 지지(地支) 오행에 점수 부여
             $jijiElement = $this->convertCharToOhaeng($this->saju->get_e($pillar));
             $point = ($pillar === 'month') ? self::POINTS['month_jiji'] : self::POINTS[$pillar.'_jiji'];
-            if($jijiElement) $scores[$jijiElement] += $point;
+            if ($jijiElement) {
+                $scores[$jijiElement] += $point;
+            }
 
             // 천간(天干) 오행에 점수 부여
             $cheonGanElement = $this->convertCharToOhaeng($this->saju->get_h($pillar));
-            if($cheonGanElement) $scores[$cheonGanElement] += self::POINTS['cheon_gan'];
+            if ($cheonGanElement) {
+                $scores[$cheonGanElement] += self::POINTS['cheon_gan'];
+            }
         }
-        
+
         return $scores;
     }
 
@@ -145,7 +150,7 @@ class SinyakSingang
                 $scores[$cheonGanElement] += self::POINTS['cheon_gan'];
             }
         }
-        
+
         return $scores;
     }
 
@@ -164,9 +169,9 @@ class SinyakSingang
      * @param string $char 변환할 한자 (예: '甲', '子')
      * @return string
      */
-    private function convertCharToOhaeng(string $char): string
+    public function convertCharToOhaeng(string $char): string
     {
-        switch($char){
+        switch ($char) {
             case '甲': case '乙': case '寅': case '卯': return '木';
             case '丙': case '丁': case '巳': case '午': return '火';
             case '戊': case '己': case '辰': case '戌': case '丑': case '未': return '土';

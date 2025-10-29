@@ -23,7 +23,7 @@ trait Calendar
         $total_day = date('t', $this->date); // 2. 현재 달의 총 날짜
 
         $this->days = [];
-        // 시작하는 요일 이전의 것은 공백처리
+        // 앞쪽 빈 칸 채우기
         for ($i = 0; $i < $start_week; $i++) {
             $this->days[] = new Day();
         }
@@ -35,7 +35,7 @@ trait Calendar
 
             $this->days[] = new Day($i, $dayInfo);
         }
-        // 날짜가 끝나는 마지막 요일 까지 공백 처리
+        // 뒤쪽 빈 칸 채우기
         $remaining = 7 - (count($this->days) % 7);
         if ($remaining < 7) {
             for ($i = 0; $i < $remaining; $i++) {
@@ -60,20 +60,18 @@ trait Calendar
 class Day
 {
     public $day;
-    public $solar;
-    public $lunar;
-    public $gabja;
+    public $lunarInfo;
 
     public function __construct($day = null, $dayInfo = null)
     {
         $this->day = $day;
 
-        // 생성자에서 기본 정보를 프로퍼티에 할당
-        if ($dayInfo) {
-            $this->solar = $dayInfo->solar;
-            $this->lunar = $dayInfo->lunar;
-            $this->gabja = $dayInfo->gabja;
-            // 필요하다면 $dayInfo의 다른 정보들도 여기에 할당
+        // dayInfo 객체의 모든 public 프로퍼티를 현재 객체에 복사
+        if (is_object($dayInfo)) {
+            $this->lunarInfo = $dayInfo;
+            foreach (get_object_vars($dayInfo) as $key => $value) {
+                $this->{$key} = $value;
+            }
         }
     }
 
@@ -85,11 +83,8 @@ class Day
         }
     }
 
-
     public function __set($name, $value)
     {
         $this->{$name} = $value;
     }
-
-
 }

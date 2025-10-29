@@ -241,8 +241,8 @@ class MoveDay
             $chung_map = ['子' => '午', '午' => '子', '丑' => '未', '未' => '丑', '寅' => '申', '申' => '寅', '卯' => '酉', '酉' => '卯', '辰' => '戌', '戌' => '辰', '巳' => '亥', '亥' => '巳'];
             // $familySaju
             foreach ($family_years as $birth_year) {
-                // Saju에서는 입춘을 기준으로 년을 계산하므로 입춘이후의 월일을 임의로 대입, 여기서는 05월 01일을 사용
-                $yeonji = Saju::ymd($birth_year . '0501')->create()->get_e('year');
+                // Saju에서는 입춘을 기준으로 년을 계산하므로 입춘이후의 월일을 임의로 대입, 여기서는 02월 04일을 사용
+                $yeonji = Saju::ymd($birth_year . '0204')->create()->get_e('year');
                 if (isset($chung_map[$yeonji]) && $chung_map[$yeonji] === $today_ilji) {
                     $titles['family_chung'] = ['ko' => '가족과 충(沖)', 'desc' => '이삿날이 가족 구성원의 띠와 충돌하여 불화나 좋지 않은 일이 생길 수 있습니다.', 'type' => 'hyungsal'];
                     $scores['family_chung'] = -30;

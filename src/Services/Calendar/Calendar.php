@@ -2,11 +2,6 @@
 
 namespace Pondol\Fortune\Services\Calendar;
 
-// use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Pondol\Fortune\Facades\Lunar;
-use Pondol\Fortune\Facades\Saju;
-
 /**
  * 12실살을 제외한 기타 길신 및 흉신 구하기
  * 일지기준으로 하면 집안일
@@ -72,7 +67,5 @@ class Calendar
     {
         $samjae = new Samjae();
         return $samjae->cal($yyyy);
-
-
     }
 }

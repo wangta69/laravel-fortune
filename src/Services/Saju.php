@@ -31,6 +31,18 @@ class Saju
     public $unse;  // 운세(기타 신살 포함)
     public $taekil; // 택일
 
+    public function __construct()
+    {
+        // 객체가 생성될 때 기본값으로 현재 시간을 설정합니다.
+        // 기존 ymdhi() 메소드를 재사용하여 코드 중복을 피합니다.
+        $this->ymdhi(now()->format('YmdHi'));
+
+        // 다른 기본값들도 여기서 설정할 수 있습니다.
+        $this->sl = 'solar';
+        $this->leap = false;
+        $this->gender = 'M'; // 기본 성별
+    }
+
     /**
      * 생년월일생시
      * @param $ymdhi = yyyymmddhhii
@@ -285,8 +297,6 @@ class Saju
         }
         return $this->zizangan;
     }
-
-
 
     /**
      * 대운구하기
