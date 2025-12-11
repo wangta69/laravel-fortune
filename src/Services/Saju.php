@@ -12,7 +12,8 @@ class Saju
     public $lunar; // 음력
     public $leap = false; // 윤달여부
     public $ymd; // 생년워일 yyyymmdd
-    public $hi = '0100'; // 생시 hhmm (예 1330, 13시 30분)
+    public $hi = '9999'; // 생시 hhmm (예 1330, 13시 30분)
+    public $hourKnown = true; // 시간 정보 유무를 나타내는 플래그
     public $year = ['ch' => '', 'ko' => ''];
     public $month = ['ch' => '', 'ko' => ''];
     public $day = ['ch' => '', 'ko' => ''];
@@ -54,12 +55,22 @@ class Saju
         $typeof = gettype($ymdhi);
 
         switch ($len) {
-            case 8: $ymd = $ymdhi;
+            case 8:
+                $ymd = $ymdhi;
+                $this->hi = '9999'; // 8자리 입력은 시간이 없는 것으로 간주
+                $this->hourKnown = false;
                 break;
             case 12:
                 preg_match('/^([0-9]{8})([0-9]{4})$/', trim($ymdhi), $match);
                 list(, $ymd, $hi) = $match;
-                $this->hi = $hi;
+                // '시간 모름' 값(예: 9999)을 받았을 때 처리
+                if ($hi === '9999' || substr($hi, 0, 2) === '99') {
+                    $this->hi = '9999';
+                    $this->hourKnown = false;
+                } else {
+                    $this->hi = $hi;
+                    $this->hourKnown = true;
+                }
                 break;
             default: // 8자리나 12자리가 아닌 모든 경우를 처리
                 throw new \Exception("Invalid date length. Expected 8 or 12 characters, but got " . $len);
@@ -111,22 +122,41 @@ class Saju
         switch ($this->sl) {
             case 'solar':
                 $this->solar = $this->ymd;
-                $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->sajugabja()->create();
+                // [수정] hourKnown 플래그에 따라 분기 처리
+                if ($this->hourKnown) {
+                    $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->sajugabja()->create();
+                } else {
+                    $saju = Lunar::ymd($this->ymd)->tolunar()->sajugabja()->create(); // hi() 호출 제외
+                    // $this->hour = (object)['ko' => '알수없음', 'ch' => '時柱不明'];
+                }
                 $this->lunar = $saju->lunar;
                 break;
             case 'lunar':
                 $this->lunar = $this->ymd;
-                $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->sajugabja()->create();
+                // [수정] hourKnown 플래그에 따라 분기 처리
+                if ($this->hourKnown) {
+                    $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->sajugabja()->create();
+                } else {
+                    $saju = Lunar::ymd($this->ymd)->tosolar($this->leap)->sajugabja()->create(); // hi() 호출 제외
+                    // $this->hour = (object)['ko' => '알수없음', 'ch' => '時柱不明'];
+                }
                 $this->solar = $saju->solar;
-
                 break;
         }
 
 
-        $this->year = $saju->gabja->year;
-        $this->month = $saju->gabja->month;
-        $this->day = $saju->gabja->day;
-        $this->hour = $saju->gabja->hour;
+        $this->year = (object)$saju->gabja->year;
+        $this->month = (object)$saju->gabja->month;
+        $this->day = (object)$saju->gabja->day;
+        $this->hour = (object)$saju->gabja->hour;
+
+        // gabja 프로퍼티도 객체로 유지 (하위 호환성)
+        $this->gabja = (object)[
+            'year' => $this->year,
+            'month' => $this->month,
+            'day' => $this->day,
+            'hour' => $this->hour,
+        ];
 
         $this->korean_age = date('Y') - substr($this->solar, 0, 4) + 1;
         return $this;
@@ -337,13 +367,13 @@ class Saju
     /**
      *  토정비결용 작괘 구하기
      */
-    public function tojung()
+    public function tojeong()
     {
-        if (!isset($this->jakque)) {
-            $this->tojung = (new TojungJakque())->withSaju($this);
+        if (!isset($this->tojung)) {
+            $this->tojeong = (new TojeongJakgwae())->withSaju($this);
         }
 
-        return $this->tojung;
+        return $this->tojeong;
     }
 
 }

@@ -104,22 +104,45 @@ class Lunar_API
      */
     protected function disp2days($y1, $m1, $d1, $y2, $m2, $d2)
     {
-        try {
-            // Carbon 객체는 기원전 날짜도 안정적으로 처리합니다.
-            $date1 = Carbon::create($y1, $m1, $d1)->startOfDay();
-            $date2 = Carbon::create($y2, $m2, $d2)->startOfDay();
 
-            // diffInDays는 두 날짜 사이의 차이를 정수(일)로 반환합니다.
-            // $date2가 $date1보다 미래이면 양수, 과거이면 음수가 됩니다.
-            // 원본 로직의 $pr 변수와 동일한 역할을 합니다.
-            return $date2->diffInDays($date1);
+        $jd1 = $this->getJulianDay($y1, $m1, $d1);
+        $jd2 = $this->getJulianDay($y2, $m2, $d2);
+        return $jd1 - $jd2;
 
-        } catch (\Exception $e) {
-            // Carbon으로 파싱할 수 없는 매우 예외적인 날짜(예: 2월 30일)가 들어올 경우,
-            // 기존의 느린 방식으로 재시도합니다. (Fallback)
-            \Log::warning('Carbon date diff failed, falling back to original disp2days.', ['date1' => "$y1-$m1-$d1", 'date2' => "$y2-$m2-$d2"]);
-            return $this->disp2days_original($y1, $m1, $d1, $y2, $m2, $d2);
+        // return gregoriantojd($m2, $d2, $y2) - gregoriantojd($m1, $d1, $y1); // 서버에 php-calendar 확장 모듈이 설치/활성화
+
+        /*
+        아래는 기존에 사용하던 방식
+                try {
+                    // Carbon 객체는 기원전 날짜도 안정적으로 처리합니다.
+                    $date1 = Carbon::create($y1, $m1, $d1)->startOfDay();
+                    $date2 = Carbon::create($y2, $m2, $d2)->startOfDay();
+
+                    // diffInDays는 두 날짜 사이의 차이를 정수(일)로 반환합니다.
+                    // $date2가 $date1보다 미래이면 양수, 과거이면 음수가 됩니다.
+                    // 원본 로직의 $pr 변수와 동일한 역할을 합니다.
+                    return $date2->diffInDays($date1);
+
+                } catch (\Exception $e) {
+                    // Carbon으로 파싱할 수 없는 매우 예외적인 날짜(예: 2월 30일)가 들어올 경우,
+                    // 기존의 느린 방식으로 재시도합니다. (Fallback)
+                    \Log::warning('Carbon date diff failed, falling back to original disp2days.', ['date1' => "$y1-$m1-$d1", 'date2' => "$y2-$m2-$d2"]);
+                    return $this->disp2days_original($y1, $m1, $d1, $y2, $m2, $d2);
+                }
+                */
+    }
+
+    protected function getJulianDay($year, $month, $day)
+    {
+        if ($month <= 2) {
+            $year--;
+            $month += 12;
         }
+
+        $A = (int)($year / 100);
+        $B = 2 - $A + (int)($A / 4);
+
+        return (int)(365.25 * ($year + 4716)) + (int)(30.6001 * ($month + 1)) + $day + $B - 1524;
     }
 
     /**

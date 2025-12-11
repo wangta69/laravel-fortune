@@ -73,7 +73,7 @@ $saju = Saju::ymdhi($ymdhi)->sl($sl)->gender($gender)->leap($leap)->create();
 
 ### Api
 
-- ymdhi : 생년월일 일시 (yyyymmdd) //202010100350
+- ymdhi : 생년월일 일시 (yyyymmdd) //202010100350 (태어난 시를 모를 경우 시는 99 로 처리)
 - sl : solar | lunar (default : solar)
 - leap : 윤 여부 (default : false)
 
@@ -182,7 +182,23 @@ $saju->oheng();
 #### 십신
 
 ```
-$saju->sipsin(); // 오행과 십신을 동시에 가져오려면 $saju->oheng()->sipsin();
+$saju = Saju::ymdhi(...)->create();
+$sipsin = $saju->sipsin(); // withSaju가 자동으로 호출됨
+
+// 1. 원국 십신 접근 (타입 힌팅으로 안전)
+$monthSipsin_e = $sipsin->month->e; // '편관'
+
+// 2. 지장간에 숨겨진 십신 보기
+$zizanganSipsin = $sipsin->getZizanganSipsin();
+$hiddenSipsin = $zizanganSipsin->day->정기; // 일지에 숨겨진 진짜 속마음
+
+// 3. 올해 운(예: 甲辰년)과의 관계 보기
+$unSipsin = $sipsin->getUnSipsin('甲', '辰');
+// $unSipsin->h 는 '정인', $unSipsin->e 는 '상관'
+// "올해는 새로운 공부(정인)를 시작하고 싶은 마음과, 기존의 틀을 깨고 싶은(상관) 마음이 충돌하는 한 해입니다." 와 같은 해석 가능
+
+// 4. 십신 개수 요약 보기
+$summary = $sipsin->getSipsinCountSummary(); // ['편재' => 2, '정관' => 2, ...]
 ..........
 ```
 
@@ -287,14 +303,28 @@ $samjae = Calendar::samjae($yyyy);
 use Pondol\Fortune\Facades\Saju;
 ..........
 $tojung = Saju::ymdhi($ymdhi)->sl($sl)->leap($leap)->create();
-$jakque = $saju->tojung()->create(date('Y'));
+$jakgwae = $saju->tojeong()->create(date('Y'));
 ```
 
 > 결과
 
 ```
-"jakque":{"que":[8,6,3],"total":"863"}
+[age] => 54
+[taeseSu] => 17
+[dalSu] => 30
+[wolgeonSu] => 10
+[iljinSu] => 18
+[gwae] => Array
+    (
+        [0] => 7
+        [1] => 4
+        [2] => 1
+    )
+
+[totalGwae] => 741
 ```
+
+작괘를 구한 후 [길라잡이 작괘 풀이](https://www.gilra.kr/fortune-lab/tojeong) 에서 확인 하시면 됩니다.
 
 ## 당사주
 

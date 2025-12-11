@@ -3,6 +3,21 @@
 namespace Pondol\Fortune\Services;
 
 /**
+ * 십신(十神) 정보를 담는 간단한 데이터 객체(DTO)
+ * 이 클래스는 타입 힌팅을 통해 코드의 안정성과 가독성을 높여줍니다.
+ */
+class SipsinPillar
+{
+    public ?string $h; // 천간 십신
+    public ?string $e; // 지지 십신
+
+    public function __construct(?string $h, ?string $e)
+    {
+        $this->h = $h;
+        $this->e = $e;
+    }
+}
+/**
  * 십신(十神)을 계산하고 관리하는 클래스
  * 일간(日干)을 기준으로 다른 간지와의 관계를 분석합니다.
  */
@@ -11,8 +26,19 @@ class Sipsin
     /** @var string 나의 사주 일간 (기준점) */
     private $dayMaster;
 
-    /** @var array 십신 관계를 정의하는 규칙 */
-    private static $sipsin = [
+    /** @var Saju Saju 원국 객체 */
+    private $saju;
+
+    // --- 원국 십신 속성 ---
+    public SipsinPillar $year;
+    public SipsinPillar $month;
+    public SipsinPillar $day;
+    public SipsinPillar $hour;
+
+    /** @var array 십신 관계를 정의하는 규칙
+     * 일간을 기준으로 천간과 지지 각각에 대한 십신 관계를 맵핑합니다.
+    */
+    private static $sipsinRules = [
         'h' => [ // 천간(h) 규칙
             '甲' => ['甲' => '비견', '乙' => '겁재', '丙' => '식신', '丁' => '상관', '戊' => '편재', '己' => '정재', '庚' => '편관', '辛' => '정관', '壬' => '편인', '癸' => '정인'],
             '乙' => ['乙' => '비견', '甲' => '겁재', '丁' => '식신', '丙' => '상관', '己' => '편재', '戊' => '정재', '辛' => '편관', '庚' => '정관', '癸' => '편인', '壬' => '정인'],
@@ -48,26 +74,27 @@ class Sipsin
      */
     public function withSaju(Saju $saju): self
     {
+        $this->saju = $saju;
         // 1. 계산의 기준이 되는 일간(Day Master)을 설정
         $this->dayMaster = $saju->get_h('day');
 
         // 2. 내부 초기화 시에는 self::cal을 직접 호출하여 더 명확하고 효율적으로 처리
-        $this->year = (object)[
-            'h' => self::cal($this->dayMaster, $saju->get_h('year'), 'h'),
-            'e' => self::cal($this->dayMaster, $saju->get_e('year'), 'e')
-        ];
-        $this->month = (object)[
-            'h' => self::cal($this->dayMaster, $saju->get_h('month'), 'h'),
-            'e' => self::cal($this->dayMaster, $saju->get_e('month'), 'e')
-        ];
-        $this->day = (object)[
-            'h' => '일원', // 일간은 기준이므로 '일원'
-            'e' => self::cal($this->dayMaster, $saju->get_e('day'), 'e')
-        ];
-        $this->hour = (object)[
-            'h' => self::cal($this->dayMaster, $saju->get_h('hour'), 'h'),
-            'e' => self::cal($this->dayMaster, $saju->get_e('hour'), 'e')
-        ];
+        $this->year  = new SipsinPillar(
+            self::cal($this->dayMaster, $saju->get_h('year'), 'h'),
+            self::cal($this->dayMaster, $saju->get_e('year'), 'e')
+        );
+        $this->month = new SipsinPillar(
+            self::cal($this->dayMaster, $saju->get_h('month'), 'h'),
+            self::cal($this->dayMaster, $saju->get_e('month'), 'e')
+        );
+        $this->day   = new SipsinPillar(
+            '일원',
+            self::cal($this->dayMaster, $saju->get_e('day'), 'e')
+        );
+        $this->hour  = new SipsinPillar(
+            self::cal($this->dayMaster, $saju->get_h('hour'), 'h'),
+            self::cal($this->dayMaster, $saju->get_e('hour'), 'e')
+        );
 
         return $this;
     }
@@ -107,14 +134,78 @@ class Sipsin
         return $results;
     }
 
+
     /**
-     * @param string $day_h : 출생일의 일간
-     * @param string $he : 천간 혹은 지지
-     * @param string $flag : h: 천간  e: 지지
+     * 지장간(地藏干)에 숨겨진 십신을 분석하여 반환합니다.
+     * @return object (예: $result->year->초기->'정재')
+     */
+    public function getZizanganSipsin(): object
+    {
+        if (!isset($this->saju->zizangan)) {
+            $this->saju->zizangan(); // 지장간 데이터가 없으면 계산
+        }
+
+        $zizangan = $this->saju->zizangan;
+        $result = new \stdClass();
+        $pillars = ['year', 'month', 'day', 'hour'];
+
+        foreach ($pillars as $pillar) {
+            $result->{$pillar} = new \stdClass();
+            foreach (['초기', '중기', '정기'] as $gi) {
+                if (isset($zizangan->{$pillar}->{$gi})) {
+                    $gan = $zizangan->{$pillar}->{$gi};
+                    $result->{$pillar}->{$gi} = self::calculate($this->dayMaster, $gan, 'h');
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 사주 원국에 드러난 십신(천간+지지)의 개수를 요약하여 반환합니다.
+     * '일원'은 제외하고, 개수가 많은 순서대로 정렬됩니다.
+     *
+     * @return array ['십신이름' => 개수, ...]
+     */
+    public function getSipsinCountSummary(): array
+    {
+        $summary = [];
+        $pillars = ['year', 'month', 'day', 'hour'];
+        foreach ($pillars as $pillar) {
+            if (isset($this->{$pillar})) {
+                if ($this->{$pillar}->h !== '일원') {
+                    $summary[$this->{$pillar}->h] = ($summary[$this->{$pillar}->h] ?? 0) + 1;
+                }
+                $summary[$this->{$pillar}->e] = ($summary[$this->{$pillar}->e] ?? 0) + 1;
+            }
+        }
+        arsort($summary);
+        return $summary;
+    }
+
+    /**
+     * 특정 운(대운/세운)의 천간/지지가 들어왔을 때, 원국과의 십신 관계를 반환합니다.
+     * @param string $unGan 운의 천간 (예: '甲')
+     * @param string $unJiji 운의 지지 (예: '子')
+     * @return SipsinPillar
+     */
+    public function getUnSipsin(string $unGan, string $unJiji): SipsinPillar
+    {
+        return new SipsinPillar(
+            self::calculate($this->dayMaster, $unGan, 'h'),
+            self::calculate($this->dayMaster, $unJiji, 'e')
+        );
+    }
+
+    /**
+     * @param string $dayMaster : 출생일의 일간
+     * @param string $targetGanji : 천간 혹은 지지
+     * @param string $type : h: 천간  e: 지지
      * @return string|null
     */
-    public static function cal($day_h, $he, $flag)
+    public static function cal(string $dayMaster, string $targetGanji, string $type): ?string
     {
-        return self::$sipsin[$flag][$day_h][$he] ?? null;
+        // 지지의 경우, 지장간을 고려하지 않고 대표 십신만 반환합니다.
+        return self::$sipsinRules[$type][$dayMaster][$targetGanji] ?? null;
     }
 }
