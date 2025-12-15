@@ -17,6 +17,7 @@ class Unse
     ];
 
     private array $saju = [];
+
     public array $currentYear = [];
 
     public function withSaju($saju): self
@@ -24,15 +25,13 @@ class Unse
         $this->saju['e'] = ['y' => $saju->get_e('year')];
 
         // [핵심] withSaju가 호출될 때, 현재 년도를 기준으로 운세를 미리 계산하여 속성에 저장합니다.
-        $this->currentYear = $this->calculateForYear((int)date('Y'));
+        $this->currentYear = $this->calculateForYear((int) date('Y'));
 
         return $this;
     }
 
     /**
      * (외부 호출용) 특정 년도에 해당하는 운세 정보를 계산하여 반환하는 유틸리티 메서드.
-     * @param int $targetYear
-     * @return array
      */
     public function checkYear(int $targetYear): array
     {
@@ -75,6 +74,7 @@ class Unse
     private function getJijiForYear(int $year): string
     {
         $jiji = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
         return $jiji[($year - 4) % 12];
     }
 
@@ -91,21 +91,22 @@ class Unse
                 return $name;
             }
         }
+
         return null;
     }
 
     private function isSangmun(string $yeonji, string $targetYeonji): bool
     {
-        return in_array($yeonji.$targetYeonji, ['子寅','丑卯','寅辰','卯巳','辰午','巳未','午申','未酉','申戌','酉亥','戌子','亥丑']);
+        return in_array($yeonji.$targetYeonji, ['子寅', '丑卯', '寅辰', '卯巳', '辰午', '巳未', '午申', '未酉', '申戌', '酉亥', '戌子', '亥丑']);
     }
 
     private function isJogaek(string $yeonji, string $targetYeonji): bool
     {
-        return in_array($yeonji.$targetYeonji, ['子戌','丑亥','寅子','卯丑','辰寅','巳卯','午辰','未巳','申午','酉未','戌申','亥酉']);
+        return in_array($yeonji.$targetYeonji, ['子戌', '丑亥', '寅子', '卯丑', '辰寅', '巳卯', '午辰', '未巳', '申午', '酉未', '戌申', '亥酉']);
     }
 
     private function isGuanbu(string $yeonji, string $targetYeonji): bool
     {
-        return in_array($yeonji.$targetYeonji, ['子辰','丑巳','寅午','卯未','辰申','巳酉','午戌','未亥','申子','酉丑','戌寅','亥卯']);
+        return in_array($yeonji.$targetYeonji, ['子辰', '丑巳', '寅午', '卯未', '辰申', '巳酉', '午戌', '未亥', '申子', '酉丑', '戌寅', '亥卯']);
     }
 }

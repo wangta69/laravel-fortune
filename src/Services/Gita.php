@@ -15,14 +15,19 @@ class Gita
     ];
 
     private array $saju = [];
+
     public array $results = [];
 
     public function withSaju($saju): self
     {
         $this->saju['e'] = [
             'y' => $saju->get_e('year'), 'm' => $saju->get_e('month'),
-            'd' => $saju->get_e('day'), 'h' => $saju->get_e('hour')
+            'd' => $saju->get_e('day'), 'h' => $saju->get_e('hour'),
         ];
+
+        if ($saju->hourKnown) {
+            $this->saju['e']['h'] = $saju->get_e('hour');
+        }
 
         // withSaju 호출 시 모든 기타 신살을 계산하여 results에 저장
         $this->calculateAll();
@@ -49,7 +54,7 @@ class Gita
                 $found[] = '비염살';
             }
 
-            if (!empty($found)) {
+            if (! empty($found)) {
                 foreach ($found as $name) {
                     $this->results[$pos][] = array_merge(['ko' => $name], self::DEFINITIONS[$name]);
                 }
@@ -72,19 +77,22 @@ class Gita
         if (in_array($yeonji, ['卯', '未', '亥']) && $jiji === '亥') {
             return true;
         }
+
         return false;
     }
 
     private function isGusin(string $yeonji, string $jiji): bool
     {
-        return in_array($yeonji.$jiji, ['子卯','丑辰','寅巳','卯午','辰未','巳申','午酉','未戌','申亥','酉子','戌丑','亥寅']);
+        return in_array($yeonji.$jiji, ['子卯', '丑辰', '寅巳', '卯午', '辰未', '巳申', '午酉', '未戌', '申亥', '酉子', '戌丑', '亥寅']);
     }
+
     private function isGyosin(string $yeonji, string $jiji): bool
     {
-        return in_array($yeonji.$jiji, ['子酉','丑戌','寅亥','卯子','辰丑','巳寅','午卯','未辰','申巳','酉午','戌未','亥申']);
+        return in_array($yeonji.$jiji, ['子酉', '丑戌', '寅亥', '卯子', '辰丑', '巳寅', '午卯', '未辰', '申巳', '酉午', '戌未', '亥申']);
     }
+
     private function isBiyeom(string $yeonji, string $jiji): bool
     {
-        return in_array($yeonji.$jiji, ['子申','丑酉','寅戌','卯亥','辰子','巳丑','午寅','未卯','申辰','酉巳','戌午','亥未']);
+        return in_array($yeonji.$jiji, ['子申', '丑酉', '寅戌', '卯亥', '辰子', '巳丑', '午寅', '未卯', '申辰', '酉巳', '戌午', '亥未']);
     }
 }

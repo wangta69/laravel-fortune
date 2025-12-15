@@ -13,12 +13,12 @@ class Sinsal12
      * 12신살의 모든 정적 정보(한글, 한자)를 중앙에서 관리합니다.
      */
     private const SINSAL_DEFINITIONS = [
-        '겁살'   => ['ch' => '劫殺'],
-        '재살'   => ['ch' => '災殺'],
-        '천살'   => ['ch' => '天殺'],
-        '지살'   => ['ch' => '地殺'],
+        '겁살' => ['ch' => '劫殺'],
+        '재살' => ['ch' => '災殺'],
+        '천살' => ['ch' => '天殺'],
+        '지살' => ['ch' => '地殺'],
         '도화살' => ['ch' => '桃花殺'],
-        '월살'   => ['ch' => '月殺'],
+        '월살' => ['ch' => '月殺'],
         '망신살' => ['ch' => '亡身殺'],
         '장성살' => ['ch' => '將星殺'],
         '반안살' => ['ch' => '攀鞍殺'],
@@ -56,8 +56,11 @@ class Sinsal12
 
     // [수정] 결과값이 이제 string이 아닌 object 또는 null이 됩니다.
     public ?object $year = null;
+
     public ?object $month = null;
+
     public ?object $day = null;
+
     public ?object $hour = null;
 
     public function withSaju($saju): self
@@ -67,7 +70,13 @@ class Sinsal12
         $this->year = $this->calculate($saju->get_e('year'));
         $this->month = $this->calculate($saju->get_e('month'));
         $this->day = $this->calculate($saju->get_e('day'));
-        $this->hour = $this->calculate($saju->get_e('hour'));
+
+        // [수정] 시주 정보가 있을 때만 12신살을 계산합니다.
+        if ($saju->hourKnown) {
+            $this->hour = $this->calculate($saju->get_e('hour'));
+        } else {
+            $this->hour = null;
+        }
 
         return $this;
     }
@@ -77,7 +86,7 @@ class Sinsal12
      */
     private function calculate(string $jiji): ?object
     {
-        if (!isset(self::SINSAL_MAP[$this->yeonji])) {
+        if (! isset(self::SINSAL_MAP[$this->yeonji])) {
             return null;
         }
 
@@ -86,9 +95,9 @@ class Sinsal12
 
         // 일치하는 신살이 있을 경우, DEFINITIONS를 참조하여 객체를 생성합니다.
         if ($sinsalName && isset(self::SINSAL_DEFINITIONS[$sinsalName])) {
-            return (object)[
+            return (object) [
                 'ko' => $sinsalName,
-                'ch' => self::SINSAL_DEFINITIONS[$sinsalName]['ch']
+                'ch' => self::SINSAL_DEFINITIONS[$sinsalName]['ch'],
             ];
         }
 

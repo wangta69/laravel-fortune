@@ -5,43 +5,52 @@ namespace Pondol\Fortune\Services;
 class Oheng
 {
     public $year_h;
+
     public $year_e;
+
     public $month_h;
+
     public $month_e;
+
     public $day_h;
+
     public $day_e;
+
     public $hour_h;
+
     public $hour_e;
 
     /**
-      * Saju 객체를 받아 사주 전체의 오행 정보를 계산하고,
-      * 계산된 정보를 담은 자기 자신(Oheng 객체)을 반환합니다.
-      * Blade 뷰에서 `$saju->oheng->year_h->ch` 와 같이 사용하기 위한 메소드입니다.
-      *
-      * @param Saju $saju 분석할 사주 객체
-      * @return self
-      */
+     * Saju 객체를 받아 사주 전체의 오행 정보를 계산하고,
+     * 계산된 정보를 담은 자기 자신(Oheng 객체)을 반환합니다.
+     * Blade 뷰에서 `$saju->oheng->year_h->ch` 와 같이 사용하기 위한 메소드입니다.
+     *
+     * @param  Saju  $saju  분석할 사주 객체
+     */
     public function withSaju(Saju $saju): self
     {
-        $this->year_h  = $this->convert($saju->get_h('year'));
-        $this->year_e  = $this->convert($saju->get_e('year'));
+        $this->year_h = $this->convert($saju->get_h('year'));
+        $this->year_e = $this->convert($saju->get_e('year'));
         $this->month_h = $this->convert($saju->get_h('month'));
         $this->month_e = $this->convert($saju->get_e('month'));
-        $this->day_h   = $this->convert($saju->get_h('day'));
-        $this->day_e   = $this->convert($saju->get_e('day'));
-        $this->hour_h  = $this->convert($saju->get_h('hour'));
-        $this->hour_e  = $this->convert($saju->get_e('hour'));
+        $this->day_h = $this->convert($saju->get_h('day'));
+        $this->day_e = $this->convert($saju->get_e('day'));
+        if ($saju->hourKnown) {
+            $this->hour_h = $this->convert($saju->get_h('hour'));
+            $this->hour_e = $this->convert($saju->get_e('hour'));
+        } else {
+            $this->hour_h = null;
+            $this->hour_e = null;
+        }
 
         return $this;
     }
 
     /**
-     * [Private] 간지 문자를 음양(+/-)과 다국어 정보가 포함된 객체로 변환합니다.
+     * 간지 문자를 음양(+/-)과 다국어 정보가 포함된 객체로 변환합니다.
      * (오직 withSaju 메소드 내부에서만 사용됩니다)
-     * @param string $char
-     * @return object
      */
-    private function convert(string $char): object
+    public function convert(string $char): object
     {
         $ohengData = [];
         switch ($char) {
@@ -86,50 +95,52 @@ class Oheng
                 $ohengData['flag'] = '-';
                 break;
         }
-        return (object)$ohengData;
+
+        return (object) $ohengData;
     }
 
     /**
      * [Private] 오행의 다국어 이름과 CSS 클래스명을 배열로 반환합니다.
-     * @param int $serial
-     * @return array
      */
     private function getOhaengLanguage(int $serial): array
     {
         $ch = ['木', '火', '土', '金', '水'];
         $ko = ['목', '화', '토', '금', '수'];
         $en = ['thu', 'tue', 'sat', 'fri', 'wed'];
+
         return ['ch' => $ch[$serial], 'ko' => $ko[$serial], 'en' => $en[$serial]];
     }
 
-
     /**
      * [Public] 한글 오행을 한자 오행으로 변환합니다. (NameController에서 사용)
-     * @param string|null $hangulOhaeng '목', '화', '토', '금', '수'
+     *
+     * @param  string|null  $hangulOhaeng  '목', '화', '토', '금', '수'
      * @return string '木', '火', '土', '金', '水'
      */
     public function convertHangulToHanja(?string $hangulOhaeng): string
     {
         $map = ['목' => '木', '화' => '火', '토' => '土', '금' => '金', '수' => '水'];
+
         return $map[$hangulOhaeng] ?? '';
     }
 
-
-
     /**
      * [Public] 한자 오행을 한글 오행으로 변환합니다. (NameController에서 사용)
-     * @param string|null $hanjaOhaeng '木', '火', '土', '金', '水'
+     *
+     * @param  string|null  $hanjaOhaeng  '木', '火', '土', '金', '水'
      * @return string '목', '화', '토', '금', '수'
      */
     public function convertHanjaToHangul(?string $hanjaOhaeng): string
     {
         $map = ['木' => '목', '火' => '화', '土' => '토', '金' => '금', '水' => '수'];
+
         return $map[$hanjaOhaeng] ?? '';
     }
 
     /**
      * [Public] 신강/신약 분석 결과에 따라 용신(Yongsin)을 찾아 반환합니다. (NameController에서 사용)
-     * @param object $strengthResult SinyakSingang 클래스의 create() 메소드가 반환한 결과 객체
+     *
+     * @param  object  $strengthResult  SinyakSingang 클래스의 create() 메소드가 반환한 결과 객체
      * @return array ['priority1' => 1순위 용신, 'priority2' => 2순위 용신]
      */
     public function findYongsin(object $strengthResult): array
@@ -144,15 +155,38 @@ class Oheng
             // 신강 사주: 힘이 넘치므로 억제하거나(관성), 기운을 빼주는(식상) 오행이 필요.
             return [
                 'priority1' => $overcomingCycle[$dayMaster],
-                'priority2' => $expressionCycle[$dayMaster]
+                'priority2' => $expressionCycle[$dayMaster],
             ];
         } else {
             // 신약 사주: 힘이 부족하므로 돕거나(인성), 같은 편(비겁)이 필요.
             return [
                 'priority1' => $generationCycle[$dayMaster],
-                'priority2' => $dayMaster
+                'priority2' => $dayMaster,
             ];
         }
+    }
+
+    /**
+     * 신강/신약 분석 결과에 따라 용신, 희신, 기신을 찾아 반환합니다.
+     *
+     * @param  object  $strengthResult  SinyakSingang 클래스의 create() 결과
+     * @return array ['yongsin' => '오행', 'huisin' => '오행', 'gisin' => '오행']
+     */
+    public function findYongsinAndGisin(object $strengthResult): array
+    {
+        // 기존 findYongsin 로직을 활용
+        $yongsinData = $this->findYongsin($strengthResult);
+
+        // 기신(忌神) 찾기 (용신을 극하는 오행)
+        $overcomingCycle = ['木' => '金', '火' => '水', '土' => '木', '金' => '火', '水' => '土'];
+        $yongsin = $yongsinData['priority1'] ?? null;
+        $gisin = $yongsin ? $overcomingCycle[$yongsin] : null;
+
+        return [
+            'yongsin' => $yongsin,
+            'huisin' => $yongsinData['priority2'] ?? null,
+            'gisin' => $gisin,
+        ];
     }
 
     /**
@@ -163,7 +197,12 @@ class Oheng
     public function getOhaengCount(): array
     {
         $count = ['목' => 0, '화' => 0, '토' => 0, '금' => 0, '수' => 0];
-        $pillars = ['year_h', 'year_e', 'month_h', 'month_e', 'day_h', 'day_e', 'hour_h', 'hour_e'];
+        $pillars = ['year_h', 'year_e', 'month_h', 'month_e', 'day_h', 'day_e'];
+
+        if ($this->hour_h && $this->hour_e) {
+            $pillars[] = 'hour_h';
+            $pillars[] = 'hour_e';
+        }
 
         foreach ($pillars as $pillar) {
             if (isset($this->{$pillar}->ko)) {
@@ -180,7 +219,7 @@ class Oheng
     /**
      * 60갑자를 납음오행(納音五行)으로 변환합니다.
      *
-     * @param string $ganji (예: "甲子")
+     * @param  string  $ganji  (예: "甲子")
      * @return string (예: "金")
      */
     public function getNadiElement(string $ganji): string
@@ -204,14 +243,43 @@ class Oheng
 
     /**
      * 오행 개수 배열을 받아 가장 약한 오행(용신 후보)의 이름을 반환합니다.
-     *
-     * @param array $ohaengCount
-     * @return string
      */
     public function getNeededElement(array $ohaengCount): string
     {
         asort($ohaengCount);
+
         return key($ohaengCount);
     }
 
+    /**
+     * [추가] 오행 중 개수가 가장 적은(부족한) 성분을 반환합니다. (예: '목')
+     * StarFortuneController의 궁합 로직에서 사용됩니다.
+     */
+    public function getWeakest(): string
+    {
+        // 1. 현재 사주의 오행 개수를 가져옵니다. (['목'=>0, '화'=>2 ...])
+        $counts = $this->getOhaengCount();
+
+        // 2. 오름차순 정렬 (적은 순서대로)
+        asort($counts);
+
+        // 3. 가장 첫 번째 키(가장 적은 오행)를 반환
+        return array_key_first($counts);
+    }
+
+    /**
+     * [추가] 오행 중 개수가 가장 많은(강한) 성분을 반환합니다. (예: '토')
+     * StarFortuneController의 궁합 로직에서 사용됩니다.
+     */
+    public function getStrongest(): string
+    {
+        // 1. 현재 사주의 오행 개수를 가져옵니다.
+        $counts = $this->getOhaengCount();
+
+        // 2. 내림차순 정렬 (많은 순서대로)
+        arsort($counts);
+
+        // 3. 가장 첫 번째 키(가장 많은 오행)를 반환
+        return array_key_first($counts);
+    }
 }

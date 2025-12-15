@@ -2,34 +2,52 @@
 
 namespace Pondol\Fortune\Services;
 
-use Pondol\Fortune\Services\Oheng;
 use Pondol\Fortune\Facades\Lunar;
 
 class Saju
 {
     public $sl = 'solar'; // $lunar
+
     public $solar; // 양력
+
     public $lunar; // 음력
+
     public $leap = false; // 윤달여부
+
     public $ymd; // 생년워일 yyyymmdd
+
     public $hi = '9999'; // 생시 hhmm (예 1330, 13시 30분)
+
     public $hourKnown = true; // 시간 정보 유무를 나타내는 플래그
+
     public $year = ['ch' => '', 'ko' => ''];
+
     public $month = ['ch' => '', 'ko' => ''];
+
     public $day = ['ch' => '', 'ko' => ''];
+
     public $hour = ['ch' => '', 'ko' => ''];
-    public $gender = 'M'; //M(Man) | W(Woman)
+
+    public $gender = 'M'; // M(Man) | W(Woman)
+
     public $korean_age; // 한국나이
 
-
     public $oheng; // 오행
+
     public $sipsin; // 10신
+
     public $zizangan; // 지장간
+
     public $daewoon; // 대운
+
     public $woonsung12; // 12운성
+
     public $sinsal; // 신살
+
     public $sinsal12; // 12신살
+
     public $unse;  // 운세(기타 신살 포함)
+
     public $taekil; // 택일
 
     public function __construct()
@@ -46,7 +64,8 @@ class Saju
 
     /**
      * 생년월일생시
-     * @param $ymdhi = yyyymmddhhii
+     *
+     * @param  $ymdhi  = yyyymmddhhii
      */
     public function ymdhi($ymdhi)
     {
@@ -62,7 +81,7 @@ class Saju
                 break;
             case 12:
                 preg_match('/^([0-9]{8})([0-9]{4})$/', trim($ymdhi), $match);
-                list(, $ymd, $hi) = $match;
+                [, $ymd, $hi] = $match;
                 // '시간 모름' 값(예: 9999)을 받았을 때 처리
                 if ($hi === '9999' || substr($hi, 0, 2) === '99') {
                     $this->hi = '9999';
@@ -73,13 +92,13 @@ class Saju
                 }
                 break;
             default: // 8자리나 12자리가 아닌 모든 경우를 처리
-                throw new \Exception("Invalid date length. Expected 8 or 12 characters, but got " . $len);
+                throw new \Exception('Invalid date length. Expected 8 or 12 characters, but got '.$len);
         }
         preg_match('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', trim($ymd), $match);
         if (count($match) < 4) { // preg_match가 실패한 경우에 대한 방어 코드
-            throw new \Exception("Failed to parse ymd: " . $ymd);
+            throw new \Exception('Failed to parse ymd: '.$ymd);
         }
-        list(, $y, $m, $d) = $match;
+        [, $y, $m, $d] = $match;
         $this->ymd = $y.'-'.$m.'-'.$d;
 
         return $this;
@@ -92,27 +111,32 @@ class Saju
 
     /**
      * 양|음력
-     * @param String $sl : solar | lunar
+     *
+     * @param  string  $sl  : solar | lunar
      */
     public function sl($sl)
     {
         $this->sl = $sl;
+
         return $this;
     }
 
     /**
      * 윤달여부
-     *@param Boolean $leap : true | false
+     *
+     * @param  bool  $leap  : true | false
      */
     public function leap($leap)
     {
         $this->leap = $leap;
+
         return $this;
     }
 
     public function gender($gender)
     {
         $this->gender = $gender;
+
         return $this;
     }
 
@@ -126,7 +150,7 @@ class Saju
                 if ($this->hourKnown) {
                     $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->sajugabja()->create();
                 } else {
-                    $saju = Lunar::ymd($this->ymd)->tolunar()->sajugabja()->create(); // hi() 호출 제외
+                    $saju = Lunar::ymd($this->ymd)->tolunar()->sajugabja(false)->create(); // hi() 호출 제외
                     // $this->hour = (object)['ko' => '알수없음', 'ch' => '時柱不明'];
                 }
                 $this->lunar = $saju->lunar;
@@ -137,21 +161,25 @@ class Saju
                 if ($this->hourKnown) {
                     $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->sajugabja()->create();
                 } else {
-                    $saju = Lunar::ymd($this->ymd)->tosolar($this->leap)->sajugabja()->create(); // hi() 호출 제외
-                    // $this->hour = (object)['ko' => '알수없음', 'ch' => '時柱不明'];
+                    $saju = Lunar::ymd($this->ymd)->tosolar($this->leap)->sajugabja(false)->create(); // hi() 호출 제외
                 }
                 $this->solar = $saju->solar;
                 break;
         }
 
+        $this->year = (object) $saju->gabja->year;
+        $this->month = (object) $saju->gabja->month;
+        $this->day = (object) $saju->gabja->day;
 
-        $this->year = (object)$saju->gabja->year;
-        $this->month = (object)$saju->gabja->month;
-        $this->day = (object)$saju->gabja->day;
-        $this->hour = (object)$saju->gabja->hour;
+        if ($this->hourKnown) {
+            $this->hour = (object) $saju->gabja->hour;
+        } else {
+            // 시주를 알 수 없을 때의 기본값 설정
+            $this->hour = (object) ['ko' => '알수없음', 'ch' => '時柱不明'];
+        }
 
         // gabja 프로퍼티도 객체로 유지 (하위 호환성)
-        $this->gabja = (object)[
+        $this->gabja = (object) [
             'year' => $this->year,
             'month' => $this->month,
             'day' => $this->day,
@@ -159,9 +187,9 @@ class Saju
         ];
 
         $this->korean_age = date('Y') - substr($this->solar, 0, 4) + 1;
+
         return $this;
     }
-
 
     public function seasonal_division($ymd)
     {
@@ -169,8 +197,8 @@ class Saju
     }
 
     /** 만세에서  천간 가져오기
-    *@param String $str hour | day | month | year
-    */
+     * @param  string  $str  hour | day | month | year
+     */
     public function get_h($str)
     {
 
@@ -208,27 +236,28 @@ class Saju
         return $this->{$str}->ch;
     }
 
-
     /**
      * oheng 구하기
      */
     public function oheng()
     {
-        if (!isset($this->oheng)) {
-            $ohengCalculator  = new Oheng();
-            $this->oheng = $ohengCalculator ->withSaju($this);
+        if (! isset($this->oheng)) {
+            $ohengCalculator = new Oheng;
+            $this->oheng = $ohengCalculator->withSaju($this);
         }
+
         // $callback($oheng);
         return $this->oheng;
     }
 
     public function get_oheng(string $pillar, string $type = 'h'): string
     {
-        if (!isset($this->oheng)) {
+        if (! isset($this->oheng)) {
             $this->oheng();
         }
 
-        $property = $pillar . '_' . $type;
+        $property = $pillar.'_'.$type;
+
         return $this->oheng->{$property}->ch ?? '';
     }
 
@@ -238,10 +267,11 @@ class Saju
      */
     public function sinsal()
     {
-        if (!isset($this->sinsal)) {
-            $sinsal = new Sinsal();
+        if (! isset($this->sinsal)) {
+            $sinsal = new Sinsal;
             $this->sinsal = $sinsal->withSaju($this)->sinsal()->create();
         }
+
         return $this->sinsal;
     }
 
@@ -250,9 +280,10 @@ class Saju
      */
     public function sinsal12()
     {
-        if (!isset($this->sinsal12)) {
-            $this->sinsal12 = (new Sinsal12())->withSaju($this);
+        if (! isset($this->sinsal12)) {
+            $this->sinsal12 = (new Sinsal12)->withSaju($this);
         }
+
         return $this->sinsal12;
     }
 
@@ -262,9 +293,10 @@ class Saju
      */
     public function unse()
     {
-        if (!isset($this->unse)) {
-            $this->unse = (new Unse())->withSaju($this);
+        if (! isset($this->unse)) {
+            $this->unse = (new Unse)->withSaju($this);
         }
+
         return $this->unse;
     }
 
@@ -275,9 +307,10 @@ class Saju
      */
     public function taekil()
     {
-        if (!isset($this->taekil)) {
-            $this->taekil = (new Taekil())->withSaju($this);
+        if (! isset($this->taekil)) {
+            $this->taekil = (new Taekil)->withSaju($this);
         }
+
         return $this->taekil;
     }
 
@@ -286,9 +319,10 @@ class Saju
      */
     public function gita()
     {
-        if (!isset($this->gita)) {
-            $this->gita = (new Gita())->withSaju($this);
+        if (! isset($this->gita)) {
+            $this->gita = (new Gita)->withSaju($this);
         }
+
         return $this->gita;
     }
 
@@ -297,22 +331,24 @@ class Saju
      */
     public function woonsung12()
     {
-        if (!isset($this->woonsung12)) {
-            $woonsung12 = new Woonsung12();
+        if (! isset($this->woonsung12)) {
+            $woonsung12 = new Woonsung12;
             $this->woonsung12 = $woonsung12->withSaju($this);
         }
+
         return $this->woonsung12;
     }
 
     /**
-    * 10신 구하기
-    */
+     * 10신 구하기
+     */
     public function sipsin()
     {
-        if (!isset($this->sipsin)) {
-            $sipsin = new Sipsin();
+        if (! isset($this->sipsin)) {
+            $sipsin = new Sipsin;
             $this->sipsin = $sipsin->withSaju($this);
         }
+
         return $this->sipsin;
     }
 
@@ -321,10 +357,11 @@ class Saju
      */
     public function zizangan()
     {
-        if (!isset($this->zizangan)) {
-            $zizangan = new Zizangan();
+        if (! isset($this->zizangan)) {
+            $zizangan = new Zizangan;
             $this->zizangan = $zizangan->withSaju($this);
         }
+
         return $this->zizangan;
     }
 
@@ -333,10 +370,11 @@ class Saju
      */
     public function daewoon()
     {
-        if (!isset($this->daewoon)) {
-            $daewoon = new DaeWoon();
+        if (! isset($this->daewoon)) {
+            $daewoon = new DaeWoon;
             $this->daewoon = $daewoon->withSaju($this);
         }
+
         return $this->daewoon;
     }
 
@@ -345,10 +383,11 @@ class Saju
      */
     public function saewoon()
     {
-        if (!isset($this->saewoon)) {
-            $saewoon = new SaeWoon();
+        if (! isset($this->saewoon)) {
+            $saewoon = new SaeWoon;
             $this->saewoon = $saewoon->withSaju($this);
         }
+
         return $this->saewoon;
     }
 
@@ -357,10 +396,11 @@ class Saju
      */
     public function sinyaksingang()
     {
-        if (!isset($this->sinyaksingang)) {
-            $sinyaksingang = new SinyakSingang();
+        if (! isset($this->sinyaksingang)) {
+            $sinyaksingang = new SinyakSingang;
             $this->sinyaksingang = $sinyaksingang->withSaju($this);
         }
+
         return $this->sinyaksingang;
     }
 
@@ -369,11 +409,10 @@ class Saju
      */
     public function tojeong()
     {
-        if (!isset($this->tojung)) {
-            $this->tojeong = (new TojeongJakgwae())->withSaju($this);
+        if (! isset($this->tojung)) {
+            $this->tojeong = (new TojeongJakgwae)->withSaju($this);
         }
 
         return $this->tojeong;
     }
-
 }
