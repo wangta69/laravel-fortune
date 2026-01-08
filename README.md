@@ -1,5 +1,7 @@
 This library is used in the production of [gilra.kr](https://www.gilra.kr) (Online Fortune Service).
 
+관련 문의는 wangta69@naver.com 로 주시면 고맙겠습니다.
+
 # SAJU
 
 > 사주에 사용되는 다양한 정보를 쉽게 사용할 수 있도록 프로그램 하였습니다.
