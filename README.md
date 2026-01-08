@@ -1,8 +1,8 @@
 This library is used in the production of [gilra.kr](https://www.gilra.kr) (Online Fortune Service).
 
-# SAJU API
+# SAJU
 
-> 사주에 사용되는 다양한 정보를 API화 하여 처리하였습니다.
+> 사주에 사용되는 다양한 정보를 쉽게 사용할 수 있도록 프로그램 하였습니다.
 
 ## Installation
 
