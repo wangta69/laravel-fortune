@@ -41,17 +41,7 @@ composer require wangta69/laravel-fortune
 
 ## 만세력
 
-### Api
-
-- ymdhi : 생년월일 일시 (yyyymmdd) //202010100350
-- sl : solar | lunar (default : solar)
-- leap : 윤 여부 (default : false)
-
-```
-YourDomain/fortune/saju/{ymdhi}/{sl?}/{leap?}
-```
-
-### Facades
+### Facades 를 활용한 프로그램
 
 #### 기본적인 사주 정보
 
@@ -69,6 +59,16 @@ $saju = Saju::ymdhi($ymdhi)->sl($sl)->gender($gender)->leap($leap)->create();
 
 ```
 {"sl":"","solar":"","lunar":"","leap":,"ymd":"","hi":"","year":{"ch":"壬子","ko":"임자"},"month":{"ch":"辛亥","ko":"신해"},"day":{"ch":"丁未","ko":"정미"},"hour":{"ch":"己酉","ko":"기유"},"gender":"M","korean_age":54}
+```
+
+### Api 를 활용한 프로그램
+
+- ymdhi : 생년월일 일시 (yyyymmdd) //202010100350
+- sl : solar | lunar (default : solar)
+- leap : 윤 여부 (default : false)
+
+```
+YourDomain/fortune/saju/{ymdhi}/{sl?}/{leap?}
 ```
 
 ## 사주
@@ -138,14 +138,14 @@ Pondol\Fortune\Services\Saju Object
 
 > 각각에 대해서 보고 싶을때는 아래처럼 처리하면 됩니다.
 
-### 천간
+### 천간 구하기
 
 ```
 $saju->get_h('year'); // year, month, day, 한자로 리턴(甲...)
 $saju->get_h_serial($str); // 甲: 1
 ```
 
-### 지지
+### 지지 구하기
 
 ```
 $saju->get_e('year'); // year, month, day, 한자로 리턴(子...)
@@ -153,13 +153,13 @@ $saju->get_e_serial($str);  // 子:1....
 $saju->get_e_wolgun($str);  // 子: 11..
 ```
 
-### 천간과 지지
+### 천간과 지지 구하기
 
 ```
 $saju->get_he('year'); // year, month, day
 ```
 
-#### 오행
+#### 오행 구하기
 
 ```
 $saju->oheng();
@@ -181,7 +181,7 @@ $saju->oheng();
 
 ```
 
-#### 십신
+#### 십신 구하기
 
 ```
 $saju = Saju::ymdhi(...)->create();
@@ -204,40 +204,40 @@ $summary = $sipsin->getSipsinCountSummary(); // ['편재' => 2, '정관' => 2, .
 ..........
 ```
 
-#### 신살
+#### 신살 구하기
 
 ```
 $saju->sinsal()
 ```
 
-#### 지장간
+#### 지장간 구하기
 
 ```
 $saju->zizangan();
 ```
 
-#### 길신/흉신
+#### 길신/흉신 구하기
 
 ```
 ..........
 $saju->sinsal();
 ```
 
-#### 12신살
+#### 12신살 구하기
 
 ```
 ..........
 $saju->sinsal12();
 ```
 
-#### 12운성
+#### 12운성 구하기
 
 ```
 ..........
 $saju->woonsung12();
 ```
 
-#### 대운 / 세운
+#### 대운 / 세운 구하기
 
 ```
 ..........

@@ -9,43 +9,15 @@ namespace Pondol\Fortune\Services;
  * $saju = Saju::...->create();
  * $today = Saju::...->create();
  *
- * 전체 명반 데이터 생성
+ * // 전체 명반 데이터 생성
  * $myungban = JamiDusu::myungbanData($saju, $today);
  *
- *  특정 궁의 주성만 간단히 확인
+ * // 특정 궁의 주성만 간단히 확인
  * $jamiData = JamiDusu::getdefaultData(...);
  * $myungGungInfo = JamiDusu::jusungMyung($jamiData); // 명궁 정보
  */
 class JamiDusu
 {
-    /**
-     * 12궁(宮)의 배열 인덱스를 나타내는 상수입니다.
-     * 자미두수 명반은 통상적으로 인궁(寅宮)을 시작점(인덱스 0)으로 설정합니다.
-     */
-    private const GUNG_IN = 0;  // 인궁 (寅宮)
-
-    private const GUNG_MYO = 1;  // 묘궁 (卯宮)
-
-    private const GUNG_JIN = 2;  // 진궁 (辰宮)
-
-    private const GUNG_SA = 3;  // 사궁 (巳宮)
-
-    private const GUNG_O = 4;  // 오궁 (午宮)
-
-    private const GUNG_MI = 5;  // 미궁 (未宮)
-
-    private const GUNG_SIN = 6;  // 신궁 (申宮)
-
-    private const GUNG_YU = 7;  // 유궁 (酉宮)
-
-    private const GUNG_SUL = 8;  // 술궁 (戌宮)
-
-    private const GUNG_HAE = 9;  // 해궁 (亥宮)
-
-    private const GUNG_JA = 10; // 자궁 (子宮)
-
-    private const GUNG_CHUK = 11; // 축궁 (丑宮)
-
     /**
      * [PUBLIC] 화면에 표시할 전체 명반(命盤) 데이터를 생성합니다.
      *
@@ -66,7 +38,6 @@ class JamiDusu
 
         // $today = Saju::ymdhi(date('Y-m-d H:i'))->create();
         [$lunar_year, $lunar_month, $lunar_day] = explode('-', $yyyymmdd);
-        $lunar_month = sprintf('%02d', $lunar_month);
 
         $data = new \stdclass;
         $data->arr = []; // 12 명반에 들어갈 데이타를 넣어둔다.
@@ -396,50 +367,43 @@ class JamiDusu
     /** 노복궁 코드 가져오기 */
     public function jusungNobok($jamidusu)
     {
-        // 노복궁은 명궁으로부터 시계방향 5칸
-        return $this->getPalaceInfo($jamidusu, 5);
+        return $this->getPalaceInfo($jamidusu, 5); // 노복궁은 명궁으로부터 시계방향 5칸
     }
 
-    /** 천이궁 코드 가져오기 */
+    /** 천이 궁 코드 가져오기 */
     public function jusungChene($jamidusu)
     {
-        // 천이궁은 명궁으로부터 시계방향 6칸
-        return $this->getPalaceInfo($jamidusu, 6);
+        return $this->getPalaceInfo($jamidusu, 6); // 노복궁은 명궁으로부터 시계방향 6칸
     }
 
     /** 질액 궁 코드 가져오기 */
     public function jusungJilaek($jamidusu)
     {
-        // 질액궁은 명궁으로부터 시계방향 7칸
-        return $this->getPalaceInfo($jamidusu, 7);
+        return $this->getPalaceInfo($jamidusu, 7); // 질액궁은 명궁으로부터 시계방향 7칸
     }
 
     /** 재백궁 및 궁 코드 가져오기 */
     public function jusungJaebaek($jamidusu)
     {
-        // 재잭궁은 명궁으로부터 시계방향 8칸
-        return $this->getPalaceInfo($jamidusu, 8);
+        return $this->getPalaceInfo($jamidusu, 8); // 재잭궁은 명궁으로부터 시계방향 8칸
     }
 
     /** 자녀궁 및 궁 코드 가져오기 */
     public function jusungJanyeo($jamidusu)
     {
-        // 자녀궁은 명궁으로부터 시계방향 9칸
-        return $this->getPalaceInfo($jamidusu, 9);
+        return $this->getPalaceInfo($jamidusu, 9); // 자녀궁은 명궁으로부터 시계방향 9칸
     }
 
     /** 부처(부부)궁 및 궁 코드 가져오기 */
     public function jusungBubu($jamidusu)
     {
-        // 부부궁은 명궁으로부터 시계방향 10칸
-        return $this->getPalaceInfo($jamidusu, 10);
+        return $this->getPalaceInfo($jamidusu, 10); // 부부궁은 명궁으로부터 시계방향 10칸
     }
 
     /** 형재궁 및 궁 코드 가져오기 */
     public function jusungHyungjae($jamidusu)
     {
-        // 형재궁은 명궁으로부터 시계방향 11칸 (또는 반시계방향 1칸)
-        return $this->getPalaceInfo($jamidusu, 11);
+        return $this->getPalaceInfo($jamidusu, 11); // 형재궁은 명궁으로부터 시계방향 10칸
     }
 
     /** 천궁 코드 가져오기 */
@@ -493,13 +457,12 @@ class JamiDusu
      */
     private function jabo($lunar_month)
     {
-        $map = [
-            '01' => self::GUNG_JIN, '02' => self::GUNG_SA, '03' => self::GUNG_O, '04' => self::GUNG_MI,
-            '05' => self::GUNG_SIN, '06' => self::GUNG_YU, '07' => self::GUNG_SUL, '08' => self::GUNG_HAE,
-            '09' => self::GUNG_JA, '10' => self::GUNG_CHUK, '11' => self::GUNG_IN, '12' => self::GUNG_MYO,
-        ];
+        $jabo = array_fill(0, 12, null);
+        $positionMap = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1]; // 1월 -> 辰(2), 2월 -> 巳(3)...
+        $index = $positionMap[(int) $lunar_month - 1];
+        $jabo[$index] = '좌보';
 
-        return $this->placeStarByMap('좌보', $map, $lunar_month);
+        return $jabo;
     }
 
     /**
@@ -507,13 +470,12 @@ class JamiDusu
      */
     private function upil($lunar_month)
     {
-        $map = [
-            '01' => self::GUNG_SUL, '02' => self::GUNG_YU, '03' => self::GUNG_SIN, '04' => self::GUNG_MI,
-            '05' => self::GUNG_O, '06' => self::GUNG_SA, '07' => self::GUNG_JIN, '08' => self::GUNG_MYO,
-            '09' => self::GUNG_IN, '10' => self::GUNG_CHUK, '11' => self::GUNG_JA, '12' => self::GUNG_HAE,
-        ];
+        $upil = array_fill(0, 12, null);
+        $positionMap = [8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9]; // 1월 -> 戌(8), 2월 -> 酉(7)...
+        $index = $positionMap[(int) $lunar_month - 1];
+        $upil[$index] = '우필';
 
-        return $this->placeStarByMap('우필', $map, $lunar_month);
+        return $upil;
     }
 
     /**
@@ -522,13 +484,40 @@ class JamiDusu
      */
     private function munchang_h($year_h)
     {
-        $map = [
-            '甲' => self::GUNG_SA, '乙' => self::GUNG_O, '丙' => self::GUNG_SIN, '丁' => self::GUNG_YU,
-            '戊' => self::GUNG_SIN, '己' => self::GUNG_YU, '庚' => self::GUNG_HAE, '辛' => self::GUNG_JA,
-            '壬' => self::GUNG_IN, '癸' => self::GUNG_MYO,
-        ];
+        $munchang = array_fill(0, 12, null);
 
-        return $this->placeStarByMap('문창', $map, $year_h);
+        if ($year_h == '甲') {
+            $munchang[3] = '문창';
+        }
+        if ($year_h == '乙') {
+            $munchang[4] = '문창';
+        }
+        if ($year_h == '丙') {
+            $munchang[6] = '문창';
+        }
+        if ($year_h == '丁') {
+            $munchang[7] = '문창';
+        }
+        if ($year_h == '戊') {
+            $munchang[6] = '문창';
+        }
+        if ($year_h == '己') {
+            $munchang[7] = '문창';
+        }
+        if ($year_h == '庚') {
+            $munchang[9] = '문창';
+        }
+        if ($year_h == '辛') {
+            $munchang[10] = '문창';
+        }
+        if ($year_h == '壬') {
+            $munchang[0] = '문창';
+        }
+        if ($year_h == '癸') {
+            $munchang[1] = '문창';
+        }
+
+        return $munchang;
     }
 
     /**
@@ -536,528 +525,1132 @@ class JamiDusu
      */
     private function mungok_h($year_h)
     {
-        $map = [
-            '甲' => self::GUNG_YU, '乙' => self::GUNG_SIN, '丙' => self::GUNG_O, '丁' => self::GUNG_SA,
-            '戊' => self::GUNG_O, '己' => self::GUNG_SA, '庚' => self::GUNG_MYO, '辛' => self::GUNG_IN,
-            '壬' => self::GUNG_JA, '癸' => self::GUNG_HAE,
-        ];
+        $mungok = array_fill(0, 12, null);
+        if ($year_h == '甲') {
+            $mungok[7] = '문곡';
+        }
+        if ($year_h == '乙') {
+            $mungok[6] = '문곡';
+        }
+        if ($year_h == '丙') {
+            $mungok[4] = '문곡';
+        }
+        if ($year_h == '丁') {
+            $mungok[3] = '문곡';
+        }
+        if ($year_h == '戊') {
+            $mungok[4] = '문곡';
+        }
+        if ($year_h == '己') {
+            $mungok[3] = '문곡';
+        }
+        if ($year_h == '庚') {
+            $mungok[1] = '문곡';
+        }
+        if ($year_h == '辛') {
+            $mungok[0] = '문곡';
+        }
+        if ($year_h == '壬') {
+            $mungok[10] = '문곡';
+        }
+        if ($year_h == '癸') {
+            $mungok[9] = '문곡';
+        }
 
-        return $this->placeStarByMap('문곡', $map, $year_h);
+        return $mungok;
     }
 
     /**
-     * 생시를 이용하여 문창을 구한다.
+     * 지지의 월시를 이용하여 문창을 구한다.
+     * 유년문창
      */
     private function munchang_e($hour_e)
     {
-        $map = [
-            '子' => self::GUNG_SUL, '丑' => self::GUNG_YU, '寅' => self::GUNG_SIN, '卯' => self::GUNG_MI,
-            '辰' => self::GUNG_O, '巳' => self::GUNG_SA, '午' => self::GUNG_JIN, '未' => self::GUNG_MYO,
-            '申' => self::GUNG_IN, '酉' => self::GUNG_CHUK, '戌' => self::GUNG_JA, '亥' => self::GUNG_HAE,
-        ];
+        $munchang = array_fill(0, 12, null);
+        switch ($hour_e) {
+            case '子': $munchang[8] = '문창';
+                break;
+            case '丑': $munchang[7] = '문창';
+                break;
+            case '寅': $munchang[6] = '문창';
+                break;
+            case '卯': $munchang[5] = '문창';
+                break;
+            case '辰': $munchang[4] = '문창';
+                break;
+            case '巳': $munchang[3] = '문창';
+                break;
+            case '午': $munchang[2] = '문창';
+                break;
+            case '未': $munchang[1] = '문창';
+                break;
+            case '申': $munchang[0] = '문창';
+                break;
+            case '酉': $munchang[11] = '문창';
+                break;
+            case '戌': $munchang[10] = '문창';
+                break;
+            case '亥': $munchang[9] = '문창';
+                break;
+        }
 
-        return $this->placeStarByMap('문창', $map, $hour_e);
+        return $munchang;
+
     }
 
     /**
-     * 생시를 이용하여 문곡을 구한다.
+     * 지지의 월시를 이용하여 문창을 구한다.
      */
     private function mungok_e($hour_e)
     {
-        $map = [
-            '子' => self::GUNG_JIN, '丑' => self::GUNG_SA, '寅' => self::GUNG_O, '卯' => self::GUNG_MI,
-            '辰' => self::GUNG_SIN, '巳' => self::GUNG_YU, '午' => self::GUNG_SUL, '未' => self::GUNG_HAE,
-            '申' => self::GUNG_JA, '酉' => self::GUNG_CHUK, '戌' => self::GUNG_IN, '亥' => self::GUNG_MYO,
-        ];
+        $mungok = array_fill(0, 12, '');
+        switch ($hour_e) {
+            case '子': $mungok[2] = '문곡';
+                break;
+            case '丑': $mungok[3] = '문곡';
+                break;
+            case '寅': $mungok[4] = '문곡';
+                break;
+            case '卯': $mungok[5] = '문곡';
+                break;
+            case '辰': $mungok[6] = '문곡';
+                break;
+            case '巳': $mungok[7] = '문곡';
+                break;
+            case '午': $mungok[8] = '문곡';
+                break;
+            case '未': $mungok[9] = '문곡';
+                break;
+            case '申': $mungok[10] = '문곡';
+                break;
+            case '酉': $mungok[11] = '문곡';
+                break;
+            case '戌': $mungok[0] = '문곡';
+                break;
+            case '亥': $mungok[1] = '문곡';
+                break;
+        }
 
-        return $this->placeStarByMap('문곡', $map, $hour_e);
+        return $mungok;
     }
 
     /**
-     * 년간을 이용하여 녹존, 경양, 타라 구하기
+     * 년간을 이용하여
+     * 녹존 경양 타라 구하기
+     * 굳이 my 가아니라 유년, 대한에도 동일 공식이 들어감
      */
     private function nokGungTara($year_h)
     {
-        $positions = [
-            '甲' => ['nokjon' => self::GUNG_IN,  'gyungryang' => self::GUNG_MYO, 'tara' => self::GUNG_CHUK],
-            '乙' => ['nokjon' => self::GUNG_MYO, 'gyungryang' => self::GUNG_JIN, 'tara' => self::GUNG_IN],
-            '丙' => ['nokjon' => self::GUNG_SA,  'gyungryang' => self::GUNG_O,   'tara' => self::GUNG_JIN],
-            '戊' => ['nokjon' => self::GUNG_SA,  'gyungryang' => self::GUNG_O,   'tara' => self::GUNG_JIN],
-            '丁' => ['nokjon' => self::GUNG_O,   'gyungryang' => self::GUNG_MI,  'tara' => self::GUNG_SA],
-            '己' => ['nokjon' => self::GUNG_O,   'gyungryang' => self::GUNG_MI,  'tara' => self::GUNG_SA],
-            '庚' => ['nokjon' => self::GUNG_SIN, 'gyungryang' => self::GUNG_YU,  'tara' => self::GUNG_MI],
-            '辛' => ['nokjon' => self::GUNG_YU,  'gyungryang' => self::GUNG_SUL, 'tara' => self::GUNG_SIN],
-            '壬' => ['nokjon' => self::GUNG_HAE, 'gyungryang' => self::GUNG_JA,  'tara' => self::GUNG_SUL],
-            '癸' => ['nokjon' => self::GUNG_JA,  'gyungryang' => self::GUNG_CHUK, 'tara' => self::GUNG_HAE],
-        ];
 
         $nokjon = array_fill(0, 12, null);
         $gyungryang = array_fill(0, 12, null);
         $tara = array_fill(0, 12, null);
-
-        if (isset($positions[$year_h])) {
-            $starPos = $positions[$year_h];
-            $nokjon[$starPos['nokjon']] = '녹존';
-            $gyungryang[$starPos['gyungryang']] = '경양';
-            $tara[$starPos['tara']] = '타라';
+        // #####경양 타라와 함께계산戊
+        switch ($year_h) {
+            case '甲':
+                $nokjon[0] = '녹존';
+                $gyungryang[1] = '경양';
+                $tara[11] = '타라';
+                break;
+            case '乙':
+                $nokjon[1] = '녹존';
+                $gyungryang[2] = '경양';
+                $tara[0] = '타라';
+                break;
+            case '庚':
+                $nokjon[6] = '녹존';
+                $gyungryang[7] = '경양';
+                $tara[5] = '타라';
+                break;
+            case '辛':
+                $nokjon[7] = '녹존';
+                $gyungryang[8] = '경양';
+                $tara[6] = '타라';
+                break;
+            case '壬':
+                $nokjon[9] = '녹존';
+                $gyungryang[10] = '경양';
+                $tara[8] = '타라';
+                break;
+            case '癸':
+                $nokjon[10] = '녹존';
+                $gyungryang[11] = '경양';
+                $tara[9] = '타라';
+                break;
+            case '丙': case '戊':
+                $nokjon[3] = '녹존';
+                $gyungryang[4] = '경양';
+                $tara[2] = '타라';
+                break;
+            case '丁': case '己':
+                $nokjon[4] = '녹존';
+                $gyungryang[5] = '경양';
+                $tara[3] = '타라';
+                break;
         }
 
-        return ['nokjon' => $nokjon, 'gyungryang' => $gyungryang, 'tara' => $tara];
+        return [
+            'nokjon' => $nokjon,
+            'gyungryang' => $gyungryang,
+            'tara' => $tara,
+        ];
     }
 
     // # 천형/천요/해신/연해/천월/음살/천무
-    /** 천형 */
+    /**
+     * 천형
+     */
     private function cheanhyung($lunar_month)
     {
         $map = [
-            '01' => self::GUNG_YU, '02' => self::GUNG_SUL, '03' => self::GUNG_HAE, '04' => self::GUNG_JA,
-            '05' => self::GUNG_CHUK, '06' => self::GUNG_IN, '07' => self::GUNG_MYO, '08' => self::GUNG_JIN,
-            '09' => self::GUNG_SA, '10' => self::GUNG_O, '11' => self::GUNG_MI, '12' => self::GUNG_SIN,
+            '01' => 7, '02' => 8, '03' => 9, '04' => 10, '05' => 11, '06' => 0,
+            '07' => 1, '08' => 2, '09' => 3, '10' => 4, '11' => 5, '12' => 6,
         ];
 
-        return $this->placeStarByMap('천형', $map, $lunar_month);
+        $cheanhyung = array_fill(0, 12, null);
+        if (isset($map[$lunar_month])) {
+            $cheanhyung[$map[$lunar_month]] = '천형';
+        }
+
+        return $cheanhyung;
     }
 
-    /** 천요 */
+    /**
+     * 천요 구하기
+     */
     private function cheanyo($lunar_month)
     {
-        $map = [
-            '01' => self::GUNG_CHUK, '02' => self::GUNG_IN, '03' => self::GUNG_MYO, '04' => self::GUNG_JIN,
-            '05' => self::GUNG_SA, '06' => self::GUNG_O, '07' => self::GUNG_MI, '08' => self::GUNG_SIN,
-            '09' => self::GUNG_YU, '10' => self::GUNG_SUL, '11' => self::GUNG_HAE, '12' => self::GUNG_JA,
-        ];
+        $cheanyo = array_fill(0, 12, null);
+        switch ($lunar_month) {
+            case '01': $cheanyo[11] = '천요';
+                break;
+            case '02': $cheanyo[0] = '천요';
+                break;
+            case '03': $cheanyo[1] = '천요';
+                break;
+            case '04': $cheanyo[2] = '천요';
+                break;
+            case '05': $cheanyo[3] = '천요';
+                break;
+            case '06': $cheanyo[4] = '천요';
+                break;
+            case '07': $cheanyo[5] = '천요';
+                break;
+            case '08': $cheanyo[6] = '천요';
+                break;
+            case '09': $cheanyo[7] = '천요';
+                break;
+            case '10': $cheanyo[8] = '천요';
+                break;
+            case '11': $cheanyo[9] = '천요';
+                break;
+            case '12': $cheanyo[10] = '천요';
+                break;
+        }
 
-        return $this->placeStarByMap('천요', $map, $lunar_month);
+        return $cheanyo;
     }
 
-    /** 해신 */
+    /**
+     * 해신 구하기
+     */
     private function haesin($lunar_month)
     {
-        $map = [
-            '01' => self::GUNG_SIN, '02' => self::GUNG_SIN, '03' => self::GUNG_SUL, '04' => self::GUNG_SUL,
-            '05' => self::GUNG_JA, '06' => self::GUNG_JA, '07' => self::GUNG_IN, '08' => self::GUNG_IN,
-            '09' => self::GUNG_JIN, '10' => self::GUNG_JIN, '11' => self::GUNG_O, '12' => self::GUNG_O,
-        ];
+        $haesin = array_fill(0, 12, null);
+        switch ($lunar_month) {
+            case '01': case '02': $haesin[6] = '해신';
+                break;
+            case '03': case '04': $haesin[8] = '해신';
+                break;
+            case '05': case '06': $haesin[10] = '해신';
+                break;
+            case '07': case '08': $haesin[0] = '해신';
+                break;
+            case '09': case '10': $haesin[2] = '해신';
+                break;
+            case '11': case '12': $haesin[4] = '해신';
+                break;
+        }
 
-        return $this->placeStarByMap('해신', $map, $lunar_month);
+        return $haesin;
     }
 
-    /** 연해 */
+    /**
+     * 연해 구하기
+     */
     private function yeanhae($year_e)
     {
-        $map = [
-            '子' => self::GUNG_HAE, '丑' => self::GUNG_SUL, '寅' => self::GUNG_YU, '卯' => self::GUNG_SIN,
-            '辰' => self::GUNG_MI, '巳' => self::GUNG_O, '午' => self::GUNG_SA, '未' => self::GUNG_JIN,
-            '申' => self::GUNG_MYO, '酉' => self::GUNG_IN, '戌' => self::GUNG_CHUK, '亥' => self::GUNG_JA,
+        $yeanhae = array_fill(0, 12, null);
+        $positionMap = [
+            '子' => 9, '丑' => 8, '寅' => 7, '卯' => 6, '辰' => 5, '巳' => 4,
+            '午' => 3, '未' => 2, '申' => 1, '酉' => 0, '戌' => 11, '亥' => 10,
         ];
 
-        return $this->placeStarByMap('연해', $map, $year_e);
+        if (isset($positionMap[$year_e])) {
+            $yeanhae[$positionMap[$year_e]] = '연해';
+        }
+
+        return $yeanhae;
     }
 
-    /** 천월 */
+    /**
+     * 천월 구하기
+     */
     private function chenwol($lunar_month)
     {
-        $map = [
-            '01' => self::GUNG_SUL, '02' => self::GUNG_SA, '03' => self::GUNG_JIN, '04' => self::GUNG_IN,
-            '05' => self::GUNG_MI, '06' => self::GUNG_MYO, '07' => self::GUNG_HAE, '08' => self::GUNG_MI,
-            '09' => self::GUNG_IN, '10' => self::GUNG_O, '11' => self::GUNG_SUL, '12' => self::GUNG_IN,
-        ];
+        $chenwol = array_fill(0, 12, null);
+        if (($lunar_month == '04') || ($lunar_month == '09') || ($lunar_month == '12')) {
+            $chenwol[0] = '천월';
+        }
+        if (($lunar_month == '05') || ($lunar_month == '08')) {
+            $chenwol[5] = '천월';
+        }
+        if ($lunar_month == '02') {
+            $chenwol[3] = '천월';
+        }
+        if ($lunar_month == '03') {
+            $chenwol[2] = '천월';
+        }
+        if ($lunar_month == '06') {
+            $chenwol[1] = '천월';
+        }
+        if ($lunar_month == '07') {
+            $chenwol[9] = '천월';
+        }
+        if ($lunar_month == '10') {
+            $chenwol[4] = '천월';
+        }
+        if (($lunar_month == '01') || ($lunar_month == '11')) {
+            $chenwol[8] = '천월';
+        }
 
-        return $this->placeStarByMap('천월', $map, $lunar_month);
+        return $chenwol;
     }
 
-    /** 음살 */
+    /**
+     * 음살 구하기
+     */
     private function eumsal($lunar_month)
     {
-        $map = [
-            '01' => self::GUNG_IN, '02' => self::GUNG_JA, '03' => self::GUNG_SUL, '04' => self::GUNG_SIN,
-            '05' => self::GUNG_O, '06' => self::GUNG_JIN, '07' => self::GUNG_IN, '08' => self::GUNG_JA,
-            '09' => self::GUNG_SUL, '10' => self::GUNG_SIN, '11' => self::GUNG_O, '12' => self::GUNG_JIN,
-        ];
+        $eumsal = array_fill(0, 12, null);
+        if (($lunar_month == '01') || ($lunar_month == '07')) {
+            $eumsal[0] = '음살';
+        }
+        if (($lunar_month == '02') || ($lunar_month == '08')) {
+            $eumsal[10] = '음살';
+        }
+        if (($lunar_month == '03') || ($lunar_month == '09')) {
+            $eumsal[8] = '음살';
+        }
+        if (($lunar_month == '04') || ($lunar_month == '10')) {
+            $eumsal[6] = '음살';
+        }
+        if (($lunar_month == '05') || ($lunar_month == '11')) {
+            $eumsal[4] = '음살';
+        }
+        if (($lunar_month == '06') || ($lunar_month == '12')) {
+            $eumsal[2] = '음살';
+        }
 
-        return $this->placeStarByMap('음살', $map, $lunar_month);
+        return $eumsal;
     }
 
-    /** 천무 */
+    /**
+     * 천무구하기
+     */
     private function cheanmu($month_e)
     {
-        $map = [
-            '寅' => self::GUNG_SA, '午' => self::GUNG_SA, '戌' => self::GUNG_SA,
-            '申' => self::GUNG_IN, '子' => self::GUNG_IN, '辰' => self::GUNG_IN,
-            '巳' => self::GUNG_HAE, '酉' => self::GUNG_HAE, '丑' => self::GUNG_HAE,
-            '亥' => self::GUNG_SIN, '卯' => self::GUNG_SIN, '未' => self::GUNG_SIN,
-        ];
+        $cheanmu = array_fill(0, 12, null);
+        if (($month_e == '寅') || ($month_e == '午') || ($month_e == '戌')) {
+            $cheanmu[3] = '천무';
+        }
+        if (($month_e == '申') || ($month_e == '子') || ($month_e == '辰')) {
+            $cheanmu[0] = '천무';
+        }
+        if (($month_e == '巳') || ($month_e == '酉') || ($month_e == '丑')) {
+            $cheanmu[9] = '천무';
+        }
+        if (($month_e == '亥') || ($month_e == '卯') || ($month_e == '未')) {
+            $cheanmu[6] = '천무';
+        }
 
-        return $this->placeStarByMap('천무', $map, $month_e);
+        return $cheanmu;
     }
 
-    /** 천복 */
+    // ####삼태, 팔좌, 은광,천귀
+    /**
+     * 은광구하기
+     */
+    private function eunkwang($munchang, $lunar_day)
+    {
+        $lunar_day_temp = $lunar_day % 12;
+
+        $eunkwang = array_fill(0, 12, '');
+
+        $default = [11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        foreach ($munchang as $k => $v) {
+            if ($v) {
+
+                $start_index = $k;
+                $index = $default;
+                for ($i = 0; $i < $k; $i++) {
+                    $index_k = array_shift($index); // 맨 처음것 빼기
+                    array_push($index, $index_k); // 마지막값을 맨 앞으로 넣기
+                }
+
+                switch ($lunar_day_temp) {
+                    case 1: $eunkwang[$index[0]] = '은광';
+                        break;
+                    case 2: $eunkwang[$index[1]] = '은광';
+                        break;
+                    case 3: $eunkwang[$index[2]] = '은광';
+                        break;
+                    case 4: $eunkwang[$index[3]] = '은광';
+                        break;
+                    case 5: $eunkwang[$index[4]] = '은광';
+                        break;
+                    case 6: $eunkwang[$index[5]] = '은광';
+                        break;
+                    case 7: $eunkwang[$index[6]] = '은광';
+                        break;
+                    case 8: $eunkwang[$index[7]] = '은광';
+                        break;
+                    case 9: $eunkwang[$index[8]] = '은광';
+                        break;
+                    case 10: $eunkwang[$index[9]] = '은광';
+                        break;
+                    case 11: $eunkwang[$index[10]] = '은광';
+                        break;
+                    case 0: $eunkwang[$index[11]] = '은광';
+                        break;
+                }
+            }
+        }
+
+        return $eunkwang;
+    }
+
+    /**
+     * 천귀 구하기
+     */
+    private function cheungui($mungok_e, $lunar_day)
+    {
+        $lunar_day_temp = (int) $lunar_day % 12;
+        $cheungui = array_fill(0, 12, '');
+        $index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        foreach ($mungok_e as $k => $v) {
+            if ($v) {
+
+                $start_index = $k - 1;
+                if ($start_index < 0) {
+                    $start_index = 11;
+                }
+
+                foreach ($index as $k1 => $v1) {
+                    $index[$k1] = ($start_index + $k1) % 12;
+                }
+
+                switch ($lunar_day_temp) {
+                    case 1: $cheungui[$index[0]] = '천귀';
+                        break;
+                    case 2: $cheungui[$index[1]] = '천귀';
+                        break;
+                    case 3: $cheungui[$index[2]] = '천귀';
+                        break;
+                    case 4: $cheungui[$index[3]] = '천귀';
+                        break;
+                    case 5: $cheungui[$index[4]] = '천귀';
+                        break;
+                    case 6: $cheungui[$index[5]] = '천귀';
+                        break;
+                    case 7: $cheungui[$index[6]] = '천귀';
+                        break;
+                    case 8: $cheungui[$index[7]] = '천귀';
+                        break;
+                    case 9: $cheungui[$index[8]] = '천귀';
+                        break;
+                    case 10: $cheungui[$index[9]] = '천귀';
+                        break;
+                    case 11: $cheungui[$index[10]] = '천귀';
+                        break;
+                    case 0: $cheungui[$index[11]] = '천귀';
+                        break;
+                }
+            }
+        }
+
+        return $cheungui;
+
+    }
+
+    /**
+     * 삼태구하기
+     */
+    private function samtae($jabo, $lunar_day)
+    {
+        $lunar_day_temp = (int) $lunar_day % 12;
+        $samtae = array_fill(0, 12, '');
+
+        $index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+        foreach ($jabo as $k => $v) {
+            if ($v) {
+
+                $start_index = $k;
+
+                foreach ($index as $k1 => $v1) {
+                    $index[$k1] = ($start_index + $k1) % 12;
+                }
+
+                switch ($lunar_day_temp) {
+                    case 1: $samtae[$index[0]] = '삼태';
+                        break;
+                    case 2: $samtae[$index[1]] = '삼태';
+                        break;
+                    case 3: $samtae[$index[2]] = '삼태';
+                        break;
+                    case 4: $samtae[$index[3]] = '삼태';
+                        break;
+                    case 5: $samtae[$index[4]] = '삼태';
+                        break;
+                    case 6: $samtae[$index[5]] = '삼태';
+                        break;
+                    case 7: $samtae[$index[6]] = '삼태';
+                        break;
+                    case 8: $samtae[$index[7]] = '삼태';
+                        break;
+                    case 9: $samtae[$index[8]] = '삼태';
+                        break;
+                    case 10: $samtae[$index[9]] = '삼태';
+                        break;
+                    case 11: $samtae[$index[10]] = '삼태';
+                        break;
+                    case 0: $samtae[$index[11]] = '삼태';
+                        break;
+                }
+            }
+        }
+
+        return $samtae;
+    }
+
+    /**
+     * 팔좌 구하기
+     */
+    private function paljoa($upil, $lunar_day)
+    {
+        $lunar_day_temp = (int) $lunar_day % 12;
+
+        $paljoa = array_fill(0, 12, '');
+
+        $default = [0, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+        foreach ($upil as $k => $v) {
+            if ($v) {
+
+                $start_index = $k;
+                $index = $default;
+                for ($i = 0; $i < $k; $i++) {
+                    // $index_k = array_shift($index);
+                    $index_k = array_pop($index); // 마지막깞 빼기
+                    array_unshift($index, $index_k); // 마지막값을 맨 앞으로 넣기
+
+                }
+
+                switch ($lunar_day_temp) {
+                    case 1: $paljoa[$index[0]] = '팔좌';
+                        break;
+                    case 2: $paljoa[$index[1]] = '팔좌';
+                        break;
+                    case 3: $paljoa[$index[2]] = '팔좌';
+                        break;
+                    case 4: $paljoa[$index[3]] = '팔좌';
+                        break;
+                    case 5: $paljoa[$index[4]] = '팔좌';
+                        break;
+                    case 6: $paljoa[$index[5]] = '팔좌';
+                        break;
+                    case 7: $paljoa[$index[6]] = '팔좌';
+                        break;
+                    case 8: $paljoa[$index[7]] = '팔좌';
+                        break;
+                    case 9: $paljoa[$index[8]] = '팔좌';
+                        break;
+                    case 10: $paljoa[$index[9]] = '팔좌';
+                        break;
+                    case 11: $paljoa[$index[10]] = '팔좌';
+                        break;
+                    case 0: $paljoa[$index[11]] = '팔좌';
+                        break;
+                }
+            }
+        }
+
+        return $paljoa;
+    }
+
+    // cheanbok천복,cheanguan천관,jealgong절공,sungong순공
+    /**
+     * 천복 구하기
+     */
     private function cheanbok($year_h)
     {
-        $map = [
-            '甲' => self::GUNG_YU, '乙' => self::GUNG_SIN, '丙' => self::GUNG_JA, '丁' => self::GUNG_HAE,
-            '戊' => self::GUNG_MYO, '己' => self::GUNG_IN, '庚' => self::GUNG_O, '辛' => self::GUNG_SA,
-            '壬' => self::GUNG_O, '癸' => self::GUNG_SA,
-        ];
+        $cheanbok = array_fill(0, 12, '');
+        if ($year_h == '甲') {
+            $cheanbok[7] = '천복';
+        }
+        if ($year_h == '乙') {
+            $cheanbok[6] = '천복';
+        }
+        if ($year_h == '丙') {
+            $cheanbok[10] = '천복';
+        }
+        if ($year_h == '丁') {
+            $cheanbok[9] = '천복';
+        }
+        if ($year_h == '戊') {
+            $cheanbok[1] = '천복';
+        }
+        if ($year_h == '己') {
+            $cheanbok[0] = '천복';
+        }
+        if ($year_h == '庚') {
+            $cheanbok[4] = '천복';
+        }
+        if ($year_h == '辛') {
+            $cheanbok[3] = '천복';
+        }
+        if ($year_h == '壬') {
+            $cheanbok[4] = '천복';
+        }
+        if ($year_h == '癸') {
+            $cheanbok[3] = '천복';
+        }
 
-        return $this->placeStarByMap('천복', $map, $year_h);
+        return $cheanbok;
     }
 
-    /** 천관 */
+    /**
+     * 천관 구하기
+     */
     private function cheanguan($year_h)
     {
-        $map = [
-            '甲' => self::GUNG_MI, '乙' => self::GUNG_JIN, '丙' => self::GUNG_SA, '丁' => self::GUNG_HAE,
-            '戊' => self::GUNG_MYO, '己' => self::GUNG_YU, '庚' => self::GUNG_HAE, '辛' => self::GUNG_YU,
-            '壬' => self::GUNG_SUL, '癸' => self::GUNG_O,
-        ];
+        $cheanguan = array_fill(0, 12, '');
+        if ($year_h == '甲') {
+            $cheanguan[5] = '천관';
+        }
+        if ($year_h == '乙') {
+            $cheanguan[2] = '천관';
+        }
+        if ($year_h == '丙') {
+            $cheanguan[3] = '천관';
+        }
+        if ($year_h == '丁') {
+            $cheanguan[9] = '천관';
+        }
+        if ($year_h == '戊') {
+            $cheanguan[1] = '천관';
+        }
+        if ($year_h == '己') {
+            $cheanguan[7] = '천관';
+        }
+        if ($year_h == '庚') {
+            $cheanguan[9] = '천관';
+        }
+        if ($year_h == '辛') {
+            $cheanguan[7] = '천관';
+        }
+        if ($year_h == '壬') {
+            $cheanguan[8] = '천관';
+        }
+        if ($year_h == '癸') {
+            $cheanguan[4] = '천관';
+        }
 
-        return $this->placeStarByMap('천관', $map, $year_h);
+        return $cheanguan;
     }
 
-    /** 절공 */
+    /**
+     * 절공 구하기
+     */
     private function jealgong($year_h)
     {
-        $map = [
-            '甲' => self::GUNG_SIN, '乙' => self::GUNG_O, '丙' => self::GUNG_JIN, '丁' => self::GUNG_MYO,
-            '戊' => self::GUNG_JA, '己' => self::GUNG_YU, '庚' => self::GUNG_O, '辛' => self::GUNG_SA,
-            '壬' => self::GUNG_IN, '癸' => self::GUNG_CHUK,
-        ];
+        $jealgong = array_fill(0, 12, '');
+        if ($year_h == '甲') {
+            $jealgong[6] = '절공';
+        }
+        if ($year_h == '乙') {
+            $jealgong[4] = '절공';
+        }
+        if ($year_h == '丙') {
+            $jealgong[2] = '절공';
+        }
+        if ($year_h == '丁') {
+            $jealgong[1] = '절공';
+        }
+        if ($year_h == '戊') {
+            $jealgong[10] = '절공';
+        }
+        if ($year_h == '己') {
+            $jealgong[7] = '절공';
+        }
+        if ($year_h == '庚') {
+            $jealgong[4] = '절공';
+        }
+        if ($year_h == '辛') {
+            $jealgong[3] = '절공';
+        }
+        if ($year_h == '壬') {
+            $jealgong[0] = '절공';
+        }
+        if ($year_h == '癸') {
+            $jealgong[11] = '절공';
+        }
 
-        return $this->placeStarByMap('절공', $map, $year_h);
+        return $jealgong;
     }
 
-    /** 순공 */
+    /**
+     * 순공 구하기
+     */
     private function sungong($year_h, $year_e)
     {
         $year_he = $year_h.$year_e;
-        $map = [
-            '甲子' => self::GUNG_SUL, '丙寅' => self::GUNG_SUL, '戊辰' => self::GUNG_SUL, '庚午' => self::GUNG_SUL, '壬申' => self::GUNG_SUL,
-            '乙丑' => self::GUNG_HAE, '丁卯' => self::GUNG_HAE, '己巳' => self::GUNG_HAE, '辛未' => self::GUNG_HAE, '癸酉' => self::GUNG_HAE,
-            '甲戌' => self::GUNG_SIN, '丙子' => self::GUNG_SIN, '戊寅' => self::GUNG_SIN, '庚辰' => self::GUNG_SIN, '壬午' => self::GUNG_SIN,
-            '乙亥' => self::GUNG_YU, '丁丑' => self::GUNG_YU, '己卯' => self::GUNG_YU, '辛巳' => self::GUNG_YU, '癸未' => self::GUNG_YU,
-            '甲申' => self::GUNG_O, '丙戌' => self::GUNG_O, '戊子' => self::GUNG_O, '庚寅' => self::GUNG_O, '壬辰' => self::GUNG_O,
-            '乙酉' => self::GUNG_MI, '丁亥' => self::GUNG_MI, '己丑' => self::GUNG_MI, '辛卯' => self::GUNG_MI, '癸巳' => self::GUNG_MI,
-            '甲午' => self::GUNG_JIN, '丙申' => self::GUNG_JIN, '戊戌' => self::GUNG_JIN, '庚子' => self::GUNG_JIN, '壬寅' => self::GUNG_JIN,
-            '乙未' => self::GUNG_SA, '丁酉' => self::GUNG_SA, '己亥' => self::GUNG_SA, '辛丑' => self::GUNG_SA, '癸卯' => self::GUNG_SA,
-            '甲辰' => self::GUNG_IN, '丙午' => self::GUNG_IN, '戊申' => self::GUNG_IN, '庚戌' => self::GUNG_IN, '壬子' => self::GUNG_IN,
-            '乙巳' => self::GUNG_MYO, '丁未' => self::GUNG_MYO, '己酉' => self::GUNG_MYO, '辛亥' => self::GUNG_MYO, '癸丑' => self::GUNG_MYO,
-            '甲寅' => self::GUNG_JA, '丙辰' => self::GUNG_JA, '戊午' => self::GUNG_JA, '庚申' => self::GUNG_JA, '壬戌' => self::GUNG_JA,
-            '乙卯' => self::GUNG_CHUK, '丁巳' => self::GUNG_CHUK, '己未' => self::GUNG_CHUK, '辛酉' => self::GUNG_CHUK, '癸亥' => self::GUNG_CHUK,
-        ];
+        $sungong = array_fill(0, 12, '');
 
-        return $this->placeStarByMap('순공', $map, $year_he);
+        switch ($year_he) {
+            case '甲子': case '丙寅': case '戊辰': case '庚午': case '壬申':
+                $sungong[8] = '순공';
+                break;
+            case '乙丑': case '丁卯': case '己巳': case '辛未': case '癸酉':
+                $sungong[9] = '순공';
+                break;
+            case '甲戌': case '丙子': case '戊寅': case '庚辰': case '壬午':
+                $sungong[6] = '순공';
+                break;
+            case '乙亥': case '丁丑': case '己卯': case '辛巳': case '癸未':
+                $sungong[7] = '순공';
+                break;
+            case '甲申': case '丙戌': case '戊子': case '庚寅': case '壬辰':
+                $sungong[4] = '순공';
+                break;
+            case '乙酉': case '丁亥': case '己丑': case '辛卯': case '癸巳':
+                $sungong[5] = '순공';
+                break;
+            case '甲午': case '丙申': case '戊戌': case '庚子': case '壬寅':
+                $sungong[2] = '순공';
+                break;
+            case '乙未': case '丁酉': case '己亥': case '辛丑': case '癸卯':
+                $sungong[3] = '순공';
+                break;
+            case '甲辰': case '丙午': case '戊申': case '庚戌': case '壬子':
+                $sungong[0] = '순공';
+                break;
+            case '乙巳': case '丁未': case '己酉': case '辛亥': case '癸丑':
+                $sungong[1] = '순공';
+                break;
+            case '甲寅': case '丙辰': case '戊午': case '庚申': case '壬戌':
+                $sungong[10] = '순공';
+                break;
+            case '乙卯': case '丁巳': case '己未': case '辛酉': case '癸亥':
+                $sungong[11] = '순공';
+                break;
+        }
+
+        return $sungong;
     }
 
-    /** 천주 */
+    /**
+     * 천주구하기
+     */
     private function cheanju($year_h)
     {
-        $map = [
-            '甲' => self::GUNG_SA, '乙' => self::GUNG_O, '丙' => self::GUNG_JA, '丁' => self::GUNG_SA,
-            '戊' => self::GUNG_O, '己' => self::GUNG_SIN, '庚' => self::GUNG_IN, '辛' => self::GUNG_O,
-            '壬' => self::GUNG_YU, '癸' => self::GUNG_HAE,
-        ];
+        $cheanju = array_fill(0, 12, '');
+        if ($year_h == '甲') {
+            $cheanju[3] = '천주';
+        }
+        if ($year_h == '丁') {
+            $cheanju[3] = '천주';
+        }
+        if ($year_h == '己') {
+            $cheanju[6] = '천주';
+        }
+        if ($year_h == '癸') {
+            $cheanju[9] = '천주';
+        }
+        if ($year_h == '乙') {
+            $cheanju[4] = '천주';
+        }
+        if ($year_h == '戊') {
+            $cheanju[4] = '천주';
+        }
+        if ($year_h == '辛') {
+            $cheanju[4] = '천주';
+        }
+        if ($year_h == '庚') {
+            $cheanju[0] = '천주';
+        }
+        if ($year_h == '丙') {
+            $cheanju[10] = '천주';
+        }
+        if ($year_h == '壬') {
+            $cheanju[7] = '천주';
+        }
 
-        return $this->placeStarByMap('천주', $map, $year_h);
+        return $cheanju;
     }
 
+    // hamji/guepsal/hwagae
     /**
      * 함지 구하기
      */
     private function hamji($year_e)
     {
-        $map = [
-            '寅' => self::GUNG_MYO, '午' => self::GUNG_MYO, '戌' => self::GUNG_MYO,
-            '申' => self::GUNG_YU,  '子' => self::GUNG_YU,  '辰' => self::GUNG_YU,
-            '巳' => self::GUNG_O,   '酉' => self::GUNG_O,   '丑' => self::GUNG_O,
-            '亥' => self::GUNG_IN,  '卯' => self::GUNG_IN,  '未' => self::GUNG_IN,
+        // 삼합(三合)에 따른 위치를 맵으로 정의
+        $positionMap = [
+            '寅' => 1, '午' => 1, '戌' => 1,
+            '申' => 7, '子' => 7, '辰' => 7,
+            '巳' => 4, '酉' => 4, '丑' => 4,
+            '亥' => 0, '卯' => 0, '未' => 0,
         ];
 
-        return $this->placeStarByMap('함지', $map, $year_e);
+        $position = $positionMap[$year_e] ?? -1; // 해당 지지가 없으면 -1
+
+        return $this->placeStarByMap('함지', $position);
     }
 
-    /** 화개 */
+    /**
+     * 화개 구하기
+     */
     private function hwagae($year_e)
     {
-        $map = [
-            '寅' => self::GUNG_SUL, '午' => self::GUNG_SUL, '戌' => self::GUNG_SUL,
-            '申' => self::GUNG_JIN, '子' => self::GUNG_JIN, '辰' => self::GUNG_JIN,
-            '巳' => self::GUNG_CHUK, '酉' => self::GUNG_CHUK, '丑' => self::GUNG_CHUK,
-            '亥' => self::GUNG_MI, '卯' => self::GUNG_MI, '未' => self::GUNG_MI,
-        ];
+        $hwagae = array_fill(0, 12, '');
 
-        return $this->placeStarByMap('화개', $map, $year_e);
+        if (($year_e == '寅') || ($year_e == '午') || ($year_e == '戌')) {
+            $hwagae[8] = '화개';
+        }
+        if (($year_e == '申') || ($year_e == '子') || ($year_e == '辰')) {
+            $hwagae[2] = '화개';
+        }
+        if (($year_e == '巳') || ($year_e == '酉') || ($year_e == '丑')) {
+            $hwagae[11] = '화개';
+        }
+        if (($year_e == '亥') || ($year_e == '卯') || ($year_e == '未')) {
+            $hwagae[5] = '화개';
+        }
+
+        return $hwagae;
     }
 
-    /** 고진 */
+    /**
+     * 고진
+     */
     private function gojin($year_e)
     {
-        $map = [
-            '寅' => self::GUNG_SA, '卯' => self::GUNG_SA, '辰' => self::GUNG_SA,
-            '巳' => self::GUNG_SIN, '午' => self::GUNG_SIN, '未' => self::GUNG_SIN,
-            '申' => self::GUNG_HAE, '酉' => self::GUNG_HAE, '戌' => self::GUNG_HAE,
-            '亥' => self::GUNG_IN, '子' => self::GUNG_IN, '丑' => self::GUNG_IN,
-        ];
+        $gojin = array_fill(0, 12, '');
 
-        return $this->placeStarByMap('고진', $map, $year_e);
+        if (($year_e == '寅') || ($year_e == '卯') || ($year_e == '辰')) {
+            $gojin[3] = '고진';
+        }
+        if (($year_e == '巳') || ($year_e == '午') || ($year_e == '未')) {
+            $gojin[6] = '고진';
+        }
+        if (($year_e == '申') || ($year_e == '酉') || ($year_e == '戌')) {
+            $gojin[9] = '고진';
+        }
+        if (($year_e == '亥') || ($year_e == '子') || ($year_e == '丑')) {
+            $gojin[0] = '고진';
+        }
+
+        return $gojin;
     }
 
-    /** 과숙 */
+    /**
+     * 과숙
+     */
     private function guasuck($year_e)
     {
-        $map = [
-            '寅' => self::GUNG_CHUK, '卯' => self::GUNG_CHUK, '辰' => self::GUNG_CHUK,
-            '巳' => self::GUNG_JIN, '午' => self::GUNG_JIN, '未' => self::GUNG_JIN,
-            '申' => self::GUNG_MI, '酉' => self::GUNG_MI, '戌' => self::GUNG_MI,
-            '亥' => self::GUNG_SUL, '子' => self::GUNG_SUL, '丑' => self::GUNG_SUL,
-        ];
+        $guasuck = array_fill(0, 12, '');
+        if (($year_e == '寅') || ($year_e == '卯') || ($year_e == '辰')) {
+            $guasuck[11] = '과숙';
+        }
+        if (($year_e == '巳') || ($year_e == '午') || ($year_e == '未')) {
+            $guasuck[2] = '과숙';
+        }
+        if (($year_e == '申') || ($year_e == '酉') || ($year_e == '戌')) {
+            $guasuck[5] = '과숙';
+        }
+        if (($year_e == '亥') || ($year_e == '子') || ($year_e == '丑')) {
+            $guasuck[8] = '과숙';
+        }
 
-        return $this->placeStarByMap('과숙', $map, $year_e);
+        return $guasuck;
     }
 
     // # cheanhue/cheangok/hongran/cheanhee
-    /** 천허 */
+    /**
+     * 천허
+     */
     private function cheanhue($year_e)
     {
-        $map = [
-            '子' => self::GUNG_O, '丑' => self::GUNG_MI, '寅' => self::GUNG_SIN, '卯' => self::GUNG_YU,
-            '辰' => self::GUNG_SUL, '巳' => self::GUNG_HAE, '午' => self::GUNG_JA, '未' => self::GUNG_CHUK,
-            '申' => self::GUNG_IN, '酉' => self::GUNG_MYO, '戌' => self::GUNG_JIN, '亥' => self::GUNG_SA,
-        ];
+        $cheanhue = array_fill(0, 12, '');
+        switch ($year_e) {
+            case '子': $cheanhue[4] = '천허';
+                break;
+            case '丑': $cheanhue[5] = '천허';
+                break;
+            case '寅': $cheanhue[6] = '천허';
+                break;
+            case '卯': $cheanhue[7] = '천허';
+                break;
+            case '辰': $cheanhue[8] = '천허';
+                break;
+            case '巳': $cheanhue[9] = '천허';
+                break;
+            case '午': $cheanhue[10] = '천허';
+                break;
+            case '未': $cheanhue[11] = '천허';
+                break;
+            case '申': $cheanhue[0] = '천허';
+                break;
+            case '酉': $cheanhue[1] = '천허';
+                break;
+            case '戌': $cheanhue[2] = '천허';
+                break;
+            case '亥': $cheanhue[3] = '천허';
+                break;
+        }
 
-        return $this->placeStarByMap('천허', $map, $year_e);
+        return $cheanhue;
     }
 
-    /** 천곡 */
+    /**
+     * 천곡
+     */
     private function cheangok($year_e)
     {
-        $map = [
-            '子' => self::GUNG_O, '丑' => self::GUNG_SA, '寅' => self::GUNG_JIN, '卯' => self::GUNG_MYO,
-            '辰' => self::GUNG_IN, '巳' => self::GUNG_CHUK, '午' => self::GUNG_JA, '未' => self::GUNG_HAE,
-            '申' => self::GUNG_SUL, '酉' => self::GUNG_YU, '戌' => self::GUNG_SIN, '亥' => self::GUNG_MI,
-        ];
+        $cheangok = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $cheangok[4] = '천곡';
+        }
+        if ($year_e == '丑') {
+            $cheangok[3] = '천곡';
+        }
+        if ($year_e == '寅') {
+            $cheangok[2] = '천곡';
+        }
+        if ($year_e == '卯') {
+            $cheangok[1] = '천곡';
+        }
+        if ($year_e == '辰') {
+            $cheangok[0] = '천곡';
+        }
+        if ($year_e == '巳') {
+            $cheangok[11] = '천곡';
+        }
+        if ($year_e == '午') {
+            $cheangok[10] = '천곡';
+        }
+        if ($year_e == '未') {
+            $cheangok[9] = '천곡';
+        }
+        if ($year_e == '申') {
+            $cheangok[8] = '천곡';
+        }
+        if ($year_e == '酉') {
+            $cheangok[7] = '천곡';
+        }
+        if ($year_e == '戌') {
+            $cheangok[6] = '천곡';
+        }
+        if ($year_e == '亥') {
+            $cheangok[5] = '천곡';
+        }
 
-        return $this->placeStarByMap('천곡', $map, $year_e);
+        return $cheangok;
     }
 
-    /** 홍란 */
+    /**
+     * 홍란
+     */
     private function hongran($year_e)
     {
-        $map = [
-            '子' => self::GUNG_MYO, '丑' => self::GUNG_IN, '寅' => self::GUNG_CHUK, '卯' => self::GUNG_JA,
-            '辰' => self::GUNG_HAE, '巳' => self::GUNG_SUL, '午' => self::GUNG_YU, '未' => self::GUNG_SIN,
-            '申' => self::GUNG_MI, '酉' => self::GUNG_O, '戌' => self::GUNG_SA, '亥' => self::GUNG_JIN,
-        ];
+        $hongran = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $hongran[1] = '홍란';
+        }
+        if ($year_e == '丑') {
+            $hongran[0] = '홍란';
+        }
+        if ($year_e == '寅') {
+            $hongran[11] = '홍란';
+        }
+        if ($year_e == '卯') {
+            $hongran[10] = '홍란';
+        }
+        if ($year_e == '辰') {
+            $hongran[9] = '홍란';
+        }
+        if ($year_e == '巳') {
+            $hongran[8] = '홍란';
+        }
+        if ($year_e == '午') {
+            $hongran[7] = '홍란';
+        }
+        if ($year_e == '未') {
+            $hongran[6] = '홍란';
+        }
+        if ($year_e == '申') {
+            $hongran[5] = '홍란';
+        }
+        if ($year_e == '酉') {
+            $hongran[4] = '홍란';
+        }
+        if ($year_e == '戌') {
+            $hongran[3] = '홍란';
+        }
+        if ($year_e == '亥') {
+            $hongran[2] = '홍란';
+        }
 
-        return $this->placeStarByMap('홍란', $map, $year_e);
+        return $hongran;
     }
 
-    /** 천희 */
+    /**
+     * 천희
+     */
     private function cheanhee($year_e)
     {
-        $map = [
-            '子' => self::GUNG_YU, '丑' => self::GUNG_SIN, '寅' => self::GUNG_MI, '卯' => self::GUNG_O,
-            '辰' => self::GUNG_SA, '巳' => self::GUNG_JIN, '午' => self::GUNG_MYO, '未' => self::GUNG_IN,
-            '申' => self::GUNG_CHUK, '酉' => self::GUNG_JA, '戌' => self::GUNG_HAE, '亥' => self::GUNG_SUL,
-        ];
+        $cheanhee = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $cheanhee[7] = '천희';
+        }
+        if ($year_e == '丑') {
+            $cheanhee[6] = '천희';
+        }
+        if ($year_e == '寅') {
+            $cheanhee[5] = '천희';
+        }
+        if ($year_e == '卯') {
+            $cheanhee[4] = '천희';
+        }
+        if ($year_e == '辰') {
+            $cheanhee[3] = '천희';
+        }
+        if ($year_e == '巳') {
+            $cheanhee[2] = '천희';
+        }
+        if ($year_e == '午') {
+            $cheanhee[1] = '천희';
+        }
+        if ($year_e == '未') {
+            $cheanhee[0] = '천희';
+        }
+        if ($year_e == '申') {
+            $cheanhee[11] = '천희';
+        }
+        if ($year_e == '酉') {
+            $cheanhee[10] = '천희';
+        }
+        if ($year_e == '戌') {
+            $cheanhee[9] = '천희';
+        }
+        if ($year_e == '亥') {
+            $cheanhee[8] = '천희';
+        }
 
-        return $this->placeStarByMap('천희', $map, $year_e);
+        return $cheanhee;
     }
 
-    /** 용지 */
+    // yongji/bonggak/cheanjae/cheansu
+    /**
+     * 용지
+     */
     private function yongji($year_e)
     {
-        $map = [
-            '子' => self::GUNG_JIN, '丑' => self::GUNG_SA, '寅' => self::GUNG_O, '卯' => self::GUNG_MI,
-            '辰' => self::GUNG_SIN, '巳' => self::GUNG_YU, '午' => self::GUNG_SUL, '未' => self::GUNG_HAE,
-            '申' => self::GUNG_JA, '酉' => self::GUNG_CHUK, '戌' => self::GUNG_IN, '亥' => self::GUNG_MYO,
-        ];
+        $yongji = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $yongji[2] = '용지';
+        }
+        if ($year_e == '丑') {
+            $yongji[3] = '용지';
+        }
+        if ($year_e == '寅') {
+            $yongji[4] = '용지';
+        }
+        if ($year_e == '卯') {
+            $yongji[5] = '용지';
+        }
+        if ($year_e == '辰') {
+            $yongji[6] = '용지';
+        }
+        if ($year_e == '巳') {
+            $yongji[7] = '용지';
+        }
+        if ($year_e == '午') {
+            $yongji[8] = '용지';
+        }
+        if ($year_e == '未') {
+            $yongji[9] = '용지';
+        }
+        if ($year_e == '申') {
+            $yongji[10] = '용지';
+        }
+        if ($year_e == '酉') {
+            $yongji[11] = '용지';
+        }
+        if ($year_e == '戌') {
+            $yongji[0] = '용지';
+        }
+        if ($year_e == '亥') {
+            $yongji[1] = '용지';
+        }
 
-        return $this->placeStarByMap('용지', $map, $year_e);
+        return $yongji;
     }
 
-    /** 봉각 */
+    /**
+     * 봉각
+     */
     private function bonggak($year_e)
     {
-        $map = [
-            '子' => self::GUNG_SUL, '丑' => self::GUNG_YU, '寅' => self::GUNG_SIN, '卯' => self::GUNG_MI,
-            '辰' => self::GUNG_O, '巳' => self::GUNG_SA, '午' => self::GUNG_JIN, '未' => self::GUNG_MYO,
-            '申' => self::GUNG_IN, '酉' => self::GUNG_CHUK, '戌' => self::GUNG_JA, '亥' => self::GUNG_HAE,
-        ];
-
-        return $this->placeStarByMap('봉각', $map, $year_e);
-    }
-
-    /** 천공 */
-    private function cheangong($year_e)
-    {
-        $map = [
-            '子' => self::GUNG_CHUK, '丑' => self::GUNG_IN, '寅' => self::GUNG_MYO, '卯' => self::GUNG_JIN,
-            '辰' => self::GUNG_SA, '巳' => self::GUNG_O, '午' => self::GUNG_MI, '未' => self::GUNG_SIN,
-            '申' => self::GUNG_YU, '酉' => self::GUNG_SUL, '戌' => self::GUNG_HAE, '亥' => self::GUNG_JA,
-        ];
-
-        return $this->placeStarByMap('천공', $map, $year_e);
-    }
-
-    /** 대모 */
-    private function daemo($year_e)
-    {
-        $map = [
-            '子' => self::GUNG_MI, '丑' => self::GUNG_O, '寅' => self::GUNG_YU, '卯' => self::GUNG_SIN,
-            '辰' => self::GUNG_HAE, '巳' => self::GUNG_SUL, '午' => self::GUNG_CHUK, '未' => self::GUNG_JA,
-            '申' => self::GUNG_MYO, '酉' => self::GUNG_IN, '戌' => self::GUNG_SA, '亥' => self::GUNG_JIN,
-        ];
-
-        return $this->placeStarByMap('대모', $map, $year_e);
-    }
-
-    /** 파쇄 */
-    private function pase($year_e)
-    {
-        $map = [
-            '子' => self::GUNG_SA, '丑' => self::GUNG_CHUK, '寅' => self::GUNG_YU, '卯' => self::GUNG_SA,
-            '辰' => self::GUNG_CHUK, '巳' => self::GUNG_YU, '午' => self::GUNG_SA, '未' => self::GUNG_CHUK,
-            '申' => self::GUNG_YU, '酉' => self::GUNG_SA, '戌' => self::GUNG_CHUK, '亥' => self::GUNG_YU,
-        ];
-
-        return $this->placeStarByMap('파쇄', $map, $year_e);
-    }
-
-    /** 천덕 */
-    private function cheanduk($year_e)
-    {
-        $map = [
-            '子' => self::GUNG_YU, '丑' => self::GUNG_SUL, '寅' => self::GUNG_HAE, '卯' => self::GUNG_JA,
-            '辰' => self::GUNG_CHUK, '巳' => self::GUNG_IN, '午' => self::GUNG_MYO, '未' => self::GUNG_JIN,
-            '申' => self::GUNG_SA, '酉' => self::GUNG_O, '戌' => self::GUNG_MI, '亥' => self::GUNG_SIN,
-        ];
-
-        return $this->placeStarByMap('천덕', $map, $year_e);
-    }
-
-    /** 월덕 */
-    private function wolduk($year_e)
-    {
-        $map = [
-            '子' => self::GUNG_SA, '丑' => self::GUNG_O, '寅' => self::GUNG_MI, '卯' => self::GUNG_SIN,
-            '辰' => self::GUNG_YU, '巳' => self::GUNG_SUL, '午' => self::GUNG_HAE, '未' => self::GUNG_JA,
-            '申' => self::GUNG_CHUK, '酉' => self::GUNG_IN, '戌' => self::GUNG_MYO, '亥' => self::GUNG_JIN,
-        ];
-
-        return $this->placeStarByMap('월덕', $map, $year_e);
-    }
-
-    /** 홍염 */
-    private function hongyeam($year_h)
-    {
-        $map = [
-            '甲' => self::GUNG_O, '乙' => self::GUNG_SIN, '丙' => self::GUNG_IN, '丁' => self::GUNG_MI,
-            '戊' => self::GUNG_JIN, '己' => self::GUNG_JIN, '庚' => self::GUNG_SUL, '辛' => self::GUNG_YU,
-            '壬' => self::GUNG_JA, '癸' => self::GUNG_SIN,
-        ];
-
-        return $this->placeStarByMap('홍염', $map, $year_h);
-    }
-
-    /** 비렴 */
-    private function biryeum($year_e)
-    {
-        $map = [
-            '子' => self::GUNG_SIN, '丑' => self::GUNG_YU, '寅' => self::GUNG_SUL, '卯' => self::GUNG_SA,
-            '辰' => self::GUNG_O, '巳' => self::GUNG_MI, '午' => self::GUNG_IN, '未' => self::GUNG_MYO,
-            '申' => self::GUNG_JIN, '酉' => self::GUNG_HAE, '戌' => self::GUNG_JA, '亥' => self::GUNG_CHUK,
-        ];
-
-        return $this->placeStarByMap('비렴', $map, $year_e);
-    }
-
-    /** 겁살 (장성12신 중 하나) */
-    private function guepsal($year_e)
-    {
-        $map = [
-            '寅' => self::GUNG_HAE, '午' => self::GUNG_HAE, '戌' => self::GUNG_HAE,
-            '申' => self::GUNG_SA, '子' => self::GUNG_SA, '辰' => self::GUNG_SA,
-            '巳' => self::GUNG_IN, '酉' => self::GUNG_IN, '丑' => self::GUNG_IN,
-            '亥' => self::GUNG_SIN, '卯' => self::GUNG_SIN, '未' => self::GUNG_SIN,
-        ];
-
-        return $this->placeStarByMap('겁살', $map, $year_e);
-    }
-
-    /** 살성 중 [화성, 영성] 구하기 */
-    private function whasunYeungsung($year_e, $hour_e)
-    {
-        $whasung = array_fill(0, 12, null);
-        $yeungsung = array_fill(0, 12, null);
-
-        // 삼합 별 시작 위치 정의
-        $startPositions = [
-            '寅' => ['whasung_start' => self::GUNG_CHUK, 'yeungsung_start' => self::GUNG_MYO],
-            '午' => ['whasung_start' => self::GUNG_CHUK, 'yeungsung_start' => self::GUNG_MYO],
-            '戌' => ['whasung_start' => self::GUNG_CHUK, 'yeungsung_start' => self::GUNG_MYO],
-
-            '申' => ['whasung_start' => self::GUNG_IN, 'yeungsung_start' => self::GUNG_SUL],
-            '子' => ['whasung_start' => self::GUNG_IN, 'yeungsung_start' => self::GUNG_SUL],
-            '辰' => ['whasung_start' => self::GUNG_IN, 'yeungsung_start' => self::GUNG_SUL],
-
-            '巳' => ['whasung_start' => self::GUNG_MYO, 'yeungsung_start' => self::GUNG_SUL],
-            '酉' => ['whasung_start' => self::GUNG_MYO, 'yeungsung_start' => self::GUNG_SUL],
-            '丑' => ['whasung_start' => self::GUNG_MYO, 'yeungsung_start' => self::GUNG_SUL],
-
-            '亥' => ['whasung_start' => self::GUNG_SUL, 'yeungsung_start' => self::GUNG_SUL],
-            '卯' => ['whasung_start' => self::GUNG_SUL, 'yeungsung_start' => self::GUNG_SUL],
-            '未' => ['whasung_start' => self::GUNG_SUL, 'yeungsung_start' => self::GUNG_SUL],
-        ];
-
-        // 시지 순서에 따른 offset
-        $hourOffsets = [
-            '子' => 0, '丑' => 1, '寅' => 2, '卯' => 3, '辰' => 4, '巳' => 5,
-            '午' => 6, '未' => 7, '申' => 8, '酉' => 9, '戌' => 10, '亥' => 11,
-        ];
-
-        if (isset($startPositions[$year_e]) && isset($hourOffsets[$hour_e])) {
-            $start = $startPositions[$year_e];
-            $offset = $hourOffsets[$hour_e];
-
-            $whasungPosition = ($start['whasung_start'] + $offset) % 12;
-            $yeungsungPosition = ($start['yeungsung_start'] + $offset) % 12;
-
-            $whasung[$whasungPosition] = '화성';
-            $yeungsung[$yeungsungPosition] = '영성';
+        $bonggak = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $bonggak[8] = '봉각';
+        }
+        if ($year_e == '丑') {
+            $bonggak[7] = '봉각';
+        }
+        if ($year_e == '寅') {
+            $bonggak[6] = '봉각';
+        }
+        if ($year_e == '卯') {
+            $bonggak[5] = '봉각';
+        }
+        if ($year_e == '辰') {
+            $bonggak[4] = '봉각';
+        }
+        if ($year_e == '巳') {
+            $bonggak[3] = '봉각';
+        }
+        if ($year_e == '午') {
+            $bonggak[2] = '봉각';
+        }
+        if ($year_e == '未') {
+            $bonggak[1] = '봉각';
+        }
+        if ($year_e == '申') {
+            $bonggak[0] = '봉각';
+        }
+        if ($year_e == '酉') {
+            $bonggak[11] = '봉각';
+        }
+        if ($year_e == '戌') {
+            $bonggak[10] = '봉각';
+        }
+        if ($year_e == '亥') {
+            $bonggak[9] = '봉각';
         }
 
-        return ['whasung' => $whasung, 'yeungsung' => $yeungsung];
-    }
-
-    /** 살성 중 [지공, 지겁] 구하기 */
-    private function jigongJigup($hour_e)
-    {
-        $positions = [
-            '子' => ['jigong' => self::GUNG_HAE, 'jigup' => self::GUNG_HAE],
-            '丑' => ['jigong' => self::GUNG_SUL, 'jigup' => self::GUNG_JA],
-            '寅' => ['jigong' => self::GUNG_YU, 'jigup' => self::GUNG_CHUK],
-            '卯' => ['jigong' => self::GUNG_SIN, 'jigup' => self::GUNG_IN],
-            '辰' => ['jigong' => self::GUNG_MI, 'jigup' => self::GUNG_MYO],
-            '巳' => ['jigong' => self::GUNG_O, 'jigup' => self::GUNG_JIN],
-            '午' => ['jigong' => self::GUNG_SA, 'jigup' => self::GUNG_SA],
-            '未' => ['jigong' => self::GUNG_JIN, 'jigup' => self::GUNG_O],
-            '申' => ['jigong' => self::GUNG_MYO, 'jigup' => self::GUNG_MI],
-            '酉' => ['jigong' => self::GUNG_IN, 'jigup' => self::GUNG_SIN],
-            '戌' => ['jigong' => self::GUNG_CHUK, 'jigup' => self::GUNG_YU],
-            '亥' => ['jigong' => self::GUNG_JA, 'jigup' => self::GUNG_SUL],
-        ];
-
-        $jigong = array_fill(0, 12, null);
-        $jigup = array_fill(0, 12, null);
-
-        if (isset($positions[$hour_e])) {
-            $starPos = $positions[$hour_e];
-            $jigong[$starPos['jigong']] = '지공';
-            $jigup[$starPos['jigup']] = '지겁';
-        }
-
-        return ['jigong' => $jigong, 'jigup' => $jigup];
+        return $bonggak;
     }
 
     /**
@@ -1192,16 +1785,249 @@ class JamiDusu
         return $chensa;
     }
 
+    // # #cheangong/daemo/pase/cheanduk/wolduk
+    /**
+     * 천공
+     */
+    private function cheangong($year_e)
+    {
+        $cheangong = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $cheangong[11] = '천공';
+        }
+        if ($year_e == '丑') {
+            $cheangong[0] = '천공';
+        }
+        if ($year_e == '寅') {
+            $cheangong[1] = '천공';
+        }
+        if ($year_e == '卯') {
+            $cheangong[2] = '천공';
+        }
+        if ($year_e == '辰') {
+            $cheangong[3] = '천공';
+        }
+        if ($year_e == '巳') {
+            $cheangong[4] = '천공';
+        }
+        if ($year_e == '午') {
+            $cheangong[5] = '천공';
+        }
+        if ($year_e == '未') {
+            $cheangong[6] = '천공';
+        }
+        if ($year_e == '申') {
+            $cheangong[7] = '천공';
+        }
+        if ($year_e == '酉') {
+            $cheangong[8] = '천공';
+        }
+        if ($year_e == '戌') {
+            $cheangong[9] = '천공';
+        }
+        if ($year_e == '亥') {
+            $cheangong[10] = '천공';
+        }
+
+        return $cheangong;
+    }
+
+    /**
+     * 대모
+     */
+    private function daemo($year_e)
+    {
+        $daemo = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $daemo[5] = '대모';
+        }
+        if ($year_e == '丑') {
+            $daemo[4] = '대모';
+        }
+        if ($year_e == '寅') {
+            $daemo[7] = '대모';
+        }
+        if ($year_e == '卯') {
+            $daemo[6] = '대모';
+        }
+        if ($year_e == '辰') {
+            $daemo[9] = '대모';
+        }
+        if ($year_e == '巳') {
+            $daemo[8] = '대모';
+        }
+        if ($year_e == '午') {
+            $daemo[11] = '대모';
+        }
+        if ($year_e == '未') {
+            $daemo[10] = '대모';
+        }
+        if ($year_e == '申') {
+            $daemo[1] = '대모';
+        }
+        if ($year_e == '酉') {
+            $daemo[0] = '대모';
+        }
+        if ($year_e == '戌') {
+            $daemo[3] = '대모';
+        }
+        if ($year_e == '亥') {
+            $daemo[2] = '대모';
+        }
+
+        return $daemo;
+    }
+
+    /**
+     * 파쇄
+     */
+    private function pase($year_e)
+    {
+        $pase = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $pase[3] = '파쇄';
+        }
+        if ($year_e == '丑') {
+            $pase[11] = '파쇄';
+        }
+        if ($year_e == '寅') {
+            $pase[7] = '파쇄';
+        }
+        if ($year_e == '卯') {
+            $pase[3] = '파쇄';
+        }
+        if ($year_e == '辰') {
+            $pase[11] = '파쇄';
+        }
+        if ($year_e == '巳') {
+            $pase[7] = '파쇄';
+        }
+        if ($year_e == '午') {
+            $pase[3] = '파쇄';
+        }
+        if ($year_e == '未') {
+            $pase[11] = '파쇄';
+        }
+        if ($year_e == '申') {
+            $pase[7] = '파쇄';
+        }
+        if ($year_e == '酉') {
+            $pase[3] = '파쇄';
+        }
+        if ($year_e == '戌') {
+            $pase[11] = '파쇄';
+        }
+        if ($year_e == '亥') {
+            $pase[7] = '파쇄';
+        }
+
+        return $pase;
+    }
+
+    /**
+     * 천덕
+     */
+    private function cheanduk($year_e)
+    {
+        $cheanduk = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $cheanduk[7] = '천덕';
+        }
+        if ($year_e == '丑') {
+            $cheanduk[8] = '천덕';
+        }
+        if ($year_e == '寅') {
+            $cheanduk[9] = '천덕';
+        }
+        if ($year_e == '卯') {
+            $cheanduk[10] = '천덕';
+        }
+        if ($year_e == '辰') {
+            $cheanduk[11] = '천덕';
+        }
+        if ($year_e == '巳') {
+            $cheanduk[0] = '천덕';
+        }
+        if ($year_e == '午') {
+            $cheanduk[1] = '천덕';
+        }
+        if ($year_e == '未') {
+            $cheanduk[2] = '천덕';
+        }
+        if ($year_e == '申') {
+            $cheanduk[3] = '천덕';
+        }
+        if ($year_e == '酉') {
+            $cheanduk[4] = '천덕';
+        }
+        if ($year_e == '戌') {
+            $cheanduk[5] = '천덕';
+        }
+        if ($year_e == '亥') {
+            $cheanduk[6] = '천덕';
+        }
+
+        return $cheanduk;
+    }
+
+    /**
+     * 월덕
+     */
+    private function wolduk($year_e)
+    {
+        $wolduk = array_fill(0, 12, '');
+        if ($year_e == '子') {
+            $wolduk[3] = '월덕';
+        }
+        if ($year_e == '丑') {
+            $wolduk[4] = '월덕';
+        }
+        if ($year_e == '寅') {
+            $wolduk[5] = '월덕';
+        }
+        if ($year_e == '卯') {
+            $wolduk[6] = '월덕';
+        }
+        if ($year_e == '辰') {
+            $wolduk[7] = '월덕';
+        }
+        if ($year_e == '巳') {
+            $wolduk[8] = '월덕';
+        }
+        if ($year_e == '午') {
+            $wolduk[9] = '월덕';
+        }
+        if ($year_e == '未') {
+            $wolduk[10] = '월덕';
+        }
+        if ($year_e == '申') {
+            $wolduk[11] = '월덕';
+        }
+        if ($year_e == '酉') {
+            $wolduk[0] = '월덕';
+        }
+        if ($year_e == '戌') {
+            $wolduk[1] = '월덕';
+        }
+        if ($year_e == '亥') {
+            $wolduk[2] = '월덕';
+        }
+
+        return $wolduk;
+    }
+
+    // 태보, 봉고
     /**
      * 태보
      */
     private function taebo($mungok)
     {
         $taebo = array_fill(0, 12, '');
-        $mungok_k = array_search('문곡', $mungok);
-        if ($mungok_k !== false) {
-            $taebo_k = ($mungok_k + 2) % 12;
-            $taebo[$taebo_k] = '태보';
+        foreach ($mungok as $k => $v) {
+            if ($v) {
+                $taebo_k = ($k + 2) % 12;
+                $taebo[$taebo_k] = '태보';
+            }
         }
 
         return $taebo;
@@ -1213,13 +2039,100 @@ class JamiDusu
     private function bonggo($mungok)
     {
         $bonggo = array_fill(0, 12, '');
-        $mungok_k = array_search('문곡', $mungok);
-        if ($mungok_k !== false) {
-            $bonggo_k = ($mungok_k + 10) % 12; // (k - 2 + 12) % 12 와 동일
-            $bonggo[$bonggo_k] = '봉고';
+        foreach ($mungok as $k => $v) {
+            if ($v) {
+                $bonggo_k = ($k + 10) % 12;
+                $bonggo[$bonggo_k] = '봉고';
+            }
         }
 
         return $bonggo;
+    }
+
+    /**
+     * 홍염
+     */
+    private function hongyeam($year_h)
+    {
+        $hongyeam = array_fill(0, 12, '');
+        if ($year_h == '甲') {
+            $hongyeam[4] = '홍염';
+        }
+        if ($year_h == '乙') {
+            $hongyeam[6] = '홍염';
+        }
+        if ($year_h == '丙') {
+            $hongyeam[0] = '홍염';
+        }
+        if ($year_h == '丁') {
+            $hongyeam[5] = '홍염';
+        }
+        if ($year_h == '戊') {
+            $hongyeam[2] = '홍염';
+        }
+        if ($year_h == '己') {
+            $hongyeam[2] = '홍염';
+        }
+        if ($year_h == '庚') {
+            $hongyeam[8] = '홍염';
+        }
+        if ($year_h == '辛') {
+            $hongyeam[7] = '홍염';
+        }
+        if ($year_h == '壬') {
+            $hongyeam[10] = '홍염';
+        }
+        if ($year_h == '癸') {
+            $hongyeam[6] = '홍염';
+        }
+
+        return $hongyeam;
+    }
+
+    /**
+     * 비렴
+     */
+    private function biryeum($year_e)
+    {
+        $biryeum = array_fill(0, 12, '');
+        if ($year_e == '寅') {
+            $biryeum[8] = '비렴';
+        }
+        if ($year_e == '卯') {
+            $biryeum[3] = '비렴';
+        }
+        if ($year_e == '辰') {
+            $biryeum[4] = '비렴';
+        }
+        if ($year_e == '巳') {
+            $biryeum[5] = '비렴';
+        }
+        if ($year_e == '午') {
+            $biryeum[0] = '비렴';
+        }
+        if ($year_e == '未') {
+            $biryeum[1] = '비렴';
+        }
+        if ($year_e == '申') {
+            $biryeum[2] = '비렴';
+        }
+        if ($year_e == '酉') {
+            $biryeum[9] = '비렴';
+        }
+        if ($year_e == '戌') {
+            $biryeum[10] = '비렴';
+        }
+        if ($year_e == '亥') {
+            $biryeum[11] = '비렴';
+        }
+        if ($year_e == '子') {
+            $biryeum[6] = '비렴';
+        }
+        if ($year_e == '丑') {
+            $biryeum[7] = '비렴';
+        }
+
+        return $biryeum;
     }
 
     // #생년태세12신
@@ -1266,6 +2179,7 @@ class JamiDusu
         return $taese;
     }
 
+    // ###############################################################################장성십이신/jangsung
     /**
      * 장성십이신/jangsung
      */
@@ -1291,6 +2205,26 @@ class JamiDusu
         }
 
         return $jangsung;
+    }
+
+    /**
+     * 겁살 구하기 (위의 장성 12살의 겁살 구하기와 같은 결론)
+     */
+    private function guepsal($year_e)
+    {
+        $guepsal = array_fill(0, 12, '');
+        switch ($year_e) {
+            case '寅': case '午': case '戌': $guepsal[9] = '겁살';
+                break;
+            case '申': case '子': case '辰': $guepsal[3] = '겁살';
+                break;
+            case '巳': case '酉': case '丑': $guepsal[0] = '겁살';
+                break;
+            case '亥': case '卯': case '未': $guepsal[6] = '겁살';
+                break;
+        }
+
+        return $guepsal;
     }
 
     /**
@@ -1782,6 +2716,288 @@ class JamiDusu
         }
 
         return $cheanma;
+    }
+
+    /**
+     * 살성 중 [화성, 영성'' 구하기
+     */
+    private function whasunYeungsung($year_e, $hour_e)
+    {
+        $whasung = array_fill(0, 12, null);
+        $yeungsung = array_fill(0, 12, null);
+        if (($year_e == '寅') || ($year_e == '午') || ($year_e == '戌')) {
+            if ($hour_e == '子') {
+                $whasung[11] = '화성';
+                $yeungsung[1] = '영성';
+            }
+
+            if ($hour_e == '丑') {
+                $whasung[0] = '화성';
+                $yeungsung[2] = '영성';
+            }
+            if ($hour_e == '寅') {
+                $whasung[1] = '화성';
+                $yeungsung[3] = '영성';
+            }
+            if ($hour_e == '卯') {
+                $whasung[2] = '화성';
+                $yeungsung[4] = '영성';
+            }
+            if ($hour_e == '辰') {
+                $whasung[3] = '화성';
+                $yeungsung[5] = '영성';
+            }
+            if ($hour_e == '巳') {
+                $whasung[4] = '화성';
+                $yeungsung[6] = '영성';
+            }
+            if ($hour_e == '午') {
+                $whasung[5] = '화성';
+                $yeungsung[7] = '영성';
+            }
+            if ($hour_e == '未') {
+                $whasung[6] = '화성';
+                $yeungsung[8] = '영성';
+            }
+            if ($hour_e == '申') {
+                $whasung[7] = '화성';
+                $yeungsung[9] = '영성';
+            }
+            if ($hour_e == '酉') {
+                $whasung[8] = '화성';
+                $yeungsung[10] = '영성';
+            }
+            if ($hour_e == '戌') {
+                $whasung[9] = '화성';
+                $yeungsung[11] = '영성';
+            }
+            if ($hour_e == '亥') {
+                $whasung[10] = '화성';
+                $yeungsung[12] = '영성';
+            }
+        }
+
+        if (($year_e == '申') || ($year_e == '子') || ($year_e == '辰')) {
+            if ($hour_e == '子') {
+                $whasung[0] = '화성';
+                $yeungsung[8] = '영성';
+            }
+            if ($hour_e == '丑') {
+                $whasung[1] = '화성';
+                $yeungsung[9] = '영성';
+            }
+            if ($hour_e == '寅') {
+                $whasung[2] = '화성';
+                $yeungsung[10] = '영성';
+            }
+            if ($hour_e == '卯') {
+                $whasung[3] = '화성';
+                $yeungsung[11] = '영성';
+            }
+            if ($hour_e == '辰') {
+                $whasung[4] = '화성';
+                $yeungsung[0] = '영성';
+            }
+            if ($hour_e == '巳') {
+                $whasung[5] = '화성';
+                $yeungsung[1] = '영성';
+            }
+            if ($hour_e == '午') {
+                $whasung[6] = '화성';
+                $yeungsung[2] = '영성';
+            }
+            if ($hour_e == '未') {
+                $whasung[7] = '화성';
+                $yeungsung[3] = '영성';
+            }
+            if ($hour_e == '申') {
+                $whasung[8] = '화성';
+                $yeungsung[4] = '영성';
+            }
+            if ($hour_e == '酉') {
+                $whasung[9] = '화성';
+                $yeungsung[5] = '영성';
+            }
+            if ($hour_e == '戌') {
+                $whasung[10] = '화성';
+                $yeungsung[6] = '영성';
+            }
+            if ($hour_e == '亥') {
+                $whasung[11] = '화성';
+                $yeungsung[7] = '영성';
+            }
+        }
+
+        if (($year_e == '巳') || ($year_e == '酉') || ($year_e == '丑')) {
+            if ($hour_e == '子') {
+                $whasung[1] = '화성';
+                $yeungsung[8] = '영성';
+            }
+            if ($hour_e == '丑') {
+                $whasung[2] = '화성';
+                $yeungsung[9] = '영성';
+            }
+            if ($hour_e == '寅') {
+                $whasung[3] = '화성';
+                $yeungsung[10] = '영성';
+            }
+            if ($hour_e == '卯') {
+                $whasung[4] = '화성';
+                $yeungsung[11] = '영성';
+            }
+            if ($hour_e == '辰') {
+                $whasung[5] = '화성';
+                $yeungsung[0] = '영성';
+            }
+            if ($hour_e == '巳') {
+                $whasung[6] = '화성';
+                $yeungsung[1] = '영성';
+            }
+            if ($hour_e == '午') {
+                $whasung[7] = '화성';
+                $yeungsung[2] = '영성';
+            }
+            if ($hour_e == '未') {
+                $whasung[8] = '화성';
+                $yeungsung[3] = '영성';
+            }
+            if ($hour_e == '申') {
+                $whasung[9] = '화성';
+                $yeungsung[4] = '영성';
+            }
+            if ($hour_e == '酉') {
+                $whasung[10] = '화성';
+                $yeungsung[5] = '영성';
+            }
+            if ($hour_e == '戌') {
+                $yeungsung_07 = '영성';
+                $whasung[11] = '화성';
+                $yeungsung[6] = '영성';
+            }
+            if ($hour_e == '亥') {
+                $whasung[0] = '화성';
+                $yeungsung[7] = '영성';
+            }
+        }
+
+        if (($year_e == '亥') || ($year_e == '卯') || ($year_e == '未')) {
+            if ($hour_e == '子') {
+                $whasung[7] = '화성';
+                $yeungsung[8] = '영성';
+            }
+            if ($hour_e == '丑') {
+                $whasung[8] = '화성';
+                $yeungsung[9] = '영성';
+            }
+            if ($hour_e == '寅') {
+                $whasung[9] = '화성';
+                $yeungsung[12] = '영성';
+            }
+            if ($hour_e == '卯') {
+                $whasung[10] = '화성';
+                $yeungsung[11] = '영성';
+            }
+            if ($hour_e == '辰') {
+                $whasung[11] = '화성';
+                $yeungsung[0] = '영성';
+            }
+            if ($hour_e == '巳') {
+                $whasung[0] = '화성';
+                $yeungsung[1] = '영성';
+            }
+            if ($hour_e == '午') {
+                $whasung[1] = '화성';
+                $yeungsung[2] = '영성';
+            }
+            if ($hour_e == '未') {
+                $whasung[2] = '화성';
+                $yeungsung[3] = '영성';
+            }
+            if ($hour_e == '申') {
+                $whasung[3] = '화성';
+                $yeungsung[4] = '영성';
+            }
+            if ($hour_e == '酉') {
+                $whasung[4] = '화성';
+                $yeungsung[5] = '영성';
+            }
+            if ($hour_e == '戌') {
+                $whasung[5] = '화성';
+                $yeungsung[6] = '영성';
+            }
+            if ($hour_e == '亥') {
+                $whasung[6] = '화성';
+                $yeungsung[7] = '영성';
+            }
+        }
+
+        return [
+            'whasung' => $whasung,
+            'yeungsung' => $yeungsung,
+        ];
+    }
+
+    // # 살성중 [지공, 지겁] 구하기
+    private function jigongJigup($hour_e)
+    {
+        $jigong = array_fill(0, 12, null);
+        $jigup = array_fill(0, 12, null);
+
+        switch ($hour_e) {
+            case '子':
+                $jigong[9] = '지공';
+                $jigup[9] = '지겁';
+                break;
+            case '丑':
+                $jigong[8] = '지공';
+                $jigup[10] = '지겁';
+                break;
+            case '寅':
+                $jigong[7] = '지공';
+                $jigup[11] = '지겁';
+                break;
+            case '卯':
+                $jigong[6] = '지공';
+                $jigup[0] = '지겁';
+                break;
+            case '辰':
+                $jigong[5] = '지공';
+                $jigup[1] = '지겁';
+                break;
+            case '巳':
+                $jigong[4] = '지공';
+                $jigup[2] = '지겁';
+                break;
+            case '午':
+                $jigong[3] = '지공';
+                $jigup[3] = '지겁';
+                break;
+            case '未':
+                $jigong[2] = '지공';
+                $jigup[4] = '지겁';
+                break;
+            case '申':
+                $jigong[1] = '지공';
+                $jigup[5] = '지겁';
+                break;
+            case '酉':
+                $jigong[0] = '지공';
+                $jigup[6] = '지겁';
+                break;
+            case '戌':
+                $jigong[11] = '지공';
+                $jigup[7] = '지겁';
+                break;
+            case '亥':
+                $jigong[10] = '지공';
+                $jigup[8] = '지겁';
+                break;
+        }
+
+        return [
+            'jigong' => $jigong,
+            'jigup' => $jigup,
+        ];
     }
 
     /**
@@ -2740,216 +3956,6 @@ class JamiDusu
         $goong['jami'][$k];
     }
 
-    // ####삼태, 팔좌, 은광,천귀
-    /**
-     * 은광구하기
-     */
-    private function eunkwang($munchang, $lunar_day)
-    {
-        $lunar_day_temp = $lunar_day % 12;
-
-        $eunkwang = array_fill(0, 12, '');
-
-        $default = [11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        foreach ($munchang as $k => $v) {
-            if ($v) {
-
-                $start_index = $k;
-                $index = $default;
-                for ($i = 0; $i < $k; $i++) {
-                    $index_k = array_shift($index); // 맨 처음것 빼기
-                    array_push($index, $index_k); // 마지막값을 맨 앞으로 넣기
-                }
-
-                switch ($lunar_day_temp) {
-                    case 1: $eunkwang[$index[0]] = '은광';
-                        break;
-                    case 2: $eunkwang[$index[1]] = '은광';
-                        break;
-                    case 3: $eunkwang[$index[2]] = '은광';
-                        break;
-                    case 4: $eunkwang[$index[3]] = '은광';
-                        break;
-                    case 5: $eunkwang[$index[4]] = '은광';
-                        break;
-                    case 6: $eunkwang[$index[5]] = '은광';
-                        break;
-                    case 7: $eunkwang[$index[6]] = '은광';
-                        break;
-                    case 8: $eunkwang[$index[7]] = '은광';
-                        break;
-                    case 9: $eunkwang[$index[8]] = '은광';
-                        break;
-                    case 10: $eunkwang[$index[9]] = '은광';
-                        break;
-                    case 11: $eunkwang[$index[10]] = '은광';
-                        break;
-                    case 0: $eunkwang[$index[11]] = '은광';
-                        break;
-                }
-            }
-        }
-
-        return $eunkwang;
-    }
-
-    /**
-     * 천귀 구하기
-     */
-    private function cheungui($mungok_e, $lunar_day)
-    {
-        $lunar_day_temp = (int) $lunar_day % 12;
-        $cheungui = array_fill(0, 12, '');
-        $index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-        foreach ($mungok_e as $k => $v) {
-            if ($v) {
-
-                $start_index = $k - 1;
-                if ($start_index < 0) {
-                    $start_index = 11;
-                }
-
-                foreach ($index as $k1 => $v1) {
-                    $index[$k1] = ($start_index + $k1) % 12;
-                }
-
-                switch ($lunar_day_temp) {
-                    case 1: $cheungui[$index[0]] = '천귀';
-                        break;
-                    case 2: $cheungui[$index[1]] = '천귀';
-                        break;
-                    case 3: $cheungui[$index[2]] = '천귀';
-                        break;
-                    case 4: $cheungui[$index[3]] = '천귀';
-                        break;
-                    case 5: $cheungui[$index[4]] = '천귀';
-                        break;
-                    case 6: $cheungui[$index[5]] = '천귀';
-                        break;
-                    case 7: $cheungui[$index[6]] = '천귀';
-                        break;
-                    case 8: $cheungui[$index[7]] = '천귀';
-                        break;
-                    case 9: $cheungui[$index[8]] = '천귀';
-                        break;
-                    case 10: $cheungui[$index[9]] = '천귀';
-                        break;
-                    case 11: $cheungui[$index[10]] = '천귀';
-                        break;
-                    case 0: $cheungui[$index[11]] = '천귀';
-                        break;
-                }
-            }
-        }
-
-        return $cheungui;
-
-    }
-
-    /**
-     * 삼태구하기
-     */
-    private function samtae($jabo, $lunar_day)
-    {
-        $lunar_day_temp = (int) $lunar_day % 12;
-        $samtae = array_fill(0, 12, '');
-
-        $index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-        foreach ($jabo as $k => $v) {
-            if ($v) {
-
-                $start_index = $k;
-
-                foreach ($index as $k1 => $v1) {
-                    $index[$k1] = ($start_index + $k1) % 12;
-                }
-
-                switch ($lunar_day_temp) {
-                    case 1: $samtae[$index[0]] = '삼태';
-                        break;
-                    case 2: $samtae[$index[1]] = '삼태';
-                        break;
-                    case 3: $samtae[$index[2]] = '삼태';
-                        break;
-                    case 4: $samtae[$index[3]] = '삼태';
-                        break;
-                    case 5: $samtae[$index[4]] = '삼태';
-                        break;
-                    case 6: $samtae[$index[5]] = '삼태';
-                        break;
-                    case 7: $samtae[$index[6]] = '삼태';
-                        break;
-                    case 8: $samtae[$index[7]] = '삼태';
-                        break;
-                    case 9: $samtae[$index[8]] = '삼태';
-                        break;
-                    case 10: $samtae[$index[9]] = '삼태';
-                        break;
-                    case 11: $samtae[$index[10]] = '삼태';
-                        break;
-                    case 0: $samtae[$index[11]] = '삼태';
-                        break;
-                }
-            }
-        }
-
-        return $samtae;
-    }
-
-    /**
-     * 팔좌 구하기
-     */
-    private function paljoa($upil, $lunar_day)
-    {
-        $lunar_day_temp = (int) $lunar_day % 12;
-
-        $paljoa = array_fill(0, 12, '');
-
-        $default = [0, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
-        foreach ($upil as $k => $v) {
-            if ($v) {
-
-                $start_index = $k;
-                $index = $default;
-                for ($i = 0; $i < $k; $i++) {
-                    // $index_k = array_shift($index);
-                    $index_k = array_pop($index); // 마지막깞 빼기
-                    array_unshift($index, $index_k); // 마지막값을 맨 앞으로 넣기
-
-                }
-
-                switch ($lunar_day_temp) {
-                    case 1: $paljoa[$index[0]] = '팔좌';
-                        break;
-                    case 2: $paljoa[$index[1]] = '팔좌';
-                        break;
-                    case 3: $paljoa[$index[2]] = '팔좌';
-                        break;
-                    case 4: $paljoa[$index[3]] = '팔좌';
-                        break;
-                    case 5: $paljoa[$index[4]] = '팔좌';
-                        break;
-                    case 6: $paljoa[$index[5]] = '팔좌';
-                        break;
-                    case 7: $paljoa[$index[6]] = '팔좌';
-                        break;
-                    case 8: $paljoa[$index[7]] = '팔좌';
-                        break;
-                    case 9: $paljoa[$index[8]] = '팔좌';
-                        break;
-                    case 10: $paljoa[$index[9]] = '팔좌';
-                        break;
-                    case 11: $paljoa[$index[10]] = '팔좌';
-                        break;
-                    case 0: $paljoa[$index[11]] = '팔좌';
-                        break;
-                }
-            }
-        }
-
-        return $paljoa;
-    }
-
     /**
      * 미두수의 명국(命局)을 계산합니다.
      */
@@ -3188,17 +4194,17 @@ class JamiDusu
     {
         $gung = array_fill(0, 12, null);
         $gung12 = ['父母', '福德', '田宅', '官祿', '奴僕', '遷移', '疾厄', '財帛', '子女', '夫妻', '兄弟'];
-
-        $myung_index = array_search('명', $myung);
-        if ($myung_index === false) {
-            return $gung;
-        }
-
-        // 명궁 다음 궁부터 시계 반대 방향으로 11개 궁을 배치
-        for ($i = 0; $i < 11; $i++) {
-            // 명궁 인덱스에서 1칸씩 빼면서 12로 나눈 나머지로 위치를 계산 (음수 방지 +12)
-            $palace_index = ($myung_index - 1 - $i + 12) % 12;
-            $gung[$palace_index] = $gung12[$i];
+        // [부모, 복덕, 전택, 관룍, 노족, 천이, 칠액, 재백, 자녀, 부처, 형제]
+        foreach ($myung as $k => $v) {
+            if ($v) {
+                for ($i = 0; $i < 11; $i++) { // gung 1 ~ 11, 0 제외
+                    $j = $i + ($k + 1);
+                    if ($j > 11) {
+                        $j = abs(12 - $j);
+                    }
+                    $gung[$j] = $gung12[$i];
+                }
+            }
         }
 
         return $gung;
@@ -3234,21 +4240,10 @@ class JamiDusu
         ];
     }
 
-    /**
-     * [REFACTORED HELPER]
-     * 지정된 규칙(map)에 따라 별 하나를 12궁 중 한 곳에 배치합니다.
-     *
-     * @param  string  $starName  배치할 별의 이름 (예: '문창')
-     * @param  array  $positionMap  ['입력값' => '궁 위치 상수'] 형태의 규칙 배열
-     * @param  string  $key  규칙을 찾기 위한 현재 입력값 (예: '甲', '子', '01')
-     * @return array 12궁에 별이 배치된 배열
-     */
-    private function placeStarByMap(string $starName, array $positionMap, string $key): array
+    private function placeStarByMap(string $starName, int $position): array
     {
         $palace = array_fill(0, 12, null);
-        $position = $positionMap[$key] ?? null;
-
-        if ($position !== null) {
+        if ($position >= 0 && $position < 12) {
             $palace[$position] = $starName;
         }
 
