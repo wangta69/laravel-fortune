@@ -5,7 +5,7 @@ function pad_zero1()
     return ji;
 }
 
-if (!function_exists('pad_zero')) {
+if (! function_exists('pad_zero')) {
     function pad_zero($no, $digit = 2)
     {
         return str_pad($no, $digit, '0', STR_PAD_LEFT);
@@ -17,17 +17,17 @@ if (!function_exists('pad_zero')) {
  * 모드를 사용할 경우 0이 나오는 것을 피하기 위해
  */
 // mod 를 보정하여 값 넘기기
-if (!function_exists('mod_zero_to_mod')) {
+if (! function_exists('mod_zero_to_mod')) {
     function mod_zero_to_mod($number, $mod)
     {
         $result = $number % $mod;
         $result = $result ? $result : $mod;
+
         return $result;
     }
 }
 
-
-if (!function_exists('user_date_format')) {
+if (! function_exists('user_date_format')) {
     /**
      * @params String $date 2020-20, 202020, 2020-20-20, 2020.20
      * @params String $format []: return as array,, -, null, .
@@ -43,7 +43,7 @@ if (!function_exists('user_date_format')) {
 
             $val = $date;
         } elseif (preg_match('|^([0-9]{1,4})[-.]?([0-9]{1,2})[-.]?([0-9]{1,2})?$|', trim($date), $match)) {
-            @list(, $y, $m, $d) = $match;
+            @[, $y, $m, $d] = $match;
 
             $val = [];
             array_push($val, $y);
@@ -62,12 +62,13 @@ if (!function_exists('user_date_format')) {
 /**
  * 맨 앞을 맨뒤로 보낸다.
  */
-if (!function_exists('arr_forward_rotate')) {
+if (! function_exists('arr_forward_rotate')) {
     function arr_forward_rotate($array, $distance)
     {
         for ($i = 0; $i < $distance; $i++) {
             array_push($array, array_shift($array));
         }
+
         return $array;
     }
 }
@@ -75,18 +76,19 @@ if (!function_exists('arr_forward_rotate')) {
 /**
  * 맨 뒤를 맨 앞으로 보낸다.
  */
-if (!function_exists('arr_reverse_rotate')) {
+if (! function_exists('arr_reverse_rotate')) {
     function arr_reverse_rotate($array, $distance)
     {
         for ($i = 0; $i < $distance; $i++) {
             array_unshift($array, array_pop($array));
         }
+
         return $array;
     }
 }
 
 // 년도의의 뒷자리를 기준으로 색상 가져오기
-if (!function_exists('zodiac_color')) {
+if (! function_exists('zodiac_color')) {
     function zodiac_color($h)
     {
         switch ($h) {
@@ -106,7 +108,7 @@ if (!function_exists('zodiac_color')) {
 }
 
 // 특정글자의 위치를 얻어와서 다른 언어의 동일 위치의 값을 가져온다.
-if (!function_exists('tr_code')) {
+if (! function_exists('tr_code')) {
     function tr_code($from, $to, $val)
     {
 
@@ -123,6 +125,7 @@ if (!function_exists('tr_code')) {
                     array_push($rtn, null);
                 }
             }
+
             return $rtn;
         } else { // string
             $key = array_search($val, $from);
@@ -139,15 +142,15 @@ if (!function_exists('tr_code')) {
 /**
  * 지지를 시리얼로 변경 (배열처리시)
  */
-if (!function_exists('e_to_serial')) {
+if (! function_exists('e_to_serial')) {
     function e_to_serial($e, $pad = false)
     {
 
         switch ($e) {
             case '子': $no = 0;
-                break;// 자
+                break; // 자
             case '丑': $no = 1;
-                break;// 축
+                break; // 축
             case '寅': $no = 2;
                 break; // 인
             case '卯': $no = 3;
@@ -163,11 +166,11 @@ if (!function_exists('e_to_serial')) {
             case '申': $no = 8;
                 break; // 신
             case '酉': $no = 9;
-                break; //유
+                break; // 유
             case '戌': $no = 10;
                 break; // 술
             case '亥': $no = 11;
-                break; //해
+                break; // 해
         }
 
         if ($pad == true) {
@@ -181,14 +184,14 @@ if (!function_exists('e_to_serial')) {
 /**
  * 월건을 볼때는 11월이 자 가 되고 1월이 인이 된다.
  */
-if (!function_exists('e_to_wolgun')) {
+if (! function_exists('e_to_wolgun')) {
     function e_to_wolgun($g, $pad = false)
     {
         switch ($g) {
             case '子': $no = 11;
-                break;// 자
+                break; // 자
             case '丑': $no = 12;
-                break;// 축
+                break; // 축
             case '寅': $no = 1;
                 break; // 인
             case '卯': $no = 2;
@@ -204,21 +207,22 @@ if (!function_exists('e_to_wolgun')) {
             case '申': $no = 7;
                 break; // 신
             case '酉': $no = 8;
-                break; //유
+                break; // 유
             case '戌': $no = 9;
                 break; // 술
             case '亥': $no = 10;
-                break; //해
+                break; // 해
         }
 
         if ($pad == true) {
             $no = str_pad($no, 2, '0', STR_PAD_LEFT);
         }
+
         return $no;
     }
 }
 
-if (!function_exists('h_to_serial')) {
+if (! function_exists('h_to_serial')) {
     function h_to_serial($h, $pad = false)
     {
         switch ($h) {
@@ -246,20 +250,21 @@ if (!function_exists('h_to_serial')) {
         if ($pad == true) {
             $no = str_pad($no, 2, '0', STR_PAD_LEFT);
         }
+
         return $no;
     }
 }
 
 /**
-  * 년월을 이용해서 단순하게 계산
-  */
-if (!function_exists('calgabja')) {
+ * 년월을 이용해서 단순하게 계산
+ */
+if (! function_exists('calgabja')) {
     function calgabja($year)
     {
         // 0 ~ 11
-        $h = ['庚','辛','壬','癸','甲','乙','丙','丁','戊','己'];
-        $e = ['申','酉','戌','亥', '子','丑','寅','卯','辰','巳','午','未'];
-        $rtn = new \stdClass();
+        $h = ['庚', '辛', '壬', '癸', '甲', '乙', '丙', '丁', '戊', '己'];
+        $e = ['申', '酉', '戌', '亥', '子', '丑', '寅', '卯', '辰', '巳', '午', '未'];
+        $rtn = new \stdClass;
         $remain = $year % 10;
         $rtn->h = $h[$remain];
         $remain = $year % 12;
@@ -269,15 +274,15 @@ if (!function_exists('calgabja')) {
     }
 }
 
-
 /**
-* 양력 연도로 내 나이를 계산
-*@param $yyyy 양력 생년
-*/
-if (!function_exists('korean_age')) {
+ * 양력 연도로 내 나이를 계산
+ *
+ * @param  $yyyy  양력 생년
+ */
+if (! function_exists('korean_age')) {
     function korean_age($yyyy)
     {
-        return  date('Y') - $yyyy + 1;
+        return date('Y') - $yyyy + 1;
     }
 }
 
@@ -286,20 +291,19 @@ if (!function_exists('korean_age')) {
  * 모드를 사용할 경우 0이 나오는 것을 피하기 위해
  */
 // mod 를 보정하여 값 넘기기
-if (!function_exists('correctMod')) {
+if (! function_exists('correctMod')) {
     function correctMod($mod, $number)
     {
         $result = $number % $mod;
         $result = $result ? $result : $mod;
+
         return $result;
     }
 }
 
-if (!function_exists('get_yeonji_from_year')) {
+if (! function_exists('get_yeonji_from_year')) {
     /**
      * 양력 년도를 해당 해의 년지(띠)로 변환합니다.
-     * @param int $year
-     * @return string
      */
     function get_yeonji_from_year(int $year): string
     {
@@ -311,107 +315,3 @@ if (!function_exists('get_yeonji_from_year')) {
         return $jiji[($year - 4) % 12];
     }
 }
-
-// function array_rotate($array, $distance = 1) {
-//   settype($array, 'array');
-//   $distance %= count($array);
-//   return array_merge(
-//       array_splice($array, $distance), // Last elements  - moved to the start
-//       $array                          //  First elements - appended to the end
-//   );
-// }
-
-// function array_rotate_assoc($array, $distance = 1) {
-//   $keys = array_keys((array)$array);
-//   $values = array_values((array)$array);
-//   return array_combine(
-//     array_rotate($keys, $distance),   // Rotated keys
-//     array_rotate($values, $distance) //  Rotated values
-//   );
-// }
-
-// if (!function_exists('oheng')) {
-//   // 천간 지지를 이용하여 오행 처리
-//   function oheng($he){
-//     $Oheng = [];
-//     switch($he){
-//       case '甲' : case '寅' :
-//         $Oheng= oheng_lang(0);
-//         $Oheng['flag'] = '+';
-//         break;
-//       case '乙' :  case '卯' :
-//         $Oheng= oheng_lang(0);
-//         $Oheng['flag'] = '-';
-//         break;
-//       case '丙' : case '巳' :
-//         $Oheng= oheng_lang(1);
-//         $Oheng['flag'] = '+';
-//         break;
-//       case '丁' : case '午' :
-//         $Oheng= oheng_lang(1);
-//         $Oheng['flag'] = '-';
-//         break;
-//       case '戊' : case '辰' : case '戌' :
-//         $Oheng= oheng_lang(2);
-//         $Oheng['flag'] = '+';
-//         break;
-//       case '己' : case '未' : case '丑' :
-//         $Oheng= oheng_lang(2);
-//         $Oheng['flag'] = '-';
-//         break;
-//       case '庚' : case '申' :
-//         $Oheng= oheng_lang(3);
-//         $Oheng['flag'] = '+';
-//         break;
-//       case '辛' : case '酉' :
-//         $Oheng= oheng_lang(3);
-//         $Oheng['flag'] = '-';
-//         break;
-//       case '壬' : case '亥' :
-//         $Oheng= oheng_lang(4);
-//         $Oheng['flag'] = '+';
-//         break;
-//       case '癸' : case '子' :
-//         $Oheng= oheng_lang(4);
-//         $Oheng['flag'] = '-';
-//         break;
-//     }
-
-//     return (object)$Oheng;
-//   }
-// }
-
-// if (!function_exists('oheng_lang')) {
-//   // 천간 지지를 이용하여 오행 처리
-//   function oheng_lang($serial){
-//     $ch = ['木', '火', '土', '金', '水'];
-//     $ko = ['목', '화', '토', '금', '수'];
-//     $en = ['thu', 'tue', 'sat', 'fri', 'wed'];
-
-//     return ['ch'=>$ch[$serial], 'ko'=>$ko[$serial], 'en'=>$en[$serial]];
-//   }
-
-// }
-
-
-/*
-// 한글을 한자로 변경
-function kor_to_ch($kor) {
-  switch($kor) {
-      // 12 살
-      case '지살': return '地殺';
-      case '도화': return '桃花';
-      case '월살': return '月殺';
-      case '망신': return '亡身';
-      case '장성': return '將星';
-      case '반안': return '攀鞍';
-      case '역마': return '驛馬';
-      case '육해': return '六害';
-      case '화개': return '華蓋';
-      case '겁살': return '劫殺';
-      case '재살': return '災殺';
-      case '천살': return '天殺';
-  }
-}
-
-*/
