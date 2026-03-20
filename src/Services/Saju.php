@@ -18,7 +18,7 @@ class Saju
 
     public $hi = '9999'; // 생시 hhmm (예 1330, 13시 30분)
 
-    public $hourKnown = true; // 시간 정보 유무를 나타내는 플래그
+    public $hourKnown = true; //  생시 정보 유무를 나타내는 플래그
 
     public $year = ['ch' => '', 'ko' => ''];
 
@@ -202,6 +202,10 @@ class Saju
     public function get_h($str)
     {
 
+        if ($str === 'hour' && ! $this->hourKnown) {
+            return '';
+        }
+
         return mb_substr($this->{$str}->ch, 0, 1);
     }
 
@@ -215,6 +219,10 @@ class Saju
      */
     public function get_e($str)
     {
+        if ($str === 'hour' && ! $this->hourKnown) {
+            return '';
+        }
+
         return mb_substr($this->{$str}->ch, 1, 1);
     }
 
@@ -233,6 +241,10 @@ class Saju
      */
     public function get_he($str)
     {
+        if ($str === 'hour' && ! $this->hourKnown) {
+            return ''; // 또는 '時柱不明'을 그대로 유지하고 싶다면 이 조건문을 생략
+        }
+
         return $this->{$str}->ch;
     }
 

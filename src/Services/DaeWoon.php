@@ -55,7 +55,6 @@ class DaeWoon
         $this->year_h = $saju->get_h('year');
         $this->month_e = $saju->get_e('month');
         $this->gender = $saju->gender;
-
         $this->direction = $this->get_direction();
 
         // $gabja_array = array('甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥');
@@ -64,21 +63,24 @@ class DaeWoon
         // daeun_l : 지지를 기준으로 하는 대운
         // $he = $this->month_h.$this->month_e;
 
+        $h_list = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        $e_list = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+        $h_idx = h_to_serial($this->month_h); // 乙 이면 1
+        $e_idx = e_to_serial($this->month_e); // 酉 면 9
+
         switch ($this->direction) {
             case 'forward':
-                // 기분배열을 천간월 만큰 로테이트 시킨다.
-                $arr1 = ['乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸', '甲'];
-                $this->daeun_h = arr_forward_rotate($arr1, h_to_serial($this->month_h));
-                $arr2 = ['丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子'];
-                $this->daeun_e = array_slice(arr_forward_rotate($arr2, e_to_serial($this->month_e)), 0, 10);
+                for ($i = 1; $i <= 10; $i++) {
+                    $this->daeun_h[] = $h_list[($h_idx + $i) % 10]; // 다음 글자부터 (+1)
+                    $this->daeun_e[] = $e_list[($e_idx + $i) % 12];
+                }
                 break;
             case 'reverse':
-
-                $arr1 = ['癸', '壬', '辛', '庚', '己', '戊', '丁', '丙', '乙', '甲'];
-                $this->daeun_h = arr_reverse_rotate($arr1, h_to_serial($this->month_h));
-                // 기준배열을 진간월 만큰 로테이트 시키되 앞자리 10개만 갸져온다.
-                $arr2 = ['亥', '戌', '酉', '申', '未', '午', '巳', '辰', '卯', '寅', '丑', '子'];
-                $this->daeun_e = array_slice(arr_reverse_rotate($arr2, e_to_serial($this->month_e)), 0, 10);
+                for ($i = 1; $i <= 10; $i++) {
+                    $this->daeun_h[] = $h_list[($h_idx - $i + 10) % 10]; // 이전 글자부터 (-1)
+                    $this->daeun_e[] = $e_list[($e_idx - $i + 12) % 12];
+                }
                 break;
         }
 
@@ -120,9 +122,25 @@ class DaeWoon
      */
     private function get_direction()
     {
+        // 천간이 갑병무경임(양간)인지 확인
         $isYangGan = in_array($this->year_h, ['甲', '丙', '戊', '庚', '壬']);
 
-        if (($this->gender === 'M' && $isYangGan) || ($this->gender === 'W' && ! $isYangGan)) {
+        // 성별 값을 대문자로 변환하여 정규화 ('w', 'f', 'W', 'F' 모두 대응)
+        $gender = strtoupper($this->gender);
+
+        // 여성 판별: 'W' (Woman) 또는 'F' (Female)
+        $isFemale = ($gender === 'W' || $gender === 'F');
+        // 남성 판별: 'M' (Male)
+        $isMale = ($gender === 'M');
+
+        /**
+         * 명리학 대운 방향 원칙:
+         * 1. 양남음녀(陽男陰女)는 순행 (forward)
+         *    - 남성(M)이면서 양간(Yang)일 때
+         *    - 여성(W/F)이면서 음간(!Yang)일 때
+         * 2. 그 외(음남양녀)는 역행 (reverse)
+         */
+        if (($isMale && $isYangGan) || ($isFemale && ! $isYangGan)) {
             return 'forward';
         }
 

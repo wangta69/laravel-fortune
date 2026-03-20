@@ -218,4 +218,31 @@ class Sipsin
         // 지지의 경우, 지장간을 고려하지 않고 대표 십신만 반환합니다.
         return self::$sipsinRules[$type][$dayMaster][$targetGanji] ?? null;
     }
+
+    /**
+     * 특정 십신이 원국(년, 월, 일, 시)에 총 몇 개 존재하는지 반환합니다.
+     *
+     * @param  string  $target  십신 명칭 (예: '식신', '상관', '편재' 등)
+     * @return int 해당 십신의 총 개수
+     */
+    public function getCount(string $target): int
+    {
+        $count = 0;
+        $pillars = ['year', 'month', 'day', 'hour'];
+
+        foreach ($pillars as $p) {
+            if (isset($this->{$p})) {
+                // 천간(h) 확인
+                if ($this->{$p}->h === $target) {
+                    $count++;
+                }
+                // 지지(e) 확인
+                if ($this->{$p}->e === $target) {
+                    $count++;
+                }
+            }
+        }
+
+        return $count;
+    }
 }
