@@ -226,25 +226,25 @@ if (! function_exists('h_to_serial')) {
     function h_to_serial($h, $pad = false)
     {
         switch ($h) {
-            case '甲': $no = 1;
+            case '甲': $no = 0;
                 break;
-            case '乙': $no = 2;
+            case '乙': $no = 1;
                 break;
-            case '丙': $no = 3;
+            case '丙': $no = 2;
                 break;
-            case '丁': $no = 4;
+            case '丁': $no = 3;
                 break;
-            case '戊': $no = 5;
+            case '戊': $no = 4;
                 break;
-            case '己': $no = 6;
+            case '己': $no = 5;
                 break;
-            case '庚': $no = 7;
+            case '庚': $no = 6;
                 break;
-            case '辛': $no = 8;
+            case '辛': $no = 7;
                 break;
-            case '壬': $no = 9;
+            case '壬': $no = 8;
                 break;
-            case '癸': $no = 10;
+            case '癸': $no = 9;
                 break;
         }
         if ($pad == true) {
