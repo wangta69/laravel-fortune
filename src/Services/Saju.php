@@ -198,15 +198,16 @@ class Saju
 
     /** 만세에서  천간 가져오기
      * @param  string  $str  hour | day | month | year
+     * @param  string  $lan  ch | ko
      */
-    public function get_h($str)
+    public function get_h($str, $lan = 'ch')
     {
 
         if ($str === 'hour' && ! $this->hourKnown) {
             return '';
         }
 
-        return mb_substr($this->{$str}->ch, 0, 1);
+        return mb_substr($this->{$str}->{$lan}, 0, 1);
     }
 
     public function get_h_serial($str)
@@ -216,14 +217,16 @@ class Saju
 
     /**
      * 만세에서 지지 가져오기
+     *
+     * @param  string  $lan  ch | ko
      */
-    public function get_e($str)
+    public function get_e($str, $lan = 'ch')
     {
         if ($str === 'hour' && ! $this->hourKnown) {
             return '';
         }
 
-        return mb_substr($this->{$str}->ch, 1, 1);
+        return mb_substr($this->{$str}->{$lan}, 1, 1);
     }
 
     public function get_e_serial($str)
@@ -238,14 +241,16 @@ class Saju
 
     /**
      * 만세력에서 60갑자 가져오기
+     *
+     * @param  string  $lan  ch | ko
      */
-    public function get_he($str)
+    public function get_he($str, $lan = 'ch')
     {
         if ($str === 'hour' && ! $this->hourKnown) {
             return ''; // 또는 '時柱不明'을 그대로 유지하고 싶다면 이 조건문을 생략
         }
 
-        return $this->{$str}->ch;
+        return $this->{$str}->{$lan};
     }
 
     /**
