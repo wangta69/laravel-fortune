@@ -39,6 +39,16 @@ class SinyakSingang
      */
     private $mySupporterElement;
 
+    public $total_score = 0;
+
+    public $result = '보통';
+
+    public $ally_scores_by_element = [];
+
+    public $day_master;
+
+    public $threshold = self::THRESHOLD;
+
     /**
      * 각 위치(궁위)별 오행 세력 가중치.
      * 사주에서 가장 영향력이 큰 월지(태어난 계절)에 가장 높은 점수를 부여합니다.
@@ -88,22 +98,20 @@ class SinyakSingang
     public function create(): object
     {
         $allyScores = $this->calculateAllyScores(); // 일간을 돕는 오행들의 총점 계산
-        $totalScore = array_sum($allyScores);
+        $this->total_score = array_sum($allyScores);
+        $this->ally_scores_by_element = $allyScores;
+        $this->day_master = $this->dayMaster;
 
         // 기준 점수(THRESHOLD)를 넘으면 '신강', 아니면 '신약'으로 판단
-        $result = ($totalScore >= self::THRESHOLD) ? '신강' : '신약';
+        $result = ($this->total_score >= self::THRESHOLD) ? '신강' : '신약';
         // 기준점 근처(±10)에 있으면 '중화' 사주로 판단하여 더 세밀한 결과를 제공
-        if (abs($totalScore - self::THRESHOLD) < 10) {
+        if (abs($this->total_score - self::THRESHOLD) < 10) {
             $result = '중화';
         }
 
-        return (object) [
-            'total_score' => $totalScore,
-            'threshold' => self::THRESHOLD,
-            'result' => $result,
-            'ally_scores_by_element' => $allyScores,
-            'day_master' => $this->dayMaster,
-        ];
+        $this->result = $result;
+
+        return $this;
     }
 
     /**

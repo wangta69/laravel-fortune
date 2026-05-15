@@ -103,12 +103,13 @@ class Lunar extends Lunar_API
             }
         } catch (\Exception $e) {
             // 날짜 파싱 실패 시 예외 처리
-            throw new \InvalidArgumentException('Invalid date format provided: '.$value);
+            // throw new \InvalidArgumentException('Invalid date format provided: '.$value);
+            $date = Carbon::now();
         }
 
         $this->year = $date->year;
-        $this->month = $date->month;
-        $this->day = $date->day;
+        $this->month = max(1, min(12, $date->month));
+        $this->day = max(1, min(31, $date->day));
 
         return $this;
     }
@@ -167,6 +168,16 @@ class Lunar extends Lunar_API
 
         foreach ($r as $k => $v) {
             $r[$k] = (int) $v;
+        }
+
+        // [핵심 추가] 파싱된 결과값 검증
+        if (isset($r[1])) {
+            if ($r[1] < 1) {
+                $r[1] = 1;
+            }
+            if ($r[1] > 12) {
+                $r[1] = 12;
+            }
         }
 
         return $r;

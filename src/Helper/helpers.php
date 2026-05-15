@@ -315,3 +315,25 @@ if (! function_exists('get_yeonji_from_year')) {
         return $jiji[($year - 4) % 12];
     }
 }
+
+if (! function_exists('format_ganji')) {
+    /**
+     * 한자 간지를 '한글(한자)' 형식으로 변환
+     * 예: '乙巳' -> '을사(乙巳)'
+     */
+    function format_ganji($hanja)
+    {
+        if (! $hanja) {
+            return '';
+        }
+
+        // 60간지 상수에서 해당 한자의 위치(Index)를 찾습니다.
+        $idx = array_search($hanja, GANJI['ch']);
+
+        if ($idx !== false) {
+            return GANJI['ko'][$idx]."({$hanja})";
+        }
+
+        return $hanja; // 찾지 못할 경우 원문 반환
+    }
+}

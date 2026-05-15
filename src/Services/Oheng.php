@@ -4,6 +4,8 @@ namespace Pondol\Fortune\Services;
 
 class Oheng
 {
+    private $saju;
+
     public $year_h;
 
     public $year_e;
@@ -29,6 +31,9 @@ class Oheng
      */
     public function withSaju(Saju $saju): self
     {
+
+        $this->saju = $saju;
+
         $this->year_h = $this->convert($saju->get_h('year'));
         $this->year_e = $this->convert($saju->get_e('year'));
         $this->month_h = $this->convert($saju->get_h('month'));
@@ -145,25 +150,39 @@ class Oheng
      */
     public function findYongsin(object $strengthResult): array
     {
-        $generationCycle = ['木' => '水', '火' => '木', '土' => '火', '金' => '土', '水' => '金']; // 인성(印星)
-        $overcomingCycle = ['木' => '金', '火' => '水', '土' => '木', '金' => '火', '水' => '土']; // 관성(官星)
-        $expressionCycle = array_flip($generationCycle); // 식상(食傷)
+        $dayMaster = $this->saju->get_h('day');
+        $monthE = $this->saju->get_e('month');
 
-        $dayMaster = $strengthResult->day_master;
+        $eokbu = $this->calculateEokbu($strengthResult, $dayMaster);
+        $johu = $this->calculateJohu($monthE);
+        $tonggwan = $this->calculateTonggwan();
 
-        if ($strengthResult->result === '신강') {
-            // 신강 사주: 힘이 넘치므로 억제하거나(관성), 기운을 빼주는(식상) 오행이 필요.
-            return [
-                'priority1' => $overcomingCycle[$dayMaster],
-                'priority2' => $expressionCycle[$dayMaster],
-            ];
-        } else {
-            // 신약 사주: 힘이 부족하므로 돕거나(인성), 같은 편(비겁)이 필요.
-            return [
-                'priority1' => $generationCycle[$dayMaster],
-                'priority2' => $dayMaster,
-            ];
+        // 1. 기본 순위는 억부(Eokbu)를 따릅니다.
+        $p1 = $eokbu['priority1'];
+        $p2 = $eokbu['priority2'];
+
+        // 2. 조후(Johu)가 있다면 긴급 상황으로 보고 우선순위를 높입니다.
+        if ($johu) {
+            $p1 = $johu;
+            $p2 = $eokbu['priority1'];
         }
+
+        // 3. [핵심 수정] 통관(Tonggwan) 용신이 감지되면 이는 사주의 심각한 갈등을
+        // 해결하는 기운이므로 조후(P1)를 밀어내고 1순위로 격상시킵니다.
+        // 이미지의 사주처럼 '수'가 많아 '불'이 꺼지는 상황에서 '목'이 통관으로 잡히면
+        // '목'이 1순위가 되어야 합니다.
+        if ($tonggwan) {
+            $p1 = $tonggwan;
+            $p2 = $johu ?: $eokbu['priority1'];
+        }
+
+        return [
+            'day_master' => $dayMaster,
+            'priority1' => $p1,
+            'priority2' => $p2,
+            'is_johu' => $johu ? true : false,
+            'is_tonggwan' => $tonggwan ? true : false,
+        ];
     }
 
     /**
@@ -186,6 +205,8 @@ class Oheng
             'yongsin' => $yongsin,
             'huisin' => $yongsinData['priority2'] ?? null,
             'gisin' => $gisin,
+            'is_johu' => $yongsinData['is_johu'], // 플래그 전달 추가
+            'is_tonggwan' => $yongsinData['is_tonggwan'], // 플래그 전달 추가
         ];
     }
 
@@ -214,6 +235,116 @@ class Oheng
         }
 
         return $count;
+    }
+
+    /**
+     * [조후 용신] 계절에 따른 긴급 처방
+     */
+    private function calculateJohu(string $monthE): ?string
+    {
+        // 겨울 (해, 자, 축월) -> 화(火) 필요
+        if (in_array($monthE, ['亥', '子', '丑'])) {
+            return '火';
+        }
+        // 여름 (사, 오, 미월) -> 수(水) 필요
+        if (in_array($monthE, ['巳', '午', '未'])) {
+            return '水';
+        }
+
+        return null; // 봄, 가을은 조후가 급하지 않음
+    }
+
+    /**
+     * [통관 용신] 강한 두 기운 사이의 다리 역할
+     */
+    private function calculateTonggwan(): ?string
+    {
+        $counts = $this->getOhaengCount();
+        $hanjaCounts = [];
+        foreach ($counts as $ko => $count) {
+            $hanjaCounts[$this->convertHangulToHanja($ko)] = $count;
+        }
+
+        // --- 1. 강한 기운이 약한 기운을 일방적으로 극할 때 (고립 구제) ---
+
+        // 수(水)가 강하고 화(火)가 약할 때: 수극화(水剋火)를 수생목->목생화로 연결
+        if (($hanjaCounts['水'] ?? 0) >= 3 && ($hanjaCounts['火'] ?? 0) <= 1) {
+            return '木';
+        }
+
+        // 금(金)이 강하고 목(木)이 약할 때: 금극목(金剋木)을 금생수->수생목으로 연결
+        if (($hanjaCounts['金'] ?? 0) >= 3 && ($hanjaCounts['木'] ?? 0) <= 1) {
+            return '水';
+        }
+
+        // 목(木)이 강하고 토(土)가 약할 때: 목극토(木剋土)를 목생화->화생토로 연결
+        if (($hanjaCounts['木'] ?? 0) >= 3 && ($hanjaCounts['土'] ?? 0) <= 1) {
+            return '火';
+        }
+
+        // 화(火)가 강하고 금(金)이 약할 때: 화극금(火剋金)을 화생토->토생금으로 연결
+        if (($hanjaCounts['火'] ?? 0) >= 3 && ($hanjaCounts['金'] ?? 0) <= 1) {
+            return '土';
+        }
+
+        // 토(土)가 강하고 수(水)가 약할 때: 토극수(土剋水)를 토생금->금생수로 연결
+        if (($hanjaCounts['土'] ?? 0) >= 3 && ($hanjaCounts['水'] ?? 0) <= 1) {
+            return '金';
+        }
+
+        // --- 2. 서로 강한 세력끼리 정면 충돌할 때 (세력 균형) ---
+
+        // 금(金) 3 vs 목(木) 3 이 싸울 때 -> 水로 통관
+        if (($hanjaCounts['金'] ?? 0) >= 3 && ($hanjaCounts['木'] ?? 0) >= 3) {
+            return '水';
+        }
+
+        // 목(木) 3 vs 토(土) 3 이 싸울 때 -> 火로 통관
+        if (($hanjaCounts['木'] ?? 0) >= 3 && ($hanjaCounts['土'] ?? 0) >= 3) {
+            return '火';
+        }
+
+        // 화(火) 3 vs 금(金) 3 이 싸울 때 -> 土로 통관
+        if (($hanjaCounts['火'] ?? 0) >= 3 && ($hanjaCounts['金'] ?? 0) >= 3) {
+            return '土';
+        }
+
+        // 토(土) 3 vs 수(水) 3 이 싸울 때 -> 金으로 통관
+        if (($hanjaCounts['土'] ?? 0) >= 3 && ($hanjaCounts['水'] ?? 0) >= 3) {
+            return '金';
+        }
+
+        // 수(水) 3 vs 화(火) 3 이 싸울 때 -> 木으로 통관
+        if (($hanjaCounts['水'] ?? 0) >= 3 && ($hanjaCounts['火'] ?? 0) >= 3) {
+            return '木';
+        }
+
+        return null;
+    }
+
+    /**
+     * [억부 용신] 기존의 강약 로직 분리
+     */
+    private function calculateEokbu(object $strengthResult, string $dayMaster): array
+    {
+        $generationCycle = ['木' => '水', '火' => '木', '土' => '火', '金' => '土', '水' => '金'];
+        $overcomingCycle = ['木' => '金', '火' => '水', '土' => '木', '金' => '火', '水' => '土'];
+        $expressionCycle = array_flip($generationCycle);
+
+        // 로그상 구조 대비 방어 코드
+        $res = $strengthResult->result ?? ($strengthResult->stdClass->result ?? '신약');
+
+        if ($res === '신강') {
+            return [
+                'priority1' => $overcomingCycle[$dayMaster] ?? '',
+                'priority2' => $expressionCycle[$dayMaster] ?? '',
+            ];
+        } else {
+            return [
+                'priority1' => $generationCycle[$dayMaster] ?? '',
+                'priority2' => $dayMaster,
+            ];
+        }
     }
 
     /**
@@ -273,13 +404,9 @@ class Oheng
      */
     public function getStrongest(): string
     {
-        // 1. 현재 사주의 오행 개수를 가져옵니다.
         $counts = $this->getOhaengCount();
-
-        // 2. 내림차순 정렬 (많은 순서대로)
         arsort($counts);
 
-        // 3. 가장 첫 번째 키(가장 많은 오행)를 반환
         return array_key_first($counts);
     }
 }
