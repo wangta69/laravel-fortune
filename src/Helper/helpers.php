@@ -317,23 +317,108 @@ if (! function_exists('get_yeonji_from_year')) {
 }
 
 if (! function_exists('format_ganji')) {
-    /**
-     * 한자 간지를 '한글(한자)' 형식으로 변환
-     * 예: '乙巳' -> '을사(乙巳)'
-     */
+    /** '乙巳' -> '을사(乙巳)' */
     function format_ganji($hanja)
     {
         if (! $hanja) {
             return '';
         }
-
-        // 60간지 상수에서 해당 한자의 위치(Index)를 찾습니다.
         $idx = array_search($hanja, GANJI['ch']);
 
-        if ($idx !== false) {
-            return GANJI['ko'][$idx]."({$hanja})";
+        return ($idx !== false) ? GANJI['ko'][$idx]."({$hanja})" : $hanja;
+    }
+}
+
+if (! function_exists('format_gan')) {
+    /** '乙' -> '을(乙)' */
+    function format_gan($hanja)
+    {
+        if (! $hanja) {
+            return '';
+        }
+        $idx = array_search($hanja, GAN['ch']);
+
+        return ($idx !== false) ? GAN['ko'][$idx]."({$hanja})" : $hanja;
+    }
+}
+
+if (! function_exists('format_ji')) {
+    /** '巳' -> '사(巳)' */
+    function format_ji($hanja)
+    {
+        if (! $hanja) {
+            return '';
+        }
+        $idx = array_search($hanja, JI['ch']);
+
+        return ($idx !== false) ? JI['ko'][$idx]."({$hanja})" : $hanja;
+    }
+}
+
+if (! function_exists('get_jiji_ohaeng_str')) {
+    /**
+     * "오(午)에 있는 화(火)의 기운" 형태의 문자열 반환
+     *
+     * @param  string  $ji_ch  (한자 지지: 子, 丑, 寅...)
+     */
+    function get_jiji_ohaeng_str($ji_ch)
+    {
+        $ohaeng_ko = JI_OHAENG[$ji_ch] ?? '';
+
+        // 오행 한자 매핑 (이미 GAN 상수에 있는 한자 활용)
+        $ohaeng_map = ['목' => '木', '화' => '火', '토' => '土', '금' => '金', '수' => '水'];
+        $ohaeng_ch = $ohaeng_map[$ohaeng_ko] ?? '';
+
+        if (! $ohaeng_ko) {
+            return $ji_ch;
         }
 
-        return $hanja; // 찾지 못할 경우 원문 반환
+        return "{$ji_ch}에 있는 {$ohaeng_ko}({$ohaeng_ch})의 기운";
+    }
+}
+
+if (! function_exists('get_month_from_season')) {
+    /**
+     * 절기 이름을 넣으면 해당 월(寅, 卯...)을 반환
+     *
+     * @param  string  $season_ko  (입춘, 경칩...)
+     */
+    function get_month_from_season($season_ko)
+    {
+        $index = array_search($season_ko, SEASON24['ko']);
+        if ($index === false) {
+            return null;
+        }
+
+        $ji_ch = SEASON_MONTH_MAP[$index];
+        $ji_ko = JI['ko'][array_search($ji_ch, JI['ch'])];
+
+        return "{$ji_ch}월({$ji_ko}월)";
+    }
+}
+
+if (! function_exists('get_jiji_description')) {
+    /**
+     * 지지 한자를 넣으면 "오(午)에 있는 화(火)의 기운" 형태의 감성적 문구 반환
+     *
+     * @param  string  $ji_ch  (子, 丑, 寅...)
+     * @return string
+     */
+    function get_jiji_description($ji_ch)
+    {
+        // 1. 해당 지지의 오행 한글명을 가져옴 (예: 화)
+        $ohaeng_ko = JI_OHAENG[$ji_ch] ?? null;
+        if (! $ohaeng_ko) {
+            return $ji_ch;
+        }
+
+        // 2. 오행의 한자명을 가져옴 (예: 火)
+        $ohaeng_ch = OHAENG_CH[$ohaeng_ko] ?? '';
+
+        // 3. 지지의 한글명을 가져옴 (예: 오)
+        $ji_ko = JI['ko'][array_search($ji_ch, JI['ch'])] ?? '';
+
+        // 4. 최종 문장 조립
+        return "{$ji_ko}({$ji_ch})에 있는 {$ohaeng_ko}({$ohaeng_ch})의 기운";
     }
 }
