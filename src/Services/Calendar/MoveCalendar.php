@@ -2,19 +2,17 @@
 
 namespace Pondol\Fortune\Services\Calendar;
 
-use Pondol\Fortune\Traits\SelectDay as t_selectDay;
-use Pondol\Fortune\Traits\Calendar;
-use Pondol\Fortune\Facades\Saju;
 use Pondol\Fortune\Facades\Lunar;
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Traits\Calendar;
+use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 
 /**
-* 모든 계산법이 이사택일과 같으나 이사택일은 singu_jumsu  가 결혼택일은 dae_jumsu 가 마지막에 드러간다.
-*/
-
+ * 모든 계산법이 이사택일과 같으나 이사택일은 singu_jumsu  가 결혼택일은 dae_jumsu 가 마지막에 드러간다.
+ */
 class MoveCalendar
 {
     use Calendar;
-
 
     /**
      * 이사택일 구하기
@@ -30,11 +28,11 @@ class MoveCalendar
         // 2. 각 날짜를 순회하며 길흉 정보를 계산하고, 기존 Day 객체에 병합합니다.
         foreach ($this->days as $dayObject) { // $calendar->days가 아닌 $this->days를 사용
 
-            if ($dayObject && !empty($dayObject->day)) {
+            if ($dayObject && ! empty($dayObject->day)) {
 
                 // 길흉신 계산을 위한 별도의 클래스(MoveDay) 사용
-                $calculatedData = new MoveDay();
-                $calculatedData->cal($saju, $yyyymm . str_pad($dayObject->day, 2, '0', STR_PAD_LEFT), $options);
+                $calculatedData = new MoveDay;
+                $calculatedData->cal($saju, $yyyymm.str_pad($dayObject->day, 2, '0', STR_PAD_LEFT), $options);
 
                 // 계산된 프로퍼티들(total, titles, taekilInfo)을 기존 $dayObject에 병합
                 $dayObject->setObject($calculatedData);
@@ -43,23 +41,22 @@ class MoveCalendar
 
         return $calendar->splitPerWeek();
     }
-
 }
 
 class MoveDay
 {
     use t_selectDay;
+
     /**
      * $request
      * 대장군 상살방을 처리하기 위해서는 (moving_direction_enabled, moving_direction) 전달
      * 가족구성원 조화를 보기위해서는 (family_harmony_enabled, family_years) 전달
      */
-
     public function cal($saju, $yyyymmdd, $options)
     {
         // 그날의 간지 정보를 위해 Saju 객체 생성
         $now = Saju::ymd($yyyymmdd)->create();
-        $solarDateString = substr($yyyymmdd, 0, 4) . '-' . substr($yyyymmdd, 4, 2) . '-' . substr($yyyymmdd, 6, 2);
+        $solarDateString = substr($yyyymmdd, 0, 4).'-'.substr($yyyymmdd, 4, 2).'-'.substr($yyyymmdd, 6, 2);
 
         $titles = [];
         $scores = [];
@@ -79,7 +76,7 @@ class MoveDay
         }
 
         // --- 2. 개인 나이 기준 길흉 (생기/복덕/천의) ---
-        $my_age = (int)substr($yyyymmdd, 0, 4) - (int)substr($saju->solar, 0, 4) + 1;
+        $my_age = (int) substr($yyyymmdd, 0, 4) - (int) substr($saju->solar, 0, 4) + 1;
         $senggiBokdukCheneu = $this->_senggiBokdukCheneu($my_age, $saju->gender);
         if (in_array($now->get_e('day'), $senggiBokdukCheneu['senggi'])) {
             $titles['senggi'] = ['ko' => '생기일', 'desc' => '개인에게 활력이 넘치는 좋은 날입니다.', 'type' => 'gilsin'];
@@ -141,7 +138,6 @@ class MoveDay
             $scores['ilgan_chung'] = -50;
         }
 
-
         // --- 4. 보편적 대흉일 (반드시 피해야 할 날) ---
 
         // 복단일(伏斷日) 확인
@@ -150,7 +146,7 @@ class MoveDay
             '甲寅', '乙卯', '庚寅', '辛卯', // 角, 亢
             '戊戌', '己亥',             // 婁, 胃
             '丙午', '丁未', '壬午', '癸未', // 井, 鬼
-            '丙辰', '丁巳', '壬辰', '癸巳'  // 翼, 軫
+            '丙辰', '丁巳', '壬辰', '癸巳',  // 翼, 軫
         ];
 
         if (in_array($today_ganji, $bokdanil_list)) {
@@ -168,6 +164,7 @@ class MoveDay
 
         // --- 5. 보편적 길일 / 기타 흉살 (참고하면 좋은 날) --
         $this->_whangdo($now->get_e('month'), $now->get_e('day'), $titles, $scores); // 황도/흑도
+        $this->_cheonsa($now->get_e('month'), $today_ganji, $titles, $scores);
         $this->_chuk($now->get_e('month'), $today_ganji, $titles, $scores); // 축음양불장길일(이사에 특화된 길일)
         // 주요 길신
         $this->_chenduk($now->get_e('month'), $now->get_e('day'), $today_ilgan, $titles, $scores);
@@ -203,7 +200,7 @@ class MoveDay
         $this->_singu($today_ganji, $titles, $scores);
 
         // 6. "손 없는 날(민속 길일)" (이사에 가장 대중적인 길일)
-        if ((int)$lunar_day_str % 10 === 9 || (int)$lunar_day_str % 10 === 0) {
+        if ((int) $lunar_day_str % 10 === 9 || (int) $lunar_day_str % 10 === 0) {
             $titles['son_eopneun_nal'] = ['ko' => '손 없는 날', 'desc' => '악귀가 없는 길한 날로, 이사에 가장 좋은 날 중 하나입니다.', 'type' => 'gilsin'];
             $scores['son_eopneun_nal'] = 40;
         }
@@ -242,17 +239,15 @@ class MoveDay
             // $familySaju
             foreach ($family_years as $birth_year) {
                 // Saju에서는 입춘을 기준으로 년을 계산하므로 입춘이후의 월일을 임의로 대입, 여기서는 02월 04일을 사용
-                $yeonji = Saju::ymd($birth_year . '0204')->create()->get_e('year');
+                $yeonji = Saju::ymd($birth_year.'0204')->create()->get_e('year');
                 if (isset($chung_map[$yeonji]) && $chung_map[$yeonji] === $today_ilji) {
                     $titles['family_chung'] = ['ko' => '가족과 충(沖)', 'desc' => '이삿날이 가족 구성원의 띠와 충돌하여 불화나 좋지 않은 일이 생길 수 있습니다.', 'type' => 'hyungsal'];
                     $scores['family_chung'] = -30;
-
 
                     break; // 한 명이라도 충하면 더 계산할 필요 없음
                 }
             }
         }
-
 
         // 5. 총점 계산
         $this->total = 0;
@@ -261,7 +256,6 @@ class MoveDay
             $this->total += $score;
         }
     }
-
 
     // 해당 년도의 대장군/삼살방을 계산하는 함수 필요
     public function getBadDirections($year_e) // 해당 년도의 지지 (ex: 巳)

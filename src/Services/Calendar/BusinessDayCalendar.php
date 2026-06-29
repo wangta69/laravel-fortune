@@ -2,19 +2,17 @@
 
 namespace Pondol\Fortune\Services\Calendar;
 
-use Pondol\Fortune\Traits\SelectDay as t_selectDay;
-use Pondol\Fortune\Traits\Calendar;
-use Pondol\Fortune\Facades\Saju;
 use Pondol\Fortune\Facades\Lunar;
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Traits\Calendar;
+use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 
 /**
-* 모든 계산법이 이사택일과 같으나 이사택일은 singu_jumsu  가 결혼택일은 dae_jumsu 가 마지막에 드러간다.
-*/
-
+ * 모든 계산법이 이사택일과 같으나 이사택일은 singu_jumsu  가 결혼택일은 dae_jumsu 가 마지막에 드러간다.
+ */
 class BusinessDayCalendar
 {
     use Calendar;
-
 
     /**
      * 개업/창업일 구하기
@@ -30,11 +28,11 @@ class BusinessDayCalendar
         // 2. 각 날짜를 순회하며 길흉 정보를 계산하고, 기존 Day 객체에 병합합니다.
         foreach ($this->days as $dayObject) { // $calendar->days가 아닌 $this->days를 사용
 
-            if ($dayObject && !empty($dayObject->day)) {
+            if ($dayObject && ! empty($dayObject->day)) {
 
                 // 길흉신 계산을 위한 별도의 클래스(MoveDay) 사용
-                $calculatedData = new BusinessDay();
-                $calculatedData->cal($saju, $yyyymm . str_pad($dayObject->day, 2, '0', STR_PAD_LEFT), $options);
+                $calculatedData = new BusinessDay;
+                $calculatedData->cal($saju, $yyyymm.str_pad($dayObject->day, 2, '0', STR_PAD_LEFT), $options);
 
                 // 계산된 프로퍼티들(total, titles, taekilInfo)을 기존 $dayObject에 병합
                 $dayObject->setObject($calculatedData);
@@ -43,23 +41,22 @@ class BusinessDayCalendar
 
         return $calendar->splitPerWeek();
     }
-
 }
 
 class BusinessDay
 {
     use t_selectDay;
+
     /**
      * $request
      * 대장군 상살방을 처리하기 위해서는 (moving_direction_enabled, moving_direction) 전달
      * 가족구성원 조화를 보기위해서는 (family_harmony_enabled, family_years) 전달
      */
-
     public function cal($saju, $yyyymmdd, $options)
     {
         // 그날의 간지 정보를 위해 Saju 객체 생성
         $now = Saju::ymd($yyyymmdd)->create();
-        $solarDateString = substr($yyyymmdd, 0, 4) . '-' . substr($yyyymmdd, 4, 2) . '-' . substr($yyyymmdd, 6, 2);
+        $solarDateString = substr($yyyymmdd, 0, 4).'-'.substr($yyyymmdd, 4, 2).'-'.substr($yyyymmdd, 6, 2);
 
         $titles = [];
         $scores = [];
@@ -79,7 +76,7 @@ class BusinessDay
         }
 
         // --- 2. 개인 나이 기준 길흉 (생기/복덕/천의) ---
-        $my_age = (int)substr($yyyymmdd, 0, 4) - (int)substr($saju->solar, 0, 4) + 1;
+        $my_age = (int) substr($yyyymmdd, 0, 4) - (int) substr($saju->solar, 0, 4) + 1;
         $senggiBokdukCheneu = $this->_senggiBokdukCheneu($my_age, $saju->gender);
         if (in_array($now->get_e('day'), $senggiBokdukCheneu['senggi'])) {
             $titles['senggi'] = ['ko' => '생기일', 'desc' => '개인에게 활력이 넘치는 좋은 날입니다.', 'type' => 'gilsin'];
@@ -141,7 +138,6 @@ class BusinessDay
             $scores['ilgan_chung'] = -50;
         }
 
-
         // --- 4. 보편적 대흉일 (반드시 피해야 할 날) ---
 
         // 복단일(伏斷日) 확인
@@ -150,7 +146,7 @@ class BusinessDay
             '甲寅', '乙卯', '庚寅', '辛卯', // 角, 亢
             '戊戌', '己亥',             // 婁, 胃
             '丙午', '丁未', '壬午', '癸未', // 井, 鬼
-            '丙辰', '丁巳', '壬辰', '癸巳'  // 翼, 軫
+            '丙辰', '丁巳', '壬辰', '癸巳',  // 翼, 軫
         ];
 
         if (in_array($today_ganji, $bokdanil_list)) {
@@ -171,10 +167,13 @@ class BusinessDay
         // --- 5. 보편적 길일 / 기타 흉살 (참고하면 좋은 날) --
         // 금궤황도에 가산점을 부여.
         $this->_whangdo($now->get_e('month'), $now->get_e('day'), $titles, $scores);
+
         // 황도일에 해당하면 $titles['whangdo']에 상세 배열이 이미 추가된 상태임
         if (isset($titles['whangdo']) && $titles['whangdo']['ko'] === '금궤황도') {
             $scores['whangdo'] = 50; // 기존 점수 30을 50으로 덮어씀
         }
+
+        $this->_cheonsa($now->get_e('month'), $today_ganji, $titles, $scores); // 천사일
 
         // 12포태법 재물운 길일
         $this->_jaemul_woonseong($saju->get_h('day'), $now->get_e('day'), $titles, $scores);
@@ -210,11 +209,6 @@ class BusinessDay
         // $this->_hongsasal($now->get_e('month'), $now->get_e('day'), $titles, $scores);
         $this->_haeil($now->get_e('day'), $titles, $scores);
 
-
-
-
-
-
         // 5. 총점 계산
         $this->total = 0;
         $this->titles = $titles;
@@ -222,6 +216,4 @@ class BusinessDay
             $this->total += $score;
         }
     }
-
-
 }

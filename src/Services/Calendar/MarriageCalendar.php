@@ -2,15 +2,14 @@
 
 namespace Pondol\Fortune\Services\Calendar;
 
-use Pondol\Fortune\Traits\SelectDay as t_selectDay;
-use Pondol\Fortune\Traits\Calendar;
-use Pondol\Fortune\Facades\Saju;
 use Pondol\Fortune\Facades\Lunar;
+use Pondol\Fortune\Facades\Saju;
+use Pondol\Fortune\Traits\Calendar;
+use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 
 class MarriageCalendar
 {
     use Calendar;
-
 
     public function cal($saju_male, $saju_female, $yyyymm, $options = [])
     {
@@ -18,9 +17,9 @@ class MarriageCalendar
         $calendar = $this->_create($yyyymm);
 
         foreach ($this->days as $dayObject) {
-            if ($dayObject && !empty($dayObject->day)) {
-                $calculatedData = new MarriageDay();
-                $calculatedData->cal($saju_male, $saju_female, $yyyymm . str_pad($dayObject->day, 2, '0', STR_PAD_LEFT), $options);
+            if ($dayObject && ! empty($dayObject->day)) {
+                $calculatedData = new MarriageDay;
+                $calculatedData->cal($saju_male, $saju_female, $yyyymm.str_pad($dayObject->day, 2, '0', STR_PAD_LEFT), $options);
                 $dayObject->setObject($calculatedData);
             }
         }
@@ -69,7 +68,7 @@ class MarriageDay
     private function calculateForPerson($saju_person, $now, &$titles, &$scores)
     {
         // 생기복덕, 천의
-        $my_age = (int)substr($now->solar, 0, 4) - (int)substr($saju_person->solar, 0, 4) + 1;
+        $my_age = (int) substr($now->solar, 0, 4) - (int) substr($saju_person->solar, 0, 4) + 1;
         $senggi = $this->_senggiBokdukCheneu($my_age, $saju_person->gender);
         if (in_array($now->get_e('day'), $senggi['senggi'])) {
             $titles['senggi'] = ['ko' => '생기일', 'desc' => '개인에게 활력이 넘치는 좋은 날입니다.', 'type' => 'gilsin'];
@@ -152,7 +151,7 @@ class MarriageDay
             '甲寅', '乙卯', '庚寅', '辛卯', // 角, 亢
             '戊戌', '己亥',             // 婁, 胃
             '丙午', '丁未', '壬午', '癸未', // 井, 鬼
-            '丙辰', '丁巳', '壬辰', '癸巳'  // 翼, 軫
+            '丙辰', '丁巳', '壬辰', '癸巳',  // 翼, 軫
         ];
 
         if (in_array($today_ganji, $bokdanil_list)) {

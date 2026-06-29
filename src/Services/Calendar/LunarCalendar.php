@@ -71,6 +71,9 @@ class LunarCalendar
         // 2. 황도일 (금궤황도 등)
         $this->_whangdo($month_e, $day_e, $titles, $scores);
 
+        // [추가] 2.1 천문개일 (하늘의 문이 열리는 날)
+        $this->_cheonmun($month_e, $day_e, $titles, $scores);
+
         // 3. 천사일 (하늘이 돕는 날)
         $this->_cheonsa($month_e, $day_ganji, $titles, $scores);
 
