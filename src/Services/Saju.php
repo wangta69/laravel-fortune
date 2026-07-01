@@ -140,45 +140,69 @@ class Saju
         return $this;
     }
 
+    // Pondol\Fortune\Services\Saju.php 내부 create 메서드 수정
+
     public function create()
     {
-
         switch ($this->sl) {
             case 'solar':
                 $this->solar = $this->ymd;
-                // [수정] hourKnown 플래그에 따라 분기 처리
                 if ($this->hourKnown) {
                     $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tolunar()->sajugabja()->create();
                 } else {
-                    $saju = Lunar::ymd($this->ymd)->tolunar()->sajugabja(false)->create(); // hi() 호출 제외
-                    // $this->hour = (object)['ko' => '알수없음', 'ch' => '時柱不明'];
+                    $saju = Lunar::ymd($this->ymd)->tolunar()->sajugabja(false)->create();
                 }
                 $this->lunar = $saju->lunar;
                 break;
             case 'lunar':
                 $this->lunar = $this->ymd;
-                // [수정] hourKnown 플래그에 따라 분기 처리
                 if ($this->hourKnown) {
                     $saju = Lunar::ymd($this->ymd)->hi($this->hi)->tosolar($this->leap)->sajugabja()->create();
                 } else {
-                    $saju = Lunar::ymd($this->ymd)->tosolar($this->leap)->sajugabja(false)->create(); // hi() 호출 제외
+                    $saju = Lunar::ymd($this->ymd)->tosolar($this->leap)->sajugabja(false)->create();
                 }
                 $this->solar = $saju->solar;
                 break;
         }
 
-        $this->year = (object) $saju->gabja->year;
-        $this->month = (object) $saju->gabja->month;
-        $this->day = (object) $saju->gabja->day;
+        // --- 구조 보정 및 확장 로직 ---
+        $pillars = ['year', 'month', 'day', 'hour'];
+        foreach ($pillars as $p) {
+            // Lunar::create()의 리턴값에서 해당 주(Pillar)의 데이터를 객체로 가져옴
+            $source = $saju->gabja->{$p} ?? null;
 
-        if ($this->hourKnown) {
-            $this->hour = (object) $saju->gabja->hour;
-        } else {
-            // 시주를 알 수 없을 때의 기본값 설정
-            $this->hour = (object) ['ko' => '알수없음', 'ch' => '時柱不明'];
+            // 시주 정보를 모를 때의 방어 코드
+            if ($p === 'hour' && (! $this->hourKnown || ! $source)) {
+                $this->hour = (object) [
+                    'ko' => '알수없음',
+                    'ch' => '時柱不明',
+                    'h' => (object) ['ko' => '', 'ch' => ''],
+                    'e' => (object) ['ko' => '', 'ch' => ''],
+                ];
+
+                continue;
+            }
+
+            // [중요] $source는 stdClass이므로 -> 문법으로 접근해야 에러가 나지 않습니다.
+            $koVal = $source->ko; // 예: "갑자"
+            $chVal = $source->ch; // 예: "甲子"
+
+            $this->{$p} = (object) [
+                'ko' => $koVal, // 기존 호환성 유지
+                'ch' => $chVal, // 기존 호환성 유지
+                // 신규: 천간(h)과 지지(e) 분리 객체 추가
+                'h' => (object) [
+                    'ko' => mb_substr($koVal, 0, 1),
+                    'ch' => mb_substr($chVal, 0, 1),
+                ],
+                'e' => (object) [
+                    'ko' => mb_substr($koVal, 1, 1),
+                    'ch' => mb_substr($chVal, 1, 1),
+                ],
+            ];
         }
 
-        // gabja 프로퍼티도 객체로 유지 (하위 호환성)
+        // gabja 프로퍼티 호환성 유지
         $this->gabja = (object) [
             'year' => $this->year,
             'month' => $this->month,
@@ -426,7 +450,7 @@ class Saju
      */
     public function tojeong()
     {
-        if (! isset($this->tojung)) {
+        if (! isset($this->tojeong)) {
             $this->tojeong = (new TojeongJakgwae)->withSaju($this);
         }
 
