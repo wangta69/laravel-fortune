@@ -7,14 +7,14 @@ use Pondol\Fortune\Traits\Calendar;
 use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 use Pondol\Fortune\Traits\SinsalRules;
 
-class BusinessDayCalendar
+class CarDeliveryCalendar
 {
     use Calendar;
 
     /**
-     * 개업 택일 매니저
+     * 신차 택일 매니저
      */
-    public function cal($saju, $yyyymm, $options)
+    public function cal($saju, $yyyymm, $options = [])
     {
         // 1. 공통 기초 데이터 캐시 로드
         $calendar = CalendarFacade::lunarCalendar($yyyymm);
@@ -23,18 +23,18 @@ class BusinessDayCalendar
             foreach ($week as $dayObject) {
                 if (is_object($dayObject) && ! empty($dayObject->day)) {
 
-                    // 2. 기초 점수와 태그 백업
+                    // 2. 기초 데이터 백업
                     $baseTotal = $dayObject->total ?? 0;
                     $baseTitles = $dayObject->titles ?? [];
 
-                    // 3. 개업 전용 개인화 계산기 실행
-                    $calculatedData = new BusinessDay;
+                    // 3. 차량 전용 개인화 계산기 실행
+                    $calculatedData = new CarDay;
                     $calculatedData->cal($saju, $dayObject, $options);
 
                     // 4. 최종 점수 합산
                     $dayObject->total = $calculatedData->total + $baseTotal;
 
-                    // 5. 태그 병합 및 우선순위 정렬 (개인화 태그 우선)
+                    // 5. 태그 병합 및 우선순위 정렬
                     $mergedTitles = array_merge($calculatedData->titles, $baseTitles);
                     uasort($mergedTitles, function ($a, $b) {
                         return ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0);
@@ -56,9 +56,9 @@ class BusinessDayCalendar
 }
 
 /**
- * 개업 택일 계산기
+ * 신차 택일 계산기
  */
-class BusinessDay
+class CarDay
 {
     use SinsalRules, t_selectDay;
 
@@ -68,7 +68,7 @@ class BusinessDay
 
     public function cal($saju, $dayData, $options)
     {
-        $result = $this->calculateFortune($saju, $dayData, 'business', $options);
+        $result = $this->calculateFortune($saju, $dayData, 'car', $options);
         $this->total = $result['total'];
         $this->titles = $result['titles'];
     }

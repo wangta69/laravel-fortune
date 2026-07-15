@@ -83,11 +83,17 @@ class Lunar extends Lunar_API
      *               )
      *               </pre>
      */
-    private ?int $year = null;
+    public ?int $year = null;
 
-    private ?int $month = null;
+    public ?int $month = null;
 
-    private ?int $day = null;
+    public ?int $day = null;
+
+    public ?int $lYear = null;
+
+    public ?int $lMonth = null;
+
+    public ?int $lDay = null;
 
     public function ymd($value, bool $isLunar = false): self
     {
@@ -640,6 +646,11 @@ class Lunar extends Lunar_API
 
         $r = $this->solartolunar($y, $m, $d);
         [$lunarYear, $lunarMonth, $lunarDay, $isLeap, $isLargeMonth] = $r;
+
+        // [핵심] 계산된 음력 날짜를 객체 프로퍼티에 할당
+        $this->lYear = $lunarYear;
+        $this->lMonth = $lunarMonth;
+        $this->lDay = $lunarDay;
 
         $w = $this->getweekday($y, $m, $d);
 

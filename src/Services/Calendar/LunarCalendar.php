@@ -4,110 +4,136 @@ namespace Pondol\Fortune\Services\Calendar;
 
 use Pondol\Fortune\Facades\Lunar;
 use Pondol\Fortune\Traits\Calendar;
-use Pondol\Fortune\Traits\SelectDay; // 길흉 로직 사용을 위해 추가
+use Pondol\Fortune\Traits\SelectDay;
 
 class LunarCalendar
 {
-    use Calendar, SelectDay; // SelectDay 트레이트 추가
+    use Calendar, SelectDay;
 
+    // PHP 8.2+ 동적 프로퍼티 에러 방지용 선언
+    public $info;
+
+    /**
+     * 특정 연월의 기초 데이터를 생성하고 공통 길흉 점수 및 일주 유형을 산출합니다.
+     */
     public function cal($yyyymm)
     {
+        // 1. 해당 월의 절기 및 음양력 기초 정보 생성 (패키지 엔진 호출)
         $this->info = Lunar::ymd($yyyymm.'01')->tolunar()->sajugabja()
             ->seasonal_division($yyyymm.'20')
             ->create();
 
-        // 양력에 대한 갑자 년월 구하기
+        // 2. 만세력 헤더용 데이터 보정 (solarInfo, lunarInfo)
         [$year, $month] = Lunar::to_gabja($yyyymm);
         $this->info->solarInfo = (object) ['year' => $year, 'month' => $month];
 
-        // 음력에 대한 갑자 년월 구하기
         $lunar_yyyymm = date('Ym', strtotime($this->info->lunar));
         [$year, $month] = Lunar::to_gabja($lunar_yyyymm);
         $this->info->lunarInfo = (object) ['year' => $year, 'month' => $month];
 
+        // 3. 기초 달력 그리드 생성 (Traits/Calendar.php 의 _create 호출)
+        // 이 과정에서 각 dayObject는 이미 gabja, lDay 등의 기초 데이터를 가집니다.
         $calendar = $this->_create($yyyymm);
-
         $seasonArr = $this->season_24_to_array($this->info->seasons);
 
+        // 4. 모든 날짜를 순회하며 "공통 길흉" 및 "일주 유형" 데이터 주입
         foreach ($calendar->days as $dayObject) {
-            if ($dayObject && $dayObject->day) {
-                // 3. 기존 절기 정보 매핑
-                $solar_yyyymmdd = str_replace('-', '', $dayObject->solar);
-                if (isset($seasonArr[$solar_yyyymmdd])) {
-                    $dayObject->season24 = $seasonArr[$solar_yyyymmdd];
+            if ($dayObject && isset($dayObject->day) && $dayObject->day) {
+                // [4-1] 절기 정보 매핑
+                $solar_key = str_replace('-', '', $dayObject->solar);
+                if (isset($seasonArr[$solar_key])) {
+                    $dayObject->season24 = $seasonArr[$solar_key];
                 }
 
-                // 4. [추가] 공통 길흉 정보(손없는날, 황도, 복단, 월기) 계산 로직
+                // [4-2] 일주 별칭 및 유형 매핑 (Config 활용)
+                $this->setIljuArchetype($dayObject);
+
+                // [4-3] 공통 기초 길흉(황도, 복단 등) 계산 및 주입
                 $this->setPublicFortune($dayObject);
             }
         }
 
+        // 5. 모든 연산 완료 후 주(Week) 단위로 분할하여 반환
         return $calendar->splitPerWeek();
     }
 
     /**
-     * 사주 정보 없이 날짜 정보만으로 공통 길흉 추출
+     * 일주(日柱) 간지를 바탕으로 닉네임과 아키타입을 설정합니다.
+     */
+    private function setIljuArchetype($day)
+    {
+        if (! isset($day->gabja->day->ch)) {
+            return;
+        }
+
+        $ilju = $day->gabja->day->ch; // 예: "甲子"
+        $archetypes = config('pondol-fortune.ilju_archetypes');
+
+        if (isset($archetypes[$ilju])) {
+            $day->nickname = $archetypes[$ilju]['nickname'];
+            $day->archetype = $archetypes[$ilju]['archetype'];
+        }
+    }
+
+    /**
+     * [Dispatcher] Config 설정을 순회하며 그룹/단일 로직을 동적으로 매핑합니다.
      */
     private function setPublicFortune($day)
     {
-        $titles = [];
-        $scores = []; // 점수는 참고용 (필요시 사용)
-
-        // 판단을 위한 기초 데이터 (한자 기준)
-        $year_h = mb_substr($day->lunarInfo->gabja->year->ch, 0, 1);  // 연간
-        $month_e = mb_substr($day->lunarInfo->gabja->month->ch, 1, 1); // 월지
-        $day_ganji = $day->lunarInfo->gabja->day->ch;                 // 일주(한자)
-        $day_h = mb_substr($day_ganji, 0, 1);                         // 일간
-        $day_e = mb_substr($day_ganji, 1, 1);                         // 일지
-        $lunar_day = (int) substr($day->lunar, -2);                    // 음력 날짜
-
-        // --- [긍정 시그널: Good Signs] ---
-
-        // 1. 손 없는 날
-        if ($lunar_day % 10 === 9 || $lunar_day % 10 === 0) {
-            $titles['son'] = ['ko' => '손 없는 날', 'desc' => '악귀가 없는 날로 이사, 개업에 길함', 'type' => 'gilsin'];
+        if (! is_object($day) || ! isset($day->gabja)) {
+            return;
         }
 
-        // 2. 황도일 (금궤황도 등)
-        $this->_whangdo($month_e, $day_e, $titles, $scores);
+        $baseConfigs = config('pondol-fortune.select_day.base');
+        $foundTitles = [];
+        $totalScore = 0;
 
-        // [추가] 2.1 천문개일 (하늘의 문이 열리는 날)
-        $this->_cheonmun($month_e, $day_e, $titles, $scores);
+        // [보정] 판정에 필요한 데이터 컨텍스트 확장
+        $context = [
+            'solar' => str_replace('-', '', $day->solar),
+            'lunar_d' => $day->lDay,
+            'day_he' => $day->gabja->day->ch,
+            'day_h' => mb_substr($day->gabja->day->ch, 0, 1),
+            'day_e' => mb_substr($day->gabja->day->ch, 1, 1),
+            'month_e' => mb_substr($day->gabja->month->ch, 1, 1),
+            'year_e' => mb_substr($day->gabja->year->ch, 1, 1),
+            'year_h' => mb_substr($day->gabja->year->ch, 0, 1),
+        ];
 
-        // 3. 천사일 (하늘이 돕는 날)
-        $this->_cheonsa($month_e, $day_ganji, $titles, $scores);
-
-        // 4. 천덕/월덕 귀인 (월별 길신)
-        $this->_chenduk($month_e, $day_e, $day_h, $titles, $scores);
-        $this->_wolduk($month_e, $day_h, $titles, $scores);
-
-        // --- [주의 시그널: Warning Signs] ---
-
-        // 5. 복단일 (엎어지는 날)
-        $bokdanil_list = ['甲寅', '乙卯', '庚寅', '辛卯', '戊戌', '己亥', '丙午', '丁未', '壬午', '癸未', '丙辰', '丁巳', '壬辰', '癸巳'];
-        if (in_array($day_ganji, $bokdanil_list)) {
-            $titles['bokdan'] = ['ko' => '복단일', 'desc' => '기운이 끊기는 날로 중요한 계약이나 시작 주의', 'type' => 'hyungsal'];
+        foreach ($baseConfigs as $key => $conf) {
+            if (isset($conf['is_group']) && $conf['is_group']) {
+                $method = "_group_{$key}";
+                if (method_exists($this, $method)) {
+                    // 사주가 없으므로 첫 인자에 null 전달
+                    $subKey = $this->$method(null, $context);
+                    if ($subKey && isset($conf['items'][$subKey])) {
+                        $foundTitles[$subKey] = $conf['items'][$subKey];
+                        $totalScore += $conf['items'][$subKey]['score'];
+                    }
+                }
+            } else {
+                $method = "_check_{$key}";
+                if (method_exists($this, $method)) {
+                    // 사주가 없으므로 첫 인자에 null 전달
+                    if ($this->$method(null, $context)) {
+                        $foundTitles[$key] = $conf;
+                        $totalScore += $conf['score'];
+                    }
+                }
+            }
         }
 
-        // 6. 월기일 (매월 5, 14, 23일)
-        $this->_wolgi($lunar_day, $titles, $scores);
-
-        // 7. 십악대패일
-        $this->_sipak($year_h, $day_ganji, $month_e, $titles, $scores);
-
-        // 8. 기타 흉살 (지파, 하괴 등 - 사주 무관)
-        $this->_jipa($month_e, $day_e, $titles, $scores);
-        $this->_hague($month_e, $day_e, $titles, $scores);
-
-        // 결과 저장
-        $day->titles = $titles;
-        // 사주가 없으므로 공통 점수 합산 (선택 사항)
-        $day->total = array_sum($scores);
-
+        uasort($foundTitles, fn ($a, $b) => ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0));
+        $day->titles = $foundTitles;
+        $day->total = $totalScore;
     }
 
     private function season_24_to_array($season_24)
     {
+        if (! $season_24) {
+            return [];
+        }
+
         return [
             $season_24->center->year.str_pad($season_24->center->month, 2, '0', STR_PAD_LEFT).str_pad($season_24->center->day, 2, '0', STR_PAD_LEFT) => ['ko' => $season_24->center->name->ko, 'ch' => $season_24->center->name->ch],
             $season_24->ccenter->year.str_pad($season_24->ccenter->month, 2, '0', STR_PAD_LEFT).str_pad($season_24->ccenter->day, 2, '0', STR_PAD_LEFT) => ['ko' => $season_24->ccenter->name->ko, 'ch' => $season_24->ccenter->name->ch],
