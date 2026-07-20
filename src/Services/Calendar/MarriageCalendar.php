@@ -109,5 +109,6 @@ class MarriageDay
         }
 
         $this->titles = $mergedTitles;
+        uasort($this->titles, fn ($a, $b) => ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0));
     }
 }
