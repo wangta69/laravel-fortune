@@ -273,6 +273,32 @@ return [
                     'sepa' => ['ko' => '세파살', 'type' => 'hyungsal', 'is_taekil' => true, 'score' => -20, 'priority' => 20, 'desc' => '기계적 결함이나 계약 차질을 주의해야 함'],
                     'byungbu' => ['ko' => '병부살', 'type' => 'hyungsal', 'is_taekil' => true, 'score' => -20, 'priority' => 20, 'desc' => '컨디션 난조로 인한 집중력 저하 주의'],
                 ],
+            ], 'pet_adoption' => [
+                'base_override' => [
+                    'son' => ['score' => 30, 'desc' => '아이의 낯선 환경 적응을 돕는 민속 길일입니다.'],
+                    'haeil' => ['score' => -30, 'desc' => '이동 중 변동수가 많아 아이가 불안해할 수 있는 날입니다.'],
+                ],
+                'items' => [
+                    // --- 인연의 합 ---
+                    'ilgan_hap' => ['ko' => '천간합일', 'score' => 50, 'type' => 'gilsin', 'priority' => 90, 'desc' => '주인님과 아이의 기운이 첫눈에 소통되는 날입니다.'],
+                    'jiji_hap' => ['ko' => '지합일', 'score' => 40, 'type' => 'gilsin', 'priority' => 85, 'desc' => '아이와 주인님의 생활 리듬이 찰떡같이 맞는 인연의 날입니다.'],
+                    'chuk' => ['ko' => '축음양불장길', 'score' => 30, 'type' => 'gilsin', 'priority' => 50, 'desc' => '하늘과 땅의 방해가 없어 새로운 가족을 맞이하기에 대길합니다.'],
+
+                    // --- 건강 및 주의 (원진살 포함) ---
+                    'wonjin' => ['ko' => '원진살', 'score' => -80, 'type' => 'hyungsal', 'priority' => 99, 'desc' => '서로 이유 없이 예민해질 수 있어 초기 적응에 많은 인내가 필요한 날입니다.'],
+                    'byungbu' => ['ko' => '병부살', 'is_taekil' => true, 'score' => -60, 'type' => 'hyungsal', 'priority' => 95, 'desc' => '아이의 건강 기운이 약해질 수 있으니 입양 후 컨디션 관리에 유의하세요.'],
+                    'sepa' => ['ko' => '세파살', 'is_taekil' => true, 'score' => -40, 'type' => 'hyungsal', 'priority' => 80, 'desc' => '입양 절차나 이동 과정에서 예기치 못한 차질이 생길 수 있습니다.'],
+                    'gongmang' => ['ko' => '공망일', 'score' => -50, 'type' => 'hyungsal', 'priority' => 92, 'desc' => '인연의 기운이 겉돌 수 있어 정성을 더 쏟아야 하는 날입니다.'],
+
+                    // --- 활력 (생기복덕) ---
+                    'sbc_group' => [
+                        'is_group' => true,
+                        'items' => [
+                            'senggi' => ['ko' => '생기일', 'score' => 30, 'type' => 'gilsin', 'priority' => 40, 'desc' => '아이를 맞이한 후 집안에 생동감과 웃음이 넘치는 날입니다.'],
+                            'bokduk' => ['ko' => '복덕일', 'score' => 30, 'type' => 'gilsin', 'priority' => 40, 'desc' => '복과 덕이 함께 들어와 아이가 복덩이 역할을 해주는 날입니다.'],
+                        ],
+                    ],
+                ],
             ],
         ],
     ],

@@ -459,6 +459,19 @@ trait SelectDay
         return $options['moving_direction'] === $bad['samsalbang'];
     }
 
+    protected function _check_wonjin($saju, $ctx)
+    {
+        $my_jiji = $saju->get_e('day'); // 주인 일지
+        $day_jiji = $ctx['day_e'];     // 날짜 지지
+
+        $map = [
+            '子' => '未', '丑' => '午', '寅' => '酉', '卯' => '申', '辰' => '亥', '巳' => '戌',
+            '午' => '丑', '未' => '子', '申' => '卯', '酉' => '寅', '戌' => '巳', '亥' => '辰',
+        ];
+
+        return ($map[$my_jiji] ?? '') === $day_jiji;
+    }
+
     // --- [2. 그룹 판정 메서드: _group_키이름] ---
 
     protected function _group_sbc_group($saju, $ctx)

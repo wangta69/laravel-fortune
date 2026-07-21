@@ -42,17 +42,9 @@ class Calendar
      */
     public function samjae($year)
     {
-        $lunar = new Lunar;
-        // 해당 연도의 지지(년지)를 구함
+        $lunar = new \Pondol\Fortune\Services\LunarSolar\Lunar;
         $year_e = mb_substr($lunar->gabja($year.'0101')->year->ch, 1, 1);
 
-        /**
-         * 삼재 판정 정석 로직:
-         * 신자진(원숭이, 쥐, 용띠) -> 인묘진년 삼재
-         * 해묘미(돼지, 토끼, 양띠) -> 사오미년 삼재
-         * 인오술(범, 말, 개띠)     -> 신유술년 삼재
-         * 사유축(뱀, 닭, 소띠)     -> 해자축년 삼재
-         */
         $samjae_groups = [
             '申子辰' => ['寅', '卯', '辰'],
             '亥卯未' => ['巳', '午', '未'],
@@ -61,15 +53,32 @@ class Calendar
         ];
 
         $target_samjae = [];
-        foreach ($samjae_groups as $zodiacs => $years) {
+        foreach ($samjae_groups as $zodiacs_hanja => $years) {
             if (in_array($year_e, $years)) {
                 $idx = array_search($year_e, $years);
                 $status = ($idx === 0) ? '들삼재' : (($idx === 1) ? '눌삼재' : '날삼재');
 
+                // [추가] 컨트롤러 112라인에서 기대하는 'type' 키 생성 ('들', '눌', '날')
+                $type_labels = ['들', '눌', '날'];
+                $type = $type_labels[$idx];
+
+                $samjae_ko = [];
+                for ($i = 0; $i < mb_strlen($zodiacs_hanja); $i++) {
+                    $hj = mb_substr($zodiacs_hanja, $i, 1);
+                    $ji_idx = array_search($hj, JI['ch']);
+                    if ($ji_idx !== false) {
+                        $samjae_ko[] = ZODIAC['ko'][$ji_idx];
+                    }
+                }
+
                 $target_samjae = [
                     'status' => $status,
-                    'zodiacs' => $zodiacs,
+                    'type' => $type, // 컨트롤러 불일치 해결을 위한 키 추가
+                    'zodiacs' => $zodiacs_hanja,
                     'current_year_ji' => $year_e,
+                    'samjaes' => [
+                        'ko' => $samjae_ko,
+                    ],
                 ];
                 break;
             }
@@ -114,5 +123,13 @@ class Calendar
     public function carDeliveryCalendar($saju, $yyyymm, $options = [])
     {
         return (new CarDeliveryCalendar)->cal($saju, $yyyymm, $options);
+    }
+
+    /**
+     * 반려동물 입양 택일 서비스 (추가)
+     */
+    public function petAdoptionCalendar($saju, $yyyymm, $options = [])
+    {
+        return (new PetAdoptionCalendar)->cal($saju, $yyyymm, $options);
     }
 }
