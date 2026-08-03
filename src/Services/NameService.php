@@ -72,14 +72,16 @@ class NameService
     /**
      * 4격 전체를 계산하여 배열로 반환합니다.
      */
-    public function calculateAllGueks(int $hanjano1, int $nameStroke1, int $nameStroke2): array
+    public function calculateAllGueks(int $f_sum, int $g1, int $g2_etc): array
     {
-        $early = $hanjano1 + $nameStroke1;
-        $first = $nameStroke1 + $nameStroke2;
-        $last = $hanjano1 + $nameStroke1 + $nameStroke2;
-        $middle = abs($last - $early);
+        $isOneCharName = ($g2_etc === 0);
 
-        return compact('early', 'first', 'middle', 'last');
+        return [
+            'early' => $isOneCharName ? ($g1 + 1) : ($g1 + $g2_etc), // 원격
+            'first' => $f_sum + $g1,                                // 형격
+            'middle' => $isOneCharName ? ($f_sum + 1) : ($f_sum + $g2_etc), // 이격
+            'last' => $f_sum + $g1 + $g2_etc,                      // 정격
+        ];
     }
 
     /**
