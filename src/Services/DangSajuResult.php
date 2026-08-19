@@ -86,9 +86,7 @@ class DangSajuResult
                 // 2. 구한 코드를 인덱스로 변환하여 별 이름을 리턴합니다. (코드 1이면 STARS[0])
                 return self::STARS[($code - 1) % 12];
             case 'misfortune':
-                $code = $this->calculate('lifespan');
-
-                return ($code) ? self::STARS[($code - 1) % 12] : null;
+                return $this->calculate('lifespan');
 
                 /**
                  * 나이대 표시 (현대적 해석 기준)
