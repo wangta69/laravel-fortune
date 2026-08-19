@@ -2,46 +2,46 @@
 
 namespace Pondol\Fortune\Services;
 
+/*
+   자(쥐): 천귀성 (귀함, 부귀)
+   축(소): 천액성 (액운, 장애)
+   인(호랑이): 천권성 (권력, 리더십)
+   묘(토끼): 천파성 (파재, 풍파)
+   진(용): 천간성 (간사함, 지혜)
+   사(뱀): 천문성 (학문, 예술성)
+   오(말): 천복성 (복록, 재물)
+   미(양): 천역성 (역마, 이동수)
+   신(원숭이): 천고성 (고독, 외로움)
+   유(닭): 천인성 (잔인함, 질병)
+   술(개): 천예성 (재주, 손재주)
+   돼지(해): 천수성 (장수, 평안)
+   */
+/*
+   당사주 12궁 전체 리스트 및 계산 공식
+당사주는 **년(根, 뿌리), 월(苗, 싹), 일(花, 꽃), 시(實, 열매)**를 기준으로 삼아 특정 수만큼 이동하며 별을 찾습니다.
+번호	운세 항목	공식 (시작점 → 이동량)	의미
+1	초년운(년성)	년지 그 자체	유년기, 조상 덕, 뿌리
+2	중년운(월성)	년지 → 월수	청년기, 사회 진출, 싹
+3	장년운(일성)	월성 → 일수	중년기, 본인 실력, 꽃
+4	말년운(시성)	일성 → 시지	노년기, 최종 결과, 열매
+5	부모운	년지 → 월수 (중년운과 중첩 시 보완)	부모의 배경, 유산, 가문
+6	형제운	년지 → 일수	형제/자매와의 우애, 인덕
+7	부부운	월성 → 일수 (장년운과 중첩 시 보완)	배우자 인연, 결혼 생활
+8	자녀운	일성 → 시지 (말년운과 중첩 시 보완)	자손의 번창, 노후 효도
+9	재물운	월성 → 일수	평생의 재복, 상업적 소질
+10	관록운	년지 → 일수	직업, 명예, 사회적 지위
+11	주거운	월성 → 시지	집안의 평안, 이사수, 부동산
+12	질병운	일성 → 시지	타고난 약점, 사고, 건강 주의점
+
+*/
+
 class DangSaju
 {
-    const JIJI = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '축'];
-
-    const DANGSAJU_STARS = ['천권', '천파', '천간', '천문', '천복', '천역', '천고', '천인', '천예', '천수', '천귀', '천액'];
-
-    public function getDangSajuStars(string $year_jiji, string $hour_jiji, string $lunar_date): array
+    /**
+     * 특정 사주를 기반으로 한 결과 객체를 생성합니다.
+     */
+    public function make($saju)
     {
-        [$lunar_year, $lunar_month, $lunar_day] = explode('-', $lunar_date);
-
-        // 1. 각 지지 문자에 해당하는 배열 인덱스(0~11)를 찾습니다.
-        $year_index = array_search($year_jiji, self::JIJI);
-
-        // [수정] array_search는 결과가 없으면 false를 반환합니다.
-        $hour_index_val = array_search($hour_jiji, self::JIJI);
-
-        // 2. 년(초년운)
-        $year_star_index = $year_index;
-
-        // 3. 월(중년운)
-        $month_star_index = ($year_star_index + (int) $lunar_month - 1) % 12;
-
-        // 4. 일(장년운)
-        $day_star_index = ($month_star_index + (int) $lunar_day - 1) % 12;
-
-        // 5. 시(말년운) 계산 - 시간이 있을 때만 수행
-        $hour_star_name = ''; // 기본값 설정
-
-        // $hour_index_val이 false가 아닐 때(즉, 시간이 존재할 때)만 계산
-        if ($hour_index_val !== false) {
-            $hour_star_index = ($day_star_index + $hour_index_val) % 12;
-            $hour_star_name = self::DANGSAJU_STARS[$hour_star_index];
-        }
-
-        // 6. 결과 반환
-        return [
-            'year' => self::DANGSAJU_STARS[$year_star_index],
-            'month' => self::DANGSAJU_STARS[$month_star_index],
-            'day' => self::DANGSAJU_STARS[$day_star_index],
-            'hour' => $hour_star_name, // 계산된 이름 또는 '알수없음'
-        ];
+        return new DangSajuResult($saju);
     }
 }

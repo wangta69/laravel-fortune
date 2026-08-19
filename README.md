@@ -328,18 +328,16 @@ use Pondol\Fortune\Facades\Saju;
 use Pondol\Fortune\Facades\DangSaju;
 ..........
 $saju = Saju::ymdhi('200001011200')->sl('solar')->leap(false)->create();
-$star =  DangSaju::getDangSajuStars($saju->get_e('year'), $saju->get_e('hour'), $saju->lunar);
+$star = DangSaju::make($saju);
 ```
 
 > 결과
 
 ```
-(
-    [year] => 천귀
-    [month] => 천인
-    [day] => 천파
-    [hour] => 천예
-)
+$star->early
+$star->middle
+$star->prime
+$star->lifespan
 ```
 
 ## 자미두수
