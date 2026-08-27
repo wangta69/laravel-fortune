@@ -103,4 +103,24 @@ class Sinsal12
 
         return null;
     }
+
+    /**
+     * 특정 기준 지지(yeonji) 대비 대상 지지(targetJi)의 신살 명칭을 반환합니다.
+     *
+     * @param  string  $yeonji  기준이 되는 년지 한자 (예: '申')
+     * @param  string  $targetJi  계산하려는 대상 지지 한자 (예: '巳')
+     * @return string|null 신살 명칭 (예: '겁살')
+     */
+    public static function getSinsalNameByJi(string $yeonji, string $targetJi): ?string
+    {
+        // 1. SINSAL_MAP에서 해당 년지 그룹이 있는지 확인
+        if (! isset(self::SINSAL_MAP[$yeonji])) {
+            return null;
+        }
+
+        // 2. 해당 그룹에서 targetJi를 값으로 가진 키(신살명)를 찾아서 반환
+        $sinsalName = array_search($targetJi, self::SINSAL_MAP[$yeonji]);
+
+        return $sinsalName ?: null;
+    }
 }
