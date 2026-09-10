@@ -409,4 +409,53 @@ class Oheng
 
         return array_key_first($counts);
     }
+
+    /**
+     * 사주의 5신(용신, 희신, 기신, 구신, 한신)을 모두 찾아 반환합니다.
+     *
+     * @param  object  $strengthResult  SinyakSingang 결과 객체
+     * @return array ['용신'=>'..', '희신'=>'..', '기신'=>'..', '구신'=>'..', '한신'=>'..']
+     */
+    public function findFiveGods(object $strengthResult): array
+    {
+        // 1. 용신(Priority1)과 희신(Priority2)을 먼저 가져옵니다.
+        $yongsinData = $this->findYongsin($strengthResult);
+        $yong = $yongsinData['priority1'];
+        $hui = $yongsinData['priority2'];
+
+        // 오행 리스트
+        $elements = ['木', '火', '土', '金', '水'];
+
+        // 상생 사이클 (생해주는 성분)
+        $generation = ['木' => '水', '火' => '木', '土' => '火', '金' => '土', '水' => '金'];
+        // 상극 사이클 (극하는 성분)
+        $overcoming = ['木' => '金', '火' => '水', '土' => '木', '金' => '火', '水' => '土'];
+
+        // 2. 기신(忌神): 용신을 극(Attack)하는 오행
+        $gi = $overcoming[$yong] ?? '';
+
+        // 3. 구신(仇神): 기신을 생(Help)해주거나 희신을 극하는 오행
+        $gu = $generation[$gi] ?? '';
+
+        // 4. 한신(閑神): 위 4가지를 제외한 나머지 하나
+        $used = [$yong, $hui, $gi, $gu];
+        $han = '';
+        foreach ($elements as $el) {
+            if (! in_array($el, $used)) {
+                $han = $el;
+                break;
+            }
+        }
+
+        // 5. 결과를 한글로 변환하여 반환
+        return [
+            '용신' => $this->convertHanjaToHangul($yong),
+            '희신' => $this->convertHanjaToHangul($hui),
+            '기신' => $this->convertHanjaToHangul($gi),
+            '구신' => $this->convertHanjaToHangul($gu),
+            '한신' => $this->convertHanjaToHangul($han),
+            'is_johu' => $yongsinData['is_johu'],
+            'is_tonggwan' => $yongsinData['is_tonggwan'],
+        ];
+    }
 }

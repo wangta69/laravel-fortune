@@ -245,4 +245,22 @@ class Sipsin
 
         return $count;
     }
+
+    /**
+     * 본인 일간과 성별 기준 배우자성(남=재성, 여=관성) 오행 추출
+     *
+     * @return string '목' | '화' | '토' | '금' | '수'
+     */
+    public function getRelativeElement(string $relation = 'spouse'): string
+    {
+        // 1. 이미 Sipsin에 저장된 dayMaster와 saju->gender 사용
+        $dayH = $this->dayMaster;
+        $isMale = in_array(strtoupper($this->saju->gender ?? 'M'), ['M', '남']);
+
+        $map = $isMale
+            ? ['甲' => '토', '乙' => '토', '丙' => '금', '丁' => '금', '戊' => '수', '己' => '수', '庚' => '목', '辛' => '목', '壬' => '화', '癸' => '화']
+            : ['甲' => '금', '乙' => '금', '丙' => '수', '丁' => '수', '戊' => '목', '己' => '목', '庚' => '화', '辛' => '화', '壬' => '토', '癸' => '토'];
+
+        return $map[$dayH] ?? '토';
+    }
 }
