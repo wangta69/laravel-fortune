@@ -2,14 +2,38 @@
 
 namespace Pondol\Fortune\Services;
 
+/**
+ * Class Juyeok (주역 64괘 및 정통 육효 엔진)
+ *
+ * 본 클래스는 동양 역학의 정수인 주역(周易)과 정통 육효(六爻) 점학을 수행하는 통합 엔진입니다.
+ *
+ * [주요 기능]
+ * 1. 선천괘 (Innate Trigram): 매화역수(梅花易數) 기법을 이용해 평생의 본질적인 운명괘를 산출합니다.
+ * 2. 후천괘 (Temporal Trigram): 체용법(體用法)을 이용해 특정 시점(연운, 월운, 일진, 시진)의 기운을 산출합니다.
+ * 3. 변괘 도출 (Transformed Trigram): 동효(動爻: 움직이는 효)의 비트를 반전시켜 미래의 전개 방향(지괘)을 계산합니다.
+ * 4. 육효 분석 (Yukhyo Engine): 세효(世: 나), 응효(應: 상대방), 6대 신수(육수: 청룡~현무)를 자동 배치합니다.
+ *
+ * @author  Pondol
+ *
+ * @version 2.0.0
+ *
+ * @example
+ * ```php
+ * // 기본 인스턴스 생성
+ * $juyeok = new \Pondol\Fortune\Services\Juyeok();
+ *
+ * // 1. 오늘의 주역 괘 산출 (J009 테이블 연동)
+ * $temporal = $juyeok->getTemporalGwe($userSaju, $todaySaju, 'day');
+ * $luckCode = $temporal->sangwe . $temporal->hagwe; // 예: "11", "81"
+ *
+ * // 2. 육효점 종합 분석 (본괘, 변괘, 세응, 육수)
+ * $reading = $juyeok->getYukhyoFullReading($userSaju, $todaySaju, '재물');
+ * ```
+ */
 class Juyeok
 {
     /**
-     * Juyeok Service Class
-     *
-     * 이 클래스는 두 가지 방식의 주역점 계산을 제공합니다.
-     * 1. 선천괘 (Maehwa Method): 사용자의 사주팔자를 기반으로 변하지 않는 운명의 본질을 계산합니다.
-     * 2. 후천괘 (Cheyong Method): 사용자의 사주(體)와 특정 날짜의 기운(用)을 결합하여 그날의 상호작용을 계산합니다.
+     * 8괘 배정을 위한 일간-지지 조합 테이블 (천간 체용)
      */
     private array $ganMap = [
         '乾' => ['甲寅', '甲午', '甲戌', '丙申', '丙子', '丙辰', '戊亥', '戊卯', '戊未', '庚巳', '庚酉', '庚丑', '壬寅', '壬午', '壬戌'],
@@ -22,6 +46,9 @@ class Juyeok
         '坤' => ['乙申', '乙子', '乙辰', '丁亥', '丁卯', '丁未', '己巳', '己酉', '己丑', '辛寅', '辛午', '辛戌', '癸申', '癸子', '癸辰'],
     ];
 
+    /**
+     * 8괘 배정을 위한 일지-지지 조합 테이블 (지지 체용)
+     */
     private array $jiMap = [
         '乾' => ['子寅', '子午', '子戌', '卯申', '卯子', '卯辰', '辰巳', '辰酉', '辰丑', '未亥', '未卯', '未未', '申寅', '申午', '申戌', '亥申', '亥子', '亥辰'],
         '兌' => ['丑寅', '丑午', '丑戌', '寅申', '寅子', '寅辰', '巳巳', '巳酉', '巳丑', '午亥', '午卯', '午未', '酉寅', '酉午', '酉戌', '戌申', '戌子', '戌辰'],
@@ -33,14 +60,19 @@ class Juyeok
         '坤' => ['子亥', '子卯', '子未', '卯巳', '卯酉', '卯丑', '辰申', '辰子', '辰辰', '未寅', '未午', '未戌', '申亥', '申卯', '申未', '亥巳', '亥酉', '亥丑'],
     ];
 
-    private $juyeokMap = [
+    /**
+     * 주역 64괘 마스터 데이터
+     * - code: 하괘 3비트 + 상괘 3비트 (2진수 문자열)
+     * - que8: [상괘명, 하괘명]
+     */
+    private array $juyeokMap = [
         // 하괘가 건(111)인 그룹
         ['code' => '111000', 'ko' => '지천태', 'ch' => '地天泰', 'que8' => ['곤', '건'], 'image' => ['gon', 'gun']],
         ['code' => '111001', 'ko' => '산천대축', 'ch' => '山天大畜', 'que8' => ['간', '건'], 'image' => ['gan', 'gun']],
         ['code' => '111010', 'ko' => '수천수', 'ch' => '水天需', 'que8' => ['감', '건'], 'image' => ['gam', 'gun']],
         ['code' => '111011', 'ko' => '풍천소축', 'ch' => '風天小畜', 'que8' => ['손', '건'], 'image' => ['son', 'gun']],
         ['code' => '111100', 'ko' => '뇌천대장', 'ch' => '雷天大壯', 'que8' => ['진', '건'], 'image' => ['jin', 'gun']],
-        ['code' => '111101', 'ko' => '화천대유', 'ch' => '火天大유', 'que8' => ['이', '건'], 'image' => ['lee', 'gun']],
+        ['code' => '111101', 'ko' => '화천대유', 'ch' => '火天大有', 'que8' => ['이', '건'], 'image' => ['lee', 'gun']],
         ['code' => '111110', 'ko' => '택천쾌', 'ch' => '澤天夬', 'que8' => ['태', '건'], 'image' => ['tae', 'gun']],
         ['code' => '111111', 'ko' => '건위천', 'ch' => '乾爲天', 'que8' => ['건', '건'], 'image' => ['gun', 'gun']],
 
@@ -56,18 +88,18 @@ class Juyeok
 
         // 하괘가 이(101)인 그룹
         ['code' => '101000', 'ko' => '지화명이', 'ch' => '地火明夷', 'que8' => ['곤', '이'], 'image' => ['gon', 'lee']],
-        ['code' => '101001', 'ko' => '산화비', 'ch' => '山화비', 'que8' => ['간', '이'], 'image' => ['gan', 'lee']],
+        ['code' => '101001', 'ko' => '산화비', 'ch' => '山火賁', 'que8' => ['간', '이'], 'image' => ['gan', 'lee']],
         ['code' => '101010', 'ko' => '수화기제', 'ch' => '水火旣濟', 'que8' => ['감', '이'], 'image' => ['gam', 'lee']],
         ['code' => '101011', 'ko' => '풍화가인', 'ch' => '風火家人', 'que8' => ['손', '이'], 'image' => ['son', 'lee']],
         ['code' => '101100', 'ko' => '뇌화풍', 'ch' => '雷火豊', 'que8' => ['진', '이'], 'image' => ['jin', 'lee']],
-        ['code' => '101101', 'ko' => '이위화', 'ch' => '離爲화', 'que8' => ['이', '이'], 'image' => ['lee', 'lee']],
-        ['code' => '101110', 'ko' => '택화혁', 'ch' => '澤화혁', 'que8' => ['태', '이'], 'image' => ['tae', 'lee']],
+        ['code' => '101101', 'ko' => '이위화', 'ch' => '離爲火', 'que8' => ['이', '이'], 'image' => ['lee', 'lee']],
+        ['code' => '101110', 'ko' => '택화혁', 'ch' => '澤火革', 'que8' => ['태', '이'], 'image' => ['tae', 'lee']],
         ['code' => '101111', 'ko' => '천화동인', 'ch' => '天火同人', 'que8' => ['건', '이'], 'image' => ['gun', 'lee']],
 
         // 하괘가 진(100)인 그룹
         ['code' => '100000', 'ko' => '지뢰복', 'ch' => '地雷復', 'que8' => ['곤', '진'], 'image' => ['gon', 'jin']],
         ['code' => '100001', 'ko' => '산뢰이', 'ch' => '山雷頤', 'que8' => ['간', '진'], 'image' => ['gan', 'jin']],
-        ['code' => '100010', 'ko' => '수뢰둔', 'ch' => '水雷屯', 'que8' => ['감', '진'], 'image' => ['gam', 'jin']],
+        ['code' => '100010', 'ko' => '수뢰둔', 'ch' => '水雷屯', 'que8' => ['감', '진'], 'image' => ['gam', '진']],
         ['code' => '100011', 'ko' => '풍뢰익', 'ch' => '風雷益', 'que8' => ['손', '진'], 'image' => ['son', 'jin']],
         ['code' => '100100', 'ko' => '진위뢰', 'ch' => '震爲雷', 'que8' => ['진', '진'], 'image' => ['jin', 'jin']],
         ['code' => '100101', 'ko' => '화뢰서합', 'ch' => '火雷噬嗑', 'que8' => ['이', '진'], 'image' => ['lee', 'jin']],
@@ -88,7 +120,7 @@ class Juyeok
         ['code' => '010000', 'ko' => '지수사', 'ch' => '地水師', 'que8' => ['곤', '감'], 'image' => ['gon', 'gam']],
         ['code' => '010001', 'ko' => '산수몽', 'ch' => '山水蒙', 'que8' => ['간', '감'], 'image' => ['gan', 'gam']],
         ['code' => '010010', 'ko' => '감위수', 'ch' => '坎爲水', 'que8' => ['감', '감'], 'image' => ['gam', 'gam']],
-        ['code' => '010011', 'ko' => '풍수환', 'ch' => '風수환', 'que8' => ['손', '감'], 'image' => ['son', 'gam']],
+        ['code' => '010011', 'ko' => '풍수환', 'ch' => '風水渙', 'que8' => ['손', '감'], 'image' => ['son', 'gam']],
         ['code' => '010100', 'ko' => '뇌수해', 'ch' => '雷水解', 'que8' => ['진', '감'], 'image' => ['jin', 'gam']],
         ['code' => '010101', 'ko' => '화수미제', 'ch' => '火水未濟', 'que8' => ['이', '감'], 'image' => ['lee', 'gam']],
         ['code' => '010110', 'ko' => '택수곤', 'ch' => '澤水困', 'que8' => ['태', '감'], 'image' => ['tae', 'gam']],
@@ -106,32 +138,43 @@ class Juyeok
 
         // 하괘가 곤(000)인 그룹
         ['code' => '000000', 'ko' => '곤위지', 'ch' => '坤爲地', 'que8' => ['곤', '곤'], 'image' => ['gon', 'gon']],
-        ['code' => '000001', 'ko' => '산지박', 'ch' => '山地剝', 'que8' => ['간', '곤'], 'image' => ['gan', 'gon']],
-        ['code' => '000010', 'ko' => '수지비', 'ch' => '水地比', 'que8' => ['감', '곤'], 'image' => ['gam', 'gon']],
-        ['code' => '000011', 'ko' => '풍지관', 'ch' => '風地觀', 'que8' => ['손', '곤'], 'image' => ['son', 'gon']],
-        ['code' => '000100', 'ko' => '뇌지예', 'ch' => '雷地豫', 'que8' => ['진', '곤'], 'image' => ['jin', 'gon']],
-        ['code' => '000101', 'ko' => '화지진', 'ch' => '火地晉', 'que8' => ['이', '곤'], 'image' => ['lee', 'gon']],
-        ['code' => '000110', 'ko' => '택지췌', 'ch' => '澤地萃', 'que8' => ['태', '곤'], 'image' => ['tae', 'gon']],
-        ['code' => '000111', 'ko' => '천지비', 'ch' => '天地否', 'que8' => ['건', '곤'], 'image' => ['gun', 'gon']],
-    ];
-
-    private $binaryMap = [
-        1 => '111', // 건(乾) ☰ (양-양-양)
-        2 => '110', // 태(兌) ☱ (양-양-음)
-        3 => '101', // 리(離) ☲ (양-음-양)
-        4 => '100', // 진(震) ☳ (양-음-음)
-        5 => '011', // 손(巽) ☴ (음-양-양)
-        6 => '010', // 감(坎) ☵ (음-양-음)
-        7 => '001', // 간(艮) ☶ (음-음-양)
-        8 => '000', // 곤(坤) ☷ (음-음-음)
+        ['code' => '000001', 'ko' => '산지박', 'ch' => '山地剝', 'que8' => ['간', '곤'], 'image' => ['gan', '곤']],
+        ['code' => '000010', 'ko' => '수지비', 'ch' => '水地比', 'que8' => ['감', '곤'], 'image' => ['gam', '곤']],
+        ['code' => '000011', 'ko' => '풍지관', 'ch' => '風地觀', 'que8' => ['손', '곤'], 'image' => ['son', '곤']],
+        ['code' => '000100', 'ko' => '뇌지예', 'ch' => '雷地豫', 'que8' => ['진', '곤'], 'image' => ['jin', '곤']],
+        ['code' => '000101', 'ko' => '화지진', 'ch' => '火地晉', 'que8' => ['이', '곤'], 'image' => ['lee', '곤']],
+        ['code' => '000110', 'ko' => '택지췌', 'ch' => '澤地萃', 'que8' => ['태', '곤'], 'image' => ['tae', '곤']],
+        ['code' => '000111', 'ko' => '천지비', 'ch' => '天地否', 'que8' => ['건', '곤'], 'image' => ['gun', '곤']],
     ];
 
     /**
-     * juyeokMap 을 가져오기
-     *
-     * @param  $field:  code, ko, ch...
+     * 8괘 번호와 3비트 2진수 매핑 (1=양, 0=음)
+     * [비트 순서: 초효 -> 2효 -> 3효]
      */
-    public function map($field, $v)
+    private array $binaryMap = [
+        1 => '111', // 건(乾) ☰
+        2 => '110', // 태(兌) ☱
+        3 => '101', // 리(離) ☲
+        4 => '100', // 진(震) ☳
+        5 => '011', // 손(巽) ☴
+        6 => '010', // 감(坎) ☵
+        7 => '001', // 간(艮) ☶
+        8 => '000', // 곤(坤) ☷
+    ];
+
+    /**
+     * 64괘 맵에서 특정 필드 값으로 괘 데이터 조회
+     *
+     * @param  string  $field  검색할 필드명 ('code', 'ko', 'ch' 등)
+     * @param  string  $v  검색할 값 (예: '111000', '지천태')
+     *
+     * @example
+     * ```php
+     * $gwe = $juyeok->map('ko', '지천태');
+     * echo $gwe['ch']; // "地天泰"
+     * ```
+     */
+    public function map(string $field, string $v): array
     {
         foreach ($this->juyeokMap as $map) {
             if ($map[$field] === $v) {
@@ -143,27 +186,36 @@ class Juyeok
     }
 
     /**
-     * '선천괘'를 계산합니다. (매화역수)
+     * '선천괘(先天卦)' 계산 - 매화역수(梅花易數) 기반
+     * 사용자의 사주 원국(생년월일시)을 조합하여 평생 변하지 않는 운명괘와 동효를 산출합니다.
      *
-     * @param  object  $saju  Saju 객체
+     * [계산 원리]
+     * - 상괘: (년지 + 월지 + 일지) % 8
+     * - 하괘: (년지 + 월지 + 일지 + 시지) % 8
+     * - 동효: (년지 + 월지 + 일지 + 시지) % 6
+     *
+     * @param  object  $saju  Saju 만세력 객체
+     * @return object { sangwe: int, hagwe: int, donghyo: int, map: array }
+     *
+     * @example
+     * ```php
+     * $innate = $juyeok->getInnateGwe($userSaju);
+     * echo "선천 상괘: " . $innate->sangwe; // 1~8
+     * echo "선천 하괘: " . $innate->hagwe;  // 1~8
+     * echo "동효: " . $innate->donghyo . "효"; // 1~6
+     * echo "본명괘: " . $innate->map['ko']; // 예: 지천태
+     * ```
      */
     public function getInnateGwe(object $saju): object
     {
-        // 1. 년, 월, 일 지지 숫자의 합을 먼저 구합니다.
         $ymd_sum = $saju->get_e_serial('year') + $saju->get_e_serial('month') + $saju->get_e_serial('day');
 
-        // 2. 상괘(上卦)를 계산합니다.
-        $sangweNum = $ymd_sum % 8;
-        $sangweNum = ($sangweNum == 0) ? 8 : $sangweNum;
+        $sangweNum = $ymd_sum % 8 ?: 8;
 
-        // 3. 하괘(下卦)를 계산합니다.
         $total_sum = $ymd_sum + $saju->get_e_serial('hour');
-        $hagweNum = $total_sum % 8;
-        $hagweNum = ($hagweNum == 0) ? 8 : $hagweNum;
+        $hagweNum = $total_sum % 8 ?: 8;
 
-        // 4. 동효(動爻)를 계산합니다.
-        $donghyo = $total_sum % 6;
-        $donghyo = ($donghyo == 0) ? 6 : $donghyo;
+        $donghyo = $total_sum % 6 ?: 6;
 
         $code = $this->binaryMap[$hagweNum].$this->binaryMap[$sangweNum];
         $map = $this->map('code', $code);
@@ -177,40 +229,49 @@ class Juyeok
     }
 
     /**
-     * 사주(體)와 특정일(用)로 '후천괘'를 계산합니다. (고유 점법)
+     * '후천괘(後天卦)' 계산 - 체용법(體用法) 기반
+     * 나의 본질(일주: 體)과 특정 시점의 기운(用)이 부딪혀 발생하는 현재/미래의 운을 산출합니다.
      *
-     * @param  object  $saju  나의 사주(體) 객체
-     * @param  object  $today  특정 날짜(用)의 Saju 객체
-     * @param  object  $type  hour, day, month, year 등으로 시, 일, 월, 년에 대한 운세를 구한다.
+     * [계산 원리]
+     * - 상괘: 내 일간 + 목표 시점의 지지 조합 ($ganMap)
+     * - 하괘: 내 일지 + 목표 시점의 지지 조합 ($jiMap)
+     * - 동효: (내 일간수 + 내 일지수 + 목표 시점 지지수) % 6
+     *
+     * @param  object  $saju  나의 사주(體) 만세력 객체
+     * @param  object  $today  특정 시점(用) 만세력 객체
+     * @param  string  $type  'day'(오늘의 운세/방위), 'year'(신년운세/연운), 'month', 'hour'
+     * @return object { sangwe: int, hagwe: int, donghyo: int, map: array }
+     *
+     * @example
+     * ```php
+     * // 1. 오늘의 행운 방위(J009) 조회 시
+     * $temporal = $juyeok->getTemporalGwe($userSaju, $todaySaju, 'day');
+     * $luckCode = $temporal->sangwe . $temporal->hagwe; // 예: "31" (화천대유)
+     *
+     * // 2. 신년 운세 주역 괘 산출 시 (한 해 동안 고정)
+     * $yearGwe = $juyeok->getTemporalGwe($userSaju, $targetYearManse, 'year');
+     * ```
      */
     public function getTemporalGwe(object $saju, object $today, string $type = 'day'): object
     {
-        // 1. 상괘(上卦) 계산: 나의 일간(체)과 특정 시간의 지지(용) 조합
         $myIlgan = $saju->get_h('day');
         $targetJi = $today->get_e($type);
         $sangweHanja = $this->findTrigramByCombination('Gan', $myIlgan, $targetJi);
         $sangweNum = $this->convertHanjaToNum($sangweHanja);
 
-        // 2. 하괘(下卦) 계산: 나의 일지(체)와 특정 시간의 지지(용) 조합
         $myIlji = $saju->get_e('day');
-        // $targetJi는 위에서 이미 정의되었으므로 재사용
         $hagweHanja = $this->findTrigramByCombination('Ji', $myIlji, $targetJi);
         $hagweNum = $this->convertHanjaToNum($hagweHanja);
 
-        // 3. 동효(動爻) 계산: 괘를 구성하는 모든 요소의 숫자(serial) 합
-        $total_sum = $saju->get_h_serial('day')   // 나의 일간 숫자
-                   + $saju->get_e_serial('day')   // 나의 일지 숫자
-                   + $today->get_e_serial($type); // 특정 시간의 지지 숫자
+        $total_sum = $saju->get_h_serial('day')
+                   + $saju->get_e_serial('day')
+                   + $today->get_e_serial($type);
 
-        $donghyo = $total_sum % 6;
-        $donghyo = ($donghyo == 0) ? 6 : $donghyo;
+        $donghyo = $total_sum % 6 ?: 6;
 
-        // 4. 괘 코드 생성 및 맵 정보 조회
         $code = $this->binaryMap[$hagweNum].$this->binaryMap[$sangweNum];
         $map = $this->map('code', $code);
-        // print_r($map);
 
-        // 5. 최종 결과 객체를 getInnateGwe와 동일한 형식으로 반환
         return (object) [
             'sangwe' => $sangweNum,
             'hagwe' => $hagweNum,
@@ -220,20 +281,26 @@ class Juyeok
     }
 
     /**
-     * 두 가지 방식의 주역점 결과를 모두 반환하는 메인 메소드
+     * 선천괘(타고난 운명)와 후천괘(오늘의 기운)를 한 번에 조회
+     *
+     * @param  object  $saju  나의 사주 객체
+     * @param  object  $today  오늘의 사주 객체
+     *
+     * @example
+     * ```php
+     * $reading = $juyeok->getFullReading($userSaju, $todaySaju);
+     * echo $reading->temporal->description; // "나의 본질과 오늘의 기운의 상호작용"
+     * echo $reading->innate->donghyo;        // 선천괘 동효
+     * ```
      */
     public function getFullReading(object $saju, object $today): object
     {
-        // 1. 후천괘 (오늘의 운세) 계산
         $temporalGwe = $this->getTemporalGwe($saju, $today);
-
-        // 2. 선천괘 (타고난 운명) 계산
         $innateGwe = $this->getInnateGwe($saju);
 
-        // 3. 최종 결과 객체 생성
         return (object) [
             'temporal' => (object) [
-                'description' => '나의 본질(일주)과 오늘의 기운(일지)의 상호작용 (후천괘)',
+                'description' => '나의 본질(일주)과 오늘의 기운의 상호작용 (후천괘)',
                 'sangwe' => $this->convertNumToHanja($temporalGwe->sangwe),
                 'hagwe' => $this->convertNumToHanja($temporalGwe->hagwe),
             ],
@@ -247,7 +314,200 @@ class Juyeok
     }
 
     /**
-     * 조합에 해당하는 8괘를 찾습니다.
+     * 상괘 번호(1~8)와 하괘 번호(1~8)로 64괘 마스터 데이터 직접 조회
+     *
+     * @param  int  $sangwe  상괘 번호 (1:건 ~ 8:곤)
+     * @param  int  $hagwe  하괘 번호 (1:건 ~ 8:곤)
+     * @return array 64괘 맵 배열 (code, ko, ch, que8, image)
+     *
+     * @example
+     * ```php
+     * // 상괘 8(곤), 하괘 1(건) -> 지천태
+     * $gwe = $juyeok->getGweByNums(8, 1);
+     * echo $gwe['ko']; // "지천태"
+     * echo $gwe['ch']; // "地天泰"
+     * ```
+     */
+    public function getGweByNums(int $sangwe, int $hagwe): array
+    {
+        $code = ($this->binaryMap[$hagwe] ?? '000').($this->binaryMap[$sangwe] ?? '000');
+
+        return $this->map('code', $code);
+    }
+
+    /**
+     * 동효(動爻)의 비트 반전을 통해 변괘(之卦: 미래의 괘)를 도출
+     *
+     * [원리]
+     * - 64괘 6개 비트 중 지정된 동효(1~6효) 위치의 비트를 0↔1로 반전
+     * - 반전된 새로운 6비트 코드로 미래의 변화 결과괘를 즉시 역산
+     *
+     * @param  int  $sangwe  본괘 상괘 (1~8)
+     * @param  int  $hagwe  본괘 하괘 (1~8)
+     * @param  int  $donghyo  변한 효 위치 (1~6효)
+     * @return object { sangwe: int, hagwe: int, code: string, map: array }
+     *
+     * @example
+     * ```php
+     * // 지천태(상괘8, 하괘1)의 3번째 효가 동했을 때 변괘 산출
+     * $transformed = $juyeok->getTransformedGwe(8, 1, 3);
+     * echo "변괘 이름: " . $transformed->map['ko']; // "지택림"
+     * echo "미래 상괘: " . $transformed->sangwe;     // 8
+     * echo "미래 하괘: " . $transformed->hagwe;      // 2
+     * ```
+     */
+    public function getTransformedGwe(int $sangwe, int $hagwe, int $donghyo): object
+    {
+        $code = ($this->binaryMap[$hagwe] ?? '000').($this->binaryMap[$sangwe] ?? '000');
+
+        $flipIdx = $donghyo - 1;
+        $flippedBit = ($code[$flipIdx] === '1') ? '0' : '1';
+        $newCode = substr_replace($code, $flippedBit, $flipIdx, 1);
+
+        $newHaBit = substr($newCode, 0, 3);
+        $newSangBit = substr($newCode, 3, 3);
+
+        $bitToNum = array_flip($this->binaryMap);
+        $newHagwe = $bitToNum[$newHaBit] ?? $hagwe;
+        $newSangwe = $bitToNum[$newSangBit] ?? $sangwe;
+
+        return (object) [
+            'sangwe' => $newSangwe,
+            'hagwe' => $newHagwe,
+            'code' => $newCode,
+            'map' => $this->map('code', $newCode),
+        ];
+    }
+
+    /**
+     * 64괘의 8궁(八宮) 배치 법칙에 따른 세효(世: 나)와 응효(應: 상대방) 위치 계산
+     *
+     * [원리]
+     * - 상괘 3비트와 하괘 3비트의 XOR 비트 차이를 이용한 8궁괘 수학적 판별
+     * - 세효: 내가 주도하는 효의 자리 (1~6)
+     * - 응효: 상대방이나 대상 사건의 자리 (세효와 3칸 떨어진 자리)
+     *
+     * @param  int  $sangwe  상괘 번호 (1~8)
+     * @param  int  $hagwe  하괘 번호 (1~8)
+     * @return array ['se' => int(1~6), 'eung' => int(1~6)]
+     *
+     * @example
+     * ```php
+     * // 지천태(상괘8 곤, 하괘1 건)의 세·응 위치
+     * $seeung = $juyeok->getSeEung(8, 1);
+     * echo "세효(나): " . $seeung['se'] . "효";    // 3효
+     * echo "응효(상대): " . $seeung['eung'] . "효"; // 6효
+     * ```
+     */
+    public function getSeEung(int $sangwe, int $hagwe): array
+    {
+        $haBit = $this->binaryMap[$hagwe] ?? '000';
+        $sangBit = $this->binaryMap[$sangwe] ?? '000';
+
+        $diff1 = $haBit[0] !== $sangBit[0]; // 1효 vs 4효
+        $diff2 = $haBit[1] !== $sangBit[1]; // 2효 vs 5효
+        $diff3 = $haBit[2] !== $sangBit[2]; // 3효 vs 6효
+
+        $se = match (true) {
+            ! $diff1 && ! $diff2 && ! $diff3 => 6, // 본궁괘: 6세
+            $diff1 && ! $diff2 && ! $diff3 => 1, // 1세괘
+            $diff1 && $diff2 && ! $diff3 => 2, // 2세괘
+            $diff1 && $diff2 && $diff3 => 3, // 3세괘
+            ! $diff1 && $diff2 && $diff3 => 4, // 4세괘
+            ! $diff1 && ! $diff2 && $diff3 => 5, // 5세괘
+            $diff1 && ! $diff2 && $diff3 => 4, // 유혼괘: 4세
+            ! $diff1 && $diff2 && ! $diff3 => 3, // 귀혼괘: 3세
+            default => 6,
+        };
+
+        $eung = ($se > 3) ? ($se - 3) : ($se + 3);
+
+        return ['se' => $se, 'eung' => $eung];
+    }
+
+    /**
+     * 오늘 일간(Day Stem)에 따른 육수(六獸: 6대 신수)의 1~6효 자동 배치
+     *
+     * [배치 순서]
+     * - 甲/乙: 청룡(青龍) 시작
+     * - 丙/丁: 주작(朱雀) 시작
+     * - 戊:    구진(句陳) 시작
+     * - 己:    등사(騰蛇) 시작
+     * - 庚/辛: 백호(白虎) 시작
+     * - 壬/癸: 현무(玄武) 시작
+     *
+     * @param  string  $dayHanja  오늘 일간 한자 (甲 ~ 癸)
+     * @return array [1 => '신수명', 2 => '신수명', ... 6 => '신수명']
+     *
+     * @example
+     * ```php
+     * $yuksu = $juyeok->getYuksu('甲');
+     * // [1 => '청룡', 2 => '주작', 3 => '구진', 4 => '등사', 5 => '백호', 6 => '현무']
+     * echo "3번째 효의 수호신수: " . $yuksu[3]; // "구진"
+     * ```
+     */
+    public function getYuksu(string $dayHanja): array
+    {
+        $order = ['청룡', '주작', '구진', '등사', '백호', '현무'];
+
+        $startIndex = match ($dayHanja) {
+            '甲', '乙' => 0,
+            '丙', '丁' => 1,
+            '戊' => 2,
+            '己' => 3,
+            '庚', '辛' => 4,
+            '壬', '癸' => 5,
+            default => 0,
+        };
+
+        $result = [];
+        for ($i = 0; $i < 6; $i++) {
+            $result[$i + 1] = $order[($startIndex + $i) % 6];
+        }
+
+        return $result;
+    }
+
+    /**
+     * 정통 육효점(六爻占) 종합 분석 엔진
+     * 본괘, 동효, 변괘(지괘), 세응(世應), 육수(六獸)를 한 번에 조립하여 완벽한 점학 객체로 반환합니다.
+     *
+     * @param  object  $saju  질문자 사주 객체
+     * @param  object  $today  오늘의 일진 사주 객체
+     * @param  string  $jumsa  점치는 주제 ('재물', '구직', '애정', '소송' 등)
+     * @return object { original, donghyo, transformed, seeung, yuksu }
+     *
+     * @example
+     * ```php
+     * // 육효 서비스(YukhyoService)에서 단 한 줄로 호출
+     * $juyeok = new \Pondol\Fortune\Services\Juyeok();
+     * $reading = $juyeok->getYukhyoFullReading($userSaju, $todaySaju, '사업');
+     *
+     * echo "본괘: " . $reading->original->map['ko'];      // 예: "지천태"
+     * echo "움직인 효: " . $reading->donghyo . "효 동함"; // 예: "3효"
+     * echo "변괘(미래): " . $reading->transformed->map['ko']; // 예: "지택림"
+     * echo "내 자리(世): " . $reading->seeung['se'] . "효";  // 예: "3효"
+     * echo "3효 신수: " . $reading->yuksu[3];              // 예: "구진"
+     * ```
+     */
+    public function getYukhyoFullReading(object $saju, object $today, string $jumsa = '기타'): object
+    {
+        $temporal = $this->getTemporalGwe($saju, $today, 'day');
+        $transformed = $this->getTransformedGwe($temporal->sangwe, $temporal->hagwe, $temporal->donghyo);
+        $seeung = $this->getSeEung($temporal->sangwe, $temporal->hagwe);
+        $yuksu = $this->getYuksu($today->day->h->ch);
+
+        return (object) [
+            'original' => $temporal,
+            'donghyo' => $temporal->donghyo,
+            'transformed' => $transformed,
+            'seeung' => $seeung,
+            'yuksu' => $yuksu,
+        ];
+    }
+
+    /**
+     * [내부 헬퍼] 조합 문자열로 8괘 명칭 검색
      */
     private function findTrigramByCombination(string $mode, string $var1, string $var2): string
     {
@@ -260,28 +520,26 @@ class Juyeok
             }
         }
 
-        return '오류';
+        return '坤';
     }
 
-    // --- Helper Methods ---
-
     /**
-     * [헬퍼] 8괘 숫자를 한자로 변환합니다.
+     * [내부 헬퍼] 8괘 숫자를 한자로 변환 (1:乾 ~ 8:坤)
      */
     private function convertNumToHanja(int $num): string
     {
         $map = [1 => '乾', 2 => '兌', 3 => '離', 4 => '震', 5 => '巽', 6 => '坎', 7 => '艮', 8 => '坤'];
 
-        return $map[$num] ?? '오류';
+        return $map[$num] ?? '坤';
     }
 
     /**
-     * [헬퍼] 8괘 한자를 숫자로 변환합니다.
+     * [내부 헬퍼] 8괘 한자를 숫자로 변환 (乾:1 ~ 坤:8)
      */
     private function convertHanjaToNum(string $hanja): int
     {
         $map = ['乾' => 1, '兌' => 2, '離' => 3, '震' => 4, '巽' => 5, '坎' => 6, '艮' => 7, '坤' => 8];
 
-        return $map[$hanja] ?? 0;
+        return $map[$hanja] ?? 8;
     }
 }
