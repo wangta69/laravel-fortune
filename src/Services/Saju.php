@@ -6,83 +6,139 @@ use Pondol\Fortune\Facades\Lunar;
 
 class Saju
 {
-    public $sl = 'solar'; // $lunar
+    public $sl = 'solar'; // solar | lunar
 
-    public $solar; // 양력
+    public $solar; // 양력 yyyy-mm-dd
 
-    public $lunar; // 음력
+    public $lunar; // 음력 yyyy-mm-dd
 
-    public $leap = false; // 윤달여부
+    public $leap = false; // 윤달 여부
 
-    public $ymd; // 생년워일 yyyymmdd
+    public $ymd; // 생년월일 yyyy-mm-dd
 
-    public $hi = '9999'; // 생시 hhmm (예 1330, 13시 30분)
+    public $hi = '9999'; // 생시 hhmm (예: 1330, 9999는 시간 모름)
 
-    public $hourKnown = true; //  생시 정보 유무를 나타내는 플래그
+    public $hourKnown = true; // 생시 정보 유무 플래그
 
-    public $year = ['ch' => '', 'ko' => ''];
+    /**
+     * 사주 4주(년·월·일·시) 기둥 객체
+     * 각 기둥은 ko(한글 간지), ch(한자 간지), h(천간 객체), e(지지 객체)를 포함합니다.
+     *
+     * @var object{ko: string, ch: string, h: object, e: object}
+     */
+    public $year;
 
-    public $month = ['ch' => '', 'ko' => ''];
+    public $month;
 
-    public $day = ['ch' => '', 'ko' => ''];
+    public $day;
 
-    public $hour = ['ch' => '', 'ko' => ''];
+    public $hour;
 
-    public $gender = 'M'; // M(Man) | W(Woman)
+    public $gender = 'M'; // M(남성) | F(여성) 기본값 M
 
-    public $korean_age; // 한국나이
+    public $name = '';
 
-    public $oheng; // 오행
+    public $korean_age; // 한국 나이
 
-    public $sipsin; // 10신
+    public $oheng; // 오행 분석기
 
-    public $zizangan; // 지장간
+    public $sipsin; // 10신 분석기
 
-    public $daewoon; // 대운
+    public $zizangan; // 지장간 분석기
 
-    public $woonsung12; // 12운성
+    public $daewoon; // 대운 분석기
 
-    public $sinsal; // 신살
+    public $saewoon; // 세운 분석기
 
-    public $sinsal12; // 12신살
+    public $woonsung12; // 12운성 분석기
 
-    public $unse;  // 운세(기타 신살 포함)
+    public $sinsal; // 신살 분석기
 
-    public $taekil; // 택일
+    public $sinsal12; // 12신살 분석기
+
+    public $unse; // 운세(특수 신살 포함) 분석기
+
+    public $taekil; // 택일 분석기
+
+    public $gita; // 기타 특수 신살 분석기
+
+    public $sinyaksingang; // 신약·신강 분석기
+
+    public $tojeong; // 토정비결 작괘 분석기
+
+    public $gabja; // 4주 통합 접근 객체
+
+    // [표준 메타데이터] 10천간 (1:甲 ~ 10:癸)
+    private static array $ganMeta = [
+        '甲' => ['ko' => '갑', 'ch' => '甲', 'num' => 1,  'code' => '01'],
+        '乙' => ['ko' => '을', 'ch' => '乙', 'num' => 2,  'code' => '02'],
+        '丙' => ['ko' => '병', 'ch' => '丙', 'num' => 3,  'code' => '03'],
+        '丁' => ['ko' => '정', 'ch' => '丁', 'num' => 4,  'code' => '04'],
+        '戊' => ['ko' => '무', 'ch' => '戊', 'num' => 5,  'code' => '05'],
+        '己' => ['ko' => '기', 'ch' => '己', 'num' => 6,  'code' => '06'],
+        '庚' => ['ko' => '경', 'ch' => '庚', 'num' => 7,  'code' => '07'],
+        '辛' => ['ko' => '신', 'ch' => '辛', 'num' => 8,  'code' => '08'],
+        '壬' => ['ko' => '임', 'ch' => '壬', 'num' => 9,  'code' => '09'],
+        '癸' => ['ko' => '계', 'ch' => '癸', 'num' => 10, 'code' => '10'],
+    ];
+
+    // [프로젝트 공식 표준] 12지지 (01:인(寅) ~ 12:축(丑))
+    // - num/code: 프로젝트 표준 (01:인 ~ 12:축)
+    // - order: 천문 십이지 순번 (1:자 ~ 12:해) 호환용
+    private static array $jiMeta = [
+        '寅' => ['ko' => '인', 'ch' => '寅', 'num' => 1,  'code' => '01', 'animal' => '호랑이', 'order' => 3],
+        '卯' => ['ko' => '묘', 'ch' => '卯', 'num' => 2,  'code' => '02', 'animal' => '토끼',   'order' => 4],
+        '辰' => ['ko' => '진', 'ch' => '辰', 'num' => 3,  'code' => '03', 'animal' => '용',     'order' => 5],
+        '巳' => ['ko' => '사', 'ch' => '巳', 'num' => 4,  'code' => '04', 'animal' => '뱀',     'order' => 6],
+        '午' => ['ko' => '오', 'ch' => '午', 'num' => 5,  'code' => '05', 'animal' => '말',     'order' => 7],
+        '未' => ['ko' => '미', 'ch' => '未', 'num' => 6,  'code' => '06', 'animal' => '양',     'order' => 8],
+        '申' => ['ko' => '신', 'ch' => '申', 'num' => 7,  'code' => '07', 'animal' => '원숭이', 'order' => 9],
+        '酉' => ['ko' => '유', 'ch' => '酉', 'num' => 8,  'code' => '08', 'animal' => '닭',     'order' => 10],
+        '戌' => ['ko' => '술', 'ch' => '戌', 'num' => 9,  'code' => '09', 'animal' => '개',     'order' => 11],
+        '亥' => ['ko' => '해', 'ch' => '亥', 'num' => 10, 'code' => '10', 'animal' => '돼지',   'order' => 12],
+        '子' => ['ko' => '자', 'ch' => '子', 'num' => 11, 'code' => '11', 'animal' => '쥐',     'order' => 1],
+        '丑' => ['ko' => '축', 'ch' => '丑', 'num' => 12, 'code' => '12', 'animal' => '소',     'order' => 2],
+    ];
 
     public function __construct()
     {
-        // 객체가 생성될 때 기본값으로 현재 시간을 설정합니다.
-        // 기존 ymdhi() 메소드를 재사용하여 코드 중복을 피합니다.
         $this->ymdhi(now()->format('YmdHi'));
-
-        // 다른 기본값들도 여기서 설정할 수 있습니다.
         $this->sl = 'solar';
         $this->leap = false;
-        $this->gender = 'M'; // 기본 성별
+        $this->gender = 'M'; // M | F 표준 규격
+        $this->name = '';
+
+        // [안전장치] create() 호출 전에도 $saju->day->e->num 접근 시 에러가 발생하지 않도록 초기화
+        $emptyPillar = (object) [
+            'ko' => '',
+            'ch' => '',
+            'h' => (object) ['ko' => '', 'ch' => '', 'num' => 0, 'code' => ''],
+            'e' => (object) ['ko' => '', 'ch' => '', 'num' => 0, 'code' => '', 'animal' => '', 'order' => 0],
+        ];
+
+        $this->year = clone $emptyPillar;
+        $this->month = clone $emptyPillar;
+        $this->day = clone $emptyPillar;
+        $this->hour = clone $emptyPillar;
     }
 
     /**
-     * 생년월일생시
-     *
-     * @param  $ymdhi  = yyyymmddhhii
+     * 생년월일시 입력 파싱 (8자리 또는 12자리)
      */
     public function ymdhi($ymdhi)
     {
-        $ymdhi = str_replace(['-', ':'], '', trim($ymdhi));
+        $ymdhi = str_replace(['-', ':', ' '], '', trim($ymdhi));
         $len = strlen($ymdhi);
-        $typeof = gettype($ymdhi);
 
         switch ($len) {
             case 8:
                 $ymd = $ymdhi;
-                $this->hi = '9999'; // 8자리 입력은 시간이 없는 것으로 간주
+                $this->hi = '9999';
                 $this->hourKnown = false;
                 break;
             case 12:
                 preg_match('/^([0-9]{8})([0-9]{4})$/', trim($ymdhi), $match);
                 [, $ymd, $hi] = $match;
-                // '시간 모름' 값(예: 9999)을 받았을 때 처리
                 if ($hi === '9999' || substr($hi, 0, 2) === '99') {
                     $this->hi = '9999';
                     $this->hourKnown = false;
@@ -91,11 +147,12 @@ class Saju
                     $this->hourKnown = true;
                 }
                 break;
-            default: // 8자리나 12자리가 아닌 모든 경우를 처리
+            default:
                 throw new \Exception('Invalid date length. Expected 8 or 12 characters, but got '.$len);
         }
+
         preg_match('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', trim($ymd), $match);
-        if (count($match) < 4) { // preg_match가 실패한 경우에 대한 방어 코드
+        if (count($match) < 4) {
             throw new \Exception('Failed to parse ymd: '.$ymd);
         }
         [, $y, $m, $d] = $match;
@@ -109,11 +166,6 @@ class Saju
         return $this->ymdhi($ymd);
     }
 
-    /**
-     * 양|음력
-     *
-     * @param  string  $sl  : solar | lunar
-     */
     public function sl($sl)
     {
         $this->sl = $sl;
@@ -121,11 +173,6 @@ class Saju
         return $this;
     }
 
-    /**
-     * 윤달여부
-     *
-     * @param  bool  $leap  : true | false
-     */
     public function leap($leap)
     {
         $this->leap = $leap;
@@ -135,13 +182,22 @@ class Saju
 
     public function gender($gender)
     {
-        $this->gender = $gender;
+        // '남'/'여' 입력 시에도 'M'/'F'로 자동 정규화
+        $this->gender = in_array(strtoupper($gender), ['M', '남']) ? 'M' : 'F';
 
         return $this;
     }
 
-    // Pondol\Fortune\Services\Saju.php 내부 create 메서드 수정
+    public function name($name)
+    {
+        $this->leap = $name;
 
+        return $this;
+    }
+
+    /**
+     * 사주 원국 계산 및 메타데이터 주입
+     */
     public function create()
     {
         switch ($this->sl) {
@@ -165,10 +221,9 @@ class Saju
                 break;
         }
 
-        // --- 구조 보정 및 확장 로직 ---
+        // --- 4주(년·월·일·시) 구조 보정 및 표준 메타데이터 확장 ---
         $pillars = ['year', 'month', 'day', 'hour'];
         foreach ($pillars as $p) {
-            // Lunar::create()의 리턴값에서 해당 주(Pillar)의 데이터를 객체로 가져옴
             $source = $saju->gabja->{$p} ?? null;
 
             // 시주 정보를 모를 때의 방어 코드
@@ -176,33 +231,33 @@ class Saju
                 $this->hour = (object) [
                     'ko' => '알수없음',
                     'ch' => '時柱不明',
-                    'h' => (object) ['ko' => '', 'ch' => ''],
-                    'e' => (object) ['ko' => '', 'ch' => ''],
+                    'h' => (object) ['ko' => '', 'ch' => '', 'num' => 0, 'code' => ''],
+                    'e' => (object) ['ko' => '', 'ch' => '', 'num' => 0, 'code' => '', 'animal' => '', 'order' => 0],
                 ];
 
                 continue;
             }
 
-            // [중요] $source는 stdClass이므로 -> 문법으로 접근해야 에러가 나지 않습니다.
             $koVal = $source->ko; // 예: "갑자"
             $chVal = $source->ch; // 예: "甲子"
 
+            $hCh = mb_substr($chVal, 0, 1);
+            $eCh = mb_substr($chVal, 1, 1);
+
+            // 메타데이터 매핑
+            $hMeta = self::$ganMeta[$hCh] ?? ['ko' => mb_substr($koVal, 0, 1), 'ch' => $hCh, 'num' => 1, 'code' => '01'];
+            $eMeta = self::$jiMeta[$eCh] ?? ['ko' => mb_substr($koVal, 1, 1), 'ch' => $eCh, 'num' => 1, 'code' => '01', 'animal' => '', 'order' => 1];
+
+            // 4주 각 기둥에 확장 객체 할당
             $this->{$p} = (object) [
-                'ko' => $koVal, // 기존 호환성 유지
-                'ch' => $chVal, // 기존 호환성 유지
-                // 신규: 천간(h)과 지지(e) 분리 객체 추가
-                'h' => (object) [
-                    'ko' => mb_substr($koVal, 0, 1),
-                    'ch' => mb_substr($chVal, 0, 1),
-                ],
-                'e' => (object) [
-                    'ko' => mb_substr($koVal, 1, 1),
-                    'ch' => mb_substr($chVal, 1, 1),
-                ],
+                'ko' => $koVal,
+                'ch' => $chVal,
+                'h' => (object) $hMeta, // ko, ch, num(1~10), code('01'~'10')
+                'e' => (object) $eMeta, // ko, ch, num(1~12:인~축), code('01'~'12'), animal('호랑이' 등), order(자=1기준)
             ];
         }
 
-        // gabja 프로퍼티 호환성 유지
+        // 호환용 gabja 프로퍼티 구성
         $this->gabja = (object) [
             'year' => $this->year,
             'month' => $this->month,
@@ -210,7 +265,7 @@ class Saju
             'hour' => $this->hour,
         ];
 
-        $this->korean_age = date('Y') - substr($this->solar, 0, 4) + 1;
+        $this->korean_age = (int) date('Y') - (int) substr($this->solar, 0, 4) + 1;
 
         return $this;
     }
@@ -220,13 +275,8 @@ class Saju
         return Lunar::seasonal_division($ymd)->create();
     }
 
-    /** 만세에서  천간 가져오기
-     * @param  string  $str  hour | day | month | year
-     * @param  string  $lan  ch | ko
-     */
     public function get_h($str, $lan = 'ch')
     {
-
         if ($str === 'hour' && ! $this->hourKnown) {
             return '';
         }
@@ -239,11 +289,6 @@ class Saju
         return h_to_serial($this->get_h($str));
     }
 
-    /**
-     * 만세에서 지지 가져오기
-     *
-     * @param  string  $lan  ch | ko
-     */
     public function get_e($str, $lan = 'ch')
     {
         if ($str === 'hour' && ! $this->hourKnown) {
@@ -263,23 +308,15 @@ class Saju
         return e_to_wolgun($this->get_e($str));
     }
 
-    /**
-     * 만세력에서 60갑자 가져오기
-     *
-     * @param  string  $lan  ch | ko
-     */
     public function get_he($str, $lan = 'ch')
     {
         if ($str === 'hour' && ! $this->hourKnown) {
-            return ''; // 또는 '時柱不明'을 그대로 유지하고 싶다면 이 조건문을 생략
+            return '';
         }
 
         return $this->{$str}->{$lan};
     }
 
-    /**
-     * oheng 구하기
-     */
     public function oheng()
     {
         if (! isset($this->oheng)) {
@@ -287,7 +324,6 @@ class Saju
             $this->oheng = $ohengCalculator->withSaju($this);
         }
 
-        // $callback($oheng);
         return $this->oheng;
     }
 
@@ -296,16 +332,11 @@ class Saju
         if (! isset($this->oheng)) {
             $this->oheng();
         }
-
         $property = $pillar.'_'.$type;
 
         return $this->oheng->{$property}->ch ?? '';
     }
 
-    /**
-     * 길신/흉신 구하기
-     * 위의 신살 구하기에서 결과를 받아와서 년월일시로 배열을 재정리
-     */
     public function sinsal()
     {
         if (! isset($this->sinsal)) {
@@ -316,9 +347,6 @@ class Saju
         return $this->sinsal;
     }
 
-    /**
-     * 12신살 구하기
-     */
     public function sinsal12()
     {
         if (! isset($this->sinsal12)) {
@@ -328,10 +356,6 @@ class Saju
         return $this->sinsal12;
     }
 
-    /**
-     * 운세 분석기 (년운, 월운 등)
-     * 이 메서드는 Unse 객체 자체를 반환하여, 외부에서 checkYear() 등을 호출할 수 있게 합니다.
-     */
     public function unse()
     {
         if (! isset($this->unse)) {
@@ -341,11 +365,6 @@ class Saju
         return $this->unse;
     }
 
-    /**
-     * 택일 분석기 (특정 날짜의 길흉)
-     * Taekil 객체를 생성하고 사주 정보를 주입하여 반환합니다.
-     * 외부에서 checkDate()를 호출하여 사용합니다.
-     */
     public function taekil()
     {
         if (! isset($this->taekil)) {
@@ -355,9 +374,6 @@ class Saju
         return $this->taekil;
     }
 
-    /**
-     * 기타 특수 신살 분석기
-     */
     public function gita()
     {
         if (! isset($this->gita)) {
@@ -367,9 +383,6 @@ class Saju
         return $this->gita;
     }
 
-    /**
-     * 12운성 구하기
-     */
     public function woonsung12()
     {
         if (! isset($this->woonsung12)) {
@@ -380,9 +393,6 @@ class Saju
         return $this->woonsung12;
     }
 
-    /**
-     * 10신 구하기
-     */
     public function sipsin()
     {
         if (! isset($this->sipsin)) {
@@ -393,9 +403,6 @@ class Saju
         return $this->sipsin;
     }
 
-    /**
-     * 지장간 구하기
-     */
     public function zizangan()
     {
         if (! isset($this->zizangan)) {
@@ -406,9 +413,6 @@ class Saju
         return $this->zizangan;
     }
 
-    /**
-     * 대운구하기
-     */
     public function daewoon()
     {
         if (! isset($this->daewoon)) {
@@ -419,9 +423,6 @@ class Saju
         return $this->daewoon;
     }
 
-    /**
-     * 세운구하기
-     */
     public function saewoon()
     {
         if (! isset($this->saewoon)) {
@@ -432,9 +433,6 @@ class Saju
         return $this->saewoon;
     }
 
-    /**
-     * 신약신강구하기
-     */
     public function sinyaksingang()
     {
         if (! isset($this->sinyaksingang)) {
@@ -445,9 +443,6 @@ class Saju
         return $this->sinyaksingang;
     }
 
-    /**
-     *  토정비결용 작괘 구하기
-     */
     public function tojeong()
     {
         if (! isset($this->tojeong)) {
@@ -455,5 +450,32 @@ class Saju
         }
 
         return $this->tojeong;
+    }
+
+    // 기타 util 함수
+    /**
+     * 기준 지지(기본: 일지)로부터 대상 지지까지의 12진법 순환 상대 거리 산출 (1 ~ 12)
+     * - 동일 지지: 1 (제자리/복음)
+     * - 대척 지지: 7 (정충/대충)
+     * - 삼합 지지: 5, 9
+     *
+     * @param  int|string  $targetJi  대상 지지 (한자 '子', 한글 '자', 또는 숫자 1~12)
+     * @param  string  $basePillar  기준 기둥 ('day': 일지 기준, 'year': 년지 기준)
+     * @return int 1 ~ 12 사이의 상대적 거리 인덱스
+     */
+    public function getJiDistance($targetJi, string $basePillar = 'day'): int
+    {
+        // 1. 기준 지지의 표준 순번(1:인 ~ 12:축) 추출
+        $baseNum = $this->{$basePillar}->e->num;
+
+        // 2. 대상 지지가 문자(한자/한글)인 경우 표준 번호로 변환
+        if (is_string($targetJi)) {
+            $targetNum = self::$jiMeta[$targetJi]['num'] ?? 1;
+        } else {
+            $targetNum = (int) $targetJi;
+        }
+
+        // 3. 12진법 상대 거리 공식: ((대상 - 기준 + 12) % 12) + 1
+        return (($targetNum - $baseNum + 12) % 12) + 1;
     }
 }
