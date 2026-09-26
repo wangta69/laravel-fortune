@@ -61,15 +61,17 @@ trait JamiBaseTrait
     protected function gung($myung): array
     {
         $gung = array_fill(0, 12, null);
-        $gung12 = ['父母', '福德', '田宅', '官祿', '奴僕', '遷移', '疾厄', '財帛', '子女', '夫妻', '兄弟'];
+        $gung12 = ['兄弟', '夫妻', '子女', '財帛', '疾厄', '遷移', '奴僕', '官祿', '田宅', '福德', '父母'];
 
         $myung_index = array_search('명', $myung);
         if ($myung_index === false) {
             return $gung;
         }
 
+        $gung[$myung_index] = '命宮';
+
         for ($i = 0; $i < 11; $i++) {
-            $palace_index = ($myung_index - 1 - $i + 12) % 12;
+            $palace_index = ($myung_index - 1 - $i + 12) % 12; // 반시계 방향
             $gung[$palace_index] = $gung12[$i];
         }
 
@@ -93,6 +95,7 @@ trait JamiBaseTrait
      * 특정 궁의 주성 및 매핑 정보를 가져오는 핵심 메소드
      * (사용자님 요청에 따라 stars_with_sihua 변수명 적용)
      */
+    // ② 텍스트 운세 조회 오프셋도 반시계 방향(- offset)으로 일치
     protected function getPalaceInfo($jamidusu, $palace_offset, $targetYearH = null): object
     {
         $myung_index = array_search('명', $jamidusu->myung);
@@ -100,19 +103,18 @@ trait JamiBaseTrait
             return (object) ['gung' => null, 'jusung14' => null, 'stars_with_sihua' => null];
         }
 
-        $palace_index = ($myung_index + $palace_offset + 12) % 12;
+        // + 가 아니라 - 로 계산해야 화면의 궁과 일치함
+        $palace_index = ($myung_index - $palace_offset + 12) % 12;
         $palaceOrder = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
         $gung = $palaceOrder[$palace_index];
 
         $jusung14 = $this->jusung14($palace_index, $jamidusu->jusung14);
 
-        // 차성안궁 로직
         if (! $jusung14) {
             $opposite_palace_index = ($palace_index + 6) % 12;
             $jusung14 = $this->jusung14($opposite_palace_index, $jamidusu->jusung14);
         }
 
-        // 사화 결합 로직 (JamiStarTrait에서 제공 예정)
         $starsWithSihua = $jusung14;
         if ($targetYearH && method_exists($this, 'attachSihua')) {
             $starsWithSihua = $this->attachSihua($jusung14, $targetYearH);

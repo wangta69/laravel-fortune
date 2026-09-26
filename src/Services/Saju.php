@@ -192,7 +192,7 @@ class Saju
 
     public function name($name)
     {
-        $this->leap = $name;
+        $this->name = $name;
 
         return $this;
     }
