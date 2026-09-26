@@ -68,6 +68,8 @@ class Saju
 
     public $gabja; // 4주 통합 접근 객체
 
+    public $dangsaju; // 당사주 분석기
+
     // [표준 메타데이터] 10천간 (1:甲 ~ 10:癸)
     private static array $ganMeta = [
         '甲' => ['ko' => '갑', 'ch' => '甲', 'num' => 1,  'code' => '01'],
@@ -86,18 +88,18 @@ class Saju
     // - num/code: 프로젝트 표준 (01:인 ~ 12:축)
     // - order: 천문 십이지 순번 (1:자 ~ 12:해) 호환용
     private static array $jiMeta = [
-        '寅' => ['ko' => '인', 'ch' => '寅', 'num' => 1,  'code' => '01', 'animal' => '호랑이', 'order' => 3],
-        '卯' => ['ko' => '묘', 'ch' => '卯', 'num' => 2,  'code' => '02', 'animal' => '토끼',   'order' => 4],
-        '辰' => ['ko' => '진', 'ch' => '辰', 'num' => 3,  'code' => '03', 'animal' => '용',     'order' => 5],
-        '巳' => ['ko' => '사', 'ch' => '巳', 'num' => 4,  'code' => '04', 'animal' => '뱀',     'order' => 6],
-        '午' => ['ko' => '오', 'ch' => '午', 'num' => 5,  'code' => '05', 'animal' => '말',     'order' => 7],
-        '未' => ['ko' => '미', 'ch' => '未', 'num' => 6,  'code' => '06', 'animal' => '양',     'order' => 8],
-        '申' => ['ko' => '신', 'ch' => '申', 'num' => 7,  'code' => '07', 'animal' => '원숭이', 'order' => 9],
-        '酉' => ['ko' => '유', 'ch' => '酉', 'num' => 8,  'code' => '08', 'animal' => '닭',     'order' => 10],
-        '戌' => ['ko' => '술', 'ch' => '戌', 'num' => 9,  'code' => '09', 'animal' => '개',     'order' => 11],
-        '亥' => ['ko' => '해', 'ch' => '亥', 'num' => 10, 'code' => '10', 'animal' => '돼지',   'order' => 12],
-        '子' => ['ko' => '자', 'ch' => '子', 'num' => 11, 'code' => '11', 'animal' => '쥐',     'order' => 1],
-        '丑' => ['ko' => '축', 'ch' => '丑', 'num' => 12, 'code' => '12', 'animal' => '소',     'order' => 2],
+        '寅' => ['ko' => '인', 'ch' => '寅', 'num' => 1,  'code' => '01', 'animal' => '호랑이', 'order' => 3, 'yookhap' => '亥'],
+        '卯' => ['ko' => '묘', 'ch' => '卯', 'num' => 2,  'code' => '02', 'animal' => '토끼',   'order' => 4, 'yookhap' => '戌'],
+        '辰' => ['ko' => '진', 'ch' => '辰', 'num' => 3,  'code' => '03', 'animal' => '용',     'order' => 5, 'yookhap' => '酉'],
+        '巳' => ['ko' => '사', 'ch' => '巳', 'num' => 4,  'code' => '04', 'animal' => '뱀',     'order' => 6, 'yookhap' => '申'],
+        '午' => ['ko' => '오', 'ch' => '午', 'num' => 5,  'code' => '05', 'animal' => '말',     'order' => 7, 'yookhap' => '未'],
+        '未' => ['ko' => '미', 'ch' => '未', 'num' => 6,  'code' => '06', 'animal' => '양',     'order' => 8, 'yookhap' => '午'],
+        '申' => ['ko' => '신', 'ch' => '申', 'num' => 7,  'code' => '07', 'animal' => '원숭이', 'order' => 9, 'yookhap' => '巳'],
+        '酉' => ['ko' => '유', 'ch' => '酉', 'num' => 8,  'code' => '08', 'animal' => '닭',     'order' => 10, 'yookhap' => '辰'],
+        '戌' => ['ko' => '술', 'ch' => '戌', 'num' => 9,  'code' => '09', 'animal' => '개',     'order' => 11, 'yookhap' => '卯'],
+        '亥' => ['ko' => '해', 'ch' => '亥', 'num' => 10, 'code' => '10', 'animal' => '돼지',   'order' => 12, 'yookhap' => '寅'],
+        '子' => ['ko' => '자', 'ch' => '子', 'num' => 11, 'code' => '11', 'animal' => '쥐',     'order' => 1,  'yookhap' => '丑'],
+        '丑' => ['ko' => '축', 'ch' => '丑', 'num' => 12, 'code' => '12', 'animal' => '소',     'order' => 2,  'yookhap' => '子'],
     ];
 
     public function __construct()
@@ -477,5 +479,129 @@ class Saju
 
         // 3. 12진법 상대 거리 공식: ((대상 - 기준 + 12) % 12) + 1
         return (($targetNum - $baseNum + 12) % 12) + 1;
+    }
+
+    // 당사주
+    public function dangsaju()
+    {
+        if (! isset($this->dangsaju)) {
+            $this->dangsaju = (new DangSaju)->make($this);
+        }
+
+        return $this->dangsaju;
+    }
+
+    /**
+     * [유년신수] 대상 연도(세운)와 본인의 음력 생월을 결합한 연간 신수 객체 반환
+     *
+     * @param  Saju  $targetYearSaju  대상 연도 Saju 객체 (입춘 보정 세운)
+     * @return object {
+     *                num: int (1~12, 인=1 기준 표준 번호),
+     *                code: string ('01'~'12'),
+     *                ko: string ('자', '축', '인'...),
+     *                ch: string ('子', '丑', '寅'...),
+     *                order: int (1~12, 자=1 기준 천문 순번),
+     *                woonsung: string (12운성 명칭),
+     *                sinsal12: string (12신살 명칭)
+     *                }
+     */
+    public function sinsu(Saju $targetYearSaju): object
+    {
+        // 1. 세운 천간 번호 (1:甲 ~ 10:癸)
+        $yearGanNum = $targetYearSaju->year->h->num ?? 1;
+
+        // 2. 본인 음력 생월 추출 (1 ~ 12)
+        [$lYear, $lMonth] = explode('-', $this->lunar);
+        $birthMonth = (int) $lMonth;
+
+        // 3. 유년신수 14 오프셋 순환 공식
+        $sv = 14 - $yearGanNum;
+        if ($sv > 12) {
+            $sv -= 12;
+        }
+
+        // 1~12 결과 산출 (기존 getWolgyeSinsuCode 수식)
+        $codeNum = ($sv + $birthMonth - 1) % 12 ?: 12;
+
+        // 4. 지지 매핑 (Saju::$jiMeta의 표준 인=1 ~ 축=12 규격과 연동)
+        // 12지 한글 배열 (순번 1~12 매칭)
+        $jiList = [
+            1 => '인', 2 => '묘', 3 => '진', 4 => '사', 5 => '오', 6 => '미',
+            7 => '신', 8 => '유', 9 => '술', 10 => '해', 11 => '자', 12 => '축',
+        ];
+        $ko = $jiList[$codeNum] ?? '자';
+
+        // 지지 한자 및 메타데이터 추출
+        $meta = self::$jiMeta[array_search($ko, array_column(self::$jiMeta, 'ko', 'ch'))] ?? [];
+
+        // 5. 12운성 및 12신살 도출 (내 일간/년지 기준 결합)
+        $woonsung = Woonsung12::cal($this->day->h->ch, $meta['ch'] ?? '子');
+        $sinsal12 = Sinsal12::cal($this->year->e->ch, $meta['ch'] ?? '子'); // 년지 기준 12신살
+
+        return (object) [
+            'num' => $codeNum,                                     // 1 ~ 12 (숫자)
+            'code' => str_pad((string) $codeNum, 2, '0', STR_PAD_LEFT), // '01' ~ '12' (패딩 문자열)
+            'ko' => $ko,                                          // '자', '축' ... (한글 지지)
+            'ch' => $meta['ch'] ?? '子',                          // '子', '丑' ... (한자 지지)
+            'woonsung' => $woonsung,                                    // '장생', '제왕' 등 12운성
+            'sinsal12' => $sinsal12,                                    // '역마살', '화개살' 등 12신살
+        ];
+    }
+
+    /**
+     * 60갑자 문자열(한자 또는 한글)의 순번 인덱스 반환 (1 ~ 60)
+     * constants.php의 GANJI 상수 직접 활용
+     */
+    public static function getGanji60Index(string $ganji): int
+    {
+        $idx = array_search($ganji, GANJI['ch']);
+        if ($idx === false) {
+            $idx = array_search($ganji, GANJI['ko']);
+        }
+
+        return ($idx !== false) ? $idx + 1 : 1;
+    }
+
+    /**
+     * 사주 원국의 모든 신살(일반 신살 + 12신살) 통합 및 길신 우선 정렬 반환
+     *
+     * @return array 정제된 신살 객체 배열
+     */
+    public function allSinsals(): array
+    {
+        $collection = collect();
+
+        // 1. 일반 신살 통합 (y, m, d, h 배열)
+        $sinsal = $this->sinsal();
+        foreach (['y', 'm', 'd', 'h'] as $pos) {
+            if (isset($sinsal->{$pos}) && is_iterable($sinsal->{$pos})) {
+                foreach ($sinsal->{$pos} as $item) {
+                    $collection->push((object) [
+                        'ko' => $item->ko,
+                        'ch' => $item->ch,
+                        'type' => $item->type ?? 'junglip',
+                    ]);
+                }
+            }
+        }
+
+        // 2. 12신살 통합 (year, month, day, hour 단일 객체)
+        $sinsal12 = $this->sinsal12();
+        foreach (['year', 'month', 'day', 'hour'] as $pos) {
+            if (isset($sinsal12->{$pos}) && $sinsal12->{$pos}) {
+                $item12 = $sinsal12->{$pos};
+                $collection->push((object) [
+                    'ko' => $item12->ko,
+                    'ch' => $item12->ch,
+                    'type' => $item12->type ?? 'junglip',
+                ]);
+            }
+        }
+
+        // 3. 중복 신살 제거 및 길신(gilsin) 우선 정렬
+        return $collection->unique('ko')
+            ->sortByDesc(fn ($item) => $item->type === 'gilsin')
+            ->values()
+            ->all();
     }
 }

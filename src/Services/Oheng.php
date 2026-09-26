@@ -112,8 +112,9 @@ class Oheng
         $ch = ['木', '火', '土', '金', '水'];
         $ko = ['목', '화', '토', '금', '수'];
         $en = ['thu', 'tue', 'sat', 'fri', 'wed'];
+        $num = [1, 2, 3, 4, 5];
 
-        return ['ch' => $ch[$serial], 'ko' => $ko[$serial], 'en' => $en[$serial]];
+        return ['num' => $num[$serial], 'ch' => $ch[$serial], 'ko' => $ko[$serial], 'en' => $en[$serial]];
     }
 
     /**
@@ -457,5 +458,21 @@ class Oheng
             'is_johu' => $yongsinData['is_johu'],
             'is_tonggwan' => $yongsinData['is_tonggwan'],
         ];
+    }
+
+    /**
+     * 간지(천간, 지지) 또는 오행 문자를 1~5 정수 인덱스로 변환
+     * 1: 목, 2: 화, 3: 토, 4: 금, 5: 수
+     */
+    public function getIndex(string $char): int
+    {
+        return match ($char) {
+            '甲', '乙', '寅', '卯', '목', '木' => 1,
+            '丙', '丁', '巳', '午', '화', '火' => 2,
+            '戊', '己', '辰', '戌', '丑', '未', '토', '土' => 3,
+            '庚', '辛', '申', '酉', '금', '金', '金' => 4,
+            '壬', '癸', '亥', '子', '수', '水' => 5,
+            default => 1,
+        };
     }
 }

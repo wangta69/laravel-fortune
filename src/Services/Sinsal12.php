@@ -13,18 +13,18 @@ class Sinsal12
      * 12신살의 모든 정적 정보(한글, 한자)를 중앙에서 관리합니다.
      */
     private const SINSAL_DEFINITIONS = [
-        '겁살' => ['ch' => '劫殺'],
-        '재살' => ['ch' => '災殺'],
-        '천살' => ['ch' => '天殺'],
-        '지살' => ['ch' => '地殺'],
-        '도화살' => ['ch' => '桃花殺'],
-        '월살' => ['ch' => '月殺'],
-        '망신살' => ['ch' => '亡身殺'],
-        '장성살' => ['ch' => '將星殺'],
-        '반안살' => ['ch' => '攀鞍殺'],
-        '역마살' => ['ch' => '驛馬殺'],
-        '육해살' => ['ch' => '六害殺'],
-        '화개살' => ['ch' => '華蓋殺'],
+        '지살' => ['ch' => '地殺',   'type' => 'gilsin'],
+        '장성살' => ['ch' => '將星殺', 'type' => 'gilsin'],
+        '반안살' => ['ch' => '攀鞍殺', 'type' => 'gilsin'],
+        '역마살' => ['ch' => '驛馬殺', 'type' => 'gilsin'],
+        '화개살' => ['ch' => '華蓋殺', 'type' => 'gilsin'],
+        '겁살' => ['ch' => '劫殺',   'type' => 'hyungsal'],
+        '재살' => ['ch' => '災殺',   'type' => 'hyungsal'],
+        '천살' => ['ch' => '天殺',   'type' => 'hyungsal'],
+        '망신살' => ['ch' => '亡身殺', 'type' => 'hyungsal'],
+        '육해살' => ['ch' => '六害殺', 'type' => 'hyungsal'],
+        '도화살' => ['ch' => '桃花殺', 'type' => 'junglip'],
+        '월살' => ['ch' => '月殺',   'type' => 'junglip'],
     ];
 
     /**
@@ -82,7 +82,7 @@ class Sinsal12
     }
 
     /**
-     * [수정] 핵심 엔진이 이제 string 대신 object 또는 null을 반환합니다.
+     * 핵심 엔진이 이제 string 대신 object 또는 null을 반환합니다.
      */
     private function calculate(string $jiji): ?object
     {
@@ -93,11 +93,13 @@ class Sinsal12
         $sinsalGroupMap = self::SINSAL_MAP[$this->yeonji];
         $sinsalName = array_search($jiji, $sinsalGroupMap);
 
-        // 일치하는 신살이 있을 경우, DEFINITIONS를 참조하여 객체를 생성합니다.
         if ($sinsalName && isset(self::SINSAL_DEFINITIONS[$sinsalName])) {
+            $def = self::SINSAL_DEFINITIONS[$sinsalName];
+
             return (object) [
                 'ko' => $sinsalName,
-                'ch' => self::SINSAL_DEFINITIONS[$sinsalName]['ch'],
+                'ch' => $def['ch'],
+                'type' => $def['type'],
             ];
         }
 
@@ -122,5 +124,60 @@ class Sinsal12
         $sinsalName = array_search($targetJi, self::SINSAL_MAP[$yeonji]);
 
         return $sinsalName ?: null;
+    }
+
+    /**
+     * 특정 기준 지지(년지) 대비 대상 지지의 12신살 명칭 반환 (Woonsung12::cal과 동일한 인터페이스)
+     *
+     * @param  string  $yeonji  기준 년지 한자 (예: '申')
+     * @param  string  $targetJi  대상 지지 한자 (예: '巳')
+     * @return string|null 신살 명칭 (예: '겁살')
+     */
+    public static function cal(string $yeonji, string $targetJi): ?string
+    {
+        return self::getSinsalNameByJi($yeonji, $targetJi);
+    }
+
+    /**
+     * 사주 원국의 모든 신살(일반 신살 + 12신살) 통합 및 길신 우선 정렬 반환
+     *
+     * @return array 정제된 신살 객체 배열
+     */
+    public function allSinsals(): array
+    {
+        $collection = collect();
+
+        // 1. 일반 신살 통합 (y, m, d, h 배열)
+        $sinsal = $this->sinsal();
+        foreach (['y', 'm', 'd', 'h'] as $pos) {
+            if (isset($sinsal->{$pos}) && is_iterable($sinsal->{$pos})) {
+                foreach ($sinsal->{$pos} as $item) {
+                    $collection->push((object) [
+                        'ko' => $item->ko,
+                        'ch' => $item->ch,
+                        'type' => $item->type ?? 'junglip',
+                    ]);
+                }
+            }
+        }
+
+        // 2. 12신살 통합 (year, month, day, hour 단일 객체)
+        $sinsal12 = $this->sinsal12();
+        foreach (['year', 'month', 'day', 'hour'] as $pos) {
+            if (isset($sinsal12->{$pos}) && $sinsal12->{$pos}) {
+                $item12 = $sinsal12->{$pos};
+                $collection->push((object) [
+                    'ko' => $item12->ko,
+                    'ch' => $item12->ch,
+                    'type' => $item12->type ?? 'junglip',
+                ]);
+            }
+        }
+
+        // 3. 중복 신살 제거 및 길신(gilsin) 우선 정렬
+        return $collection->unique('ko')
+            ->sortByDesc(fn ($item) => $item->type === 'gilsin')
+            ->values()
+            ->all();
     }
 }

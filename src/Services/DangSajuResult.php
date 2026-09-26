@@ -104,7 +104,81 @@ class DangSajuResult
                 case 'later_age':  return '65세 이후';
                 */
 
+                // 팔복궁 (사주신분복 01~08 코드 반환)
+            case 'eight_luck':
+            case 'eight_luck_code':
+                return $this->calculateEightLuckCode();
+
             default: return null;
+        }
+
+    }
+
+    /**
+     * [팔복궁] 사주신분복 8가지 복록 코드('01' ~ '08') 산출
+     * 태어난 계절(월지)과 시간(시지)의 조합
+     */
+    protected function calculateEightLuckCode(): string
+    {
+        // 1. 월지 (인=1 ~ 축=12 표준 번호)
+        $me = $this->saju->month->e->num ?? 1;
+
+        // 2. 시지 (시간을 모르면 낮 12시 오(午)시: 5번으로 보정하여 8번 쏠림 방지)
+        $he = ($this->saju->hourKnown && isset($this->saju->hour->e->num))
+            ? $this->saju->hour->e->num
+            : 5;
+
+        // 봄 (인, 묘, 진월)
+        if (in_array($me, [1, 2, 3])) {
+            return match (true) {
+                $he == 11 => '01', // 자시
+                in_array($he, [8, 2]) => '02', // 유, 축
+                in_array($he, [9, 1]) => '03', // 술, 인
+                $he == 7 => '04', // 신
+                $he == 3 => '05', // 묘
+                $he == 5 => '06', // 오
+                in_array($he, [10, 12]) => '07', // 해, 미
+                default => '08' // 사, 진
+            };
+        }
+        // 여름 (사, 오, 미월)
+        elseif (in_array($me, [4, 5, 6])) {
+            return match (true) {
+                $he == 5 => '01',
+                in_array($he, [8, 2]) => '02',
+                in_array($he, [7, 3]) => '03',
+                $he == 1 => '04',
+                $he == 9 => '05',
+                $he == 11 => '06',
+                in_array($he, [4, 6]) => '07',
+                default => '08'
+            };
+        }
+        // 가을 (신, 유, 술월)
+        elseif (in_array($me, [7, 8, 9])) {
+            return match (true) {
+                $he == 2 => '01',
+                in_array($he, [11, 5]) => '02',
+                in_array($he, [12, 4]) => '03',
+                $he == 10 => '04',
+                $he == 6 => '05',
+                $he == 8 => '06',
+                in_array($he, [1, 3]) => '07',
+                default => '08'
+            };
+        }
+        // 겨울 (해, 자, 축월)
+        else {
+            return match (true) {
+                $he == 8 => '01',
+                in_array($he, [11, 5]) => '02',
+                in_array($he, [10, 6]) => '03',
+                $he == 4 => '04',
+                $he == 12 => '05',
+                $he == 2 => '06',
+                in_array($he, [7, 9]) => '07',
+                default => '08'
+            };
         }
     }
 
