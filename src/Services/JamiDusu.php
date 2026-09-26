@@ -139,64 +139,67 @@ class JamiDusu
     /**
      * [PUBLIC] 특정 궁의 정보를 가져오는 래퍼 메서드들 (하위 호환)
      */
+    /**
+     * [PUBLIC] 특정 궁의 정보를 가져오는 래퍼 메서드들 (정통 12사항궁 역행 순서로 교정)
+     */
     public function jusungMyung($jamidusu)
     {
-        return $this->getPalaceInfo($jamidusu, 0);
-    }
-
-    public function jusungBumo($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 1);
-    }
-
-    public function jusungBokduk($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 2);
-    }
-
-    public function jusungJeuntaek($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 3);
-    }
-
-    public function jusungGuanrok($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 4);
-    }
-
-    public function jusungNobok($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 5);
-    }
-
-    public function jusungChene($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 6);
-    }
-
-    public function jusungJilaek($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 7);
-    }
-
-    public function jusungJaebaek($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 8);
-    }
-
-    public function jusungJanyeo($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 9);
-    }
-
-    public function jusungBubu($jamidusu)
-    {
-        return $this->getPalaceInfo($jamidusu, 10);
+        return $this->getPalaceInfo($jamidusu, 0);  // 0: 명궁
     }
 
     public function jusungHyungjae($jamidusu)
     {
-        return $this->getPalaceInfo($jamidusu, 11);
+        return $this->getPalaceInfo($jamidusu, 1);  // 1: 형제궁
+    }
+
+    public function jusungBubu($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 2);  // 2: 부부궁
+    }
+
+    public function jusungJanyeo($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 3);  // 3: 자녀궁
+    }
+
+    public function jusungJaebaek($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 4);  // 4: 재백궁
+    }
+
+    public function jusungJilaek($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 5);  // 5: 질액궁
+    }
+
+    public function jusungChene($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 6);  // 6: 천이궁
+    }
+
+    public function jusungNobok($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 7);  // 7: 노복궁
+    }
+
+    public function jusungGuanrok($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 8);  // 8: 관록궁
+    }
+
+    public function jusungJeuntaek($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 9);  // 9: 전택궁
+    }
+
+    public function jusungBokduk($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 10); // 10: 복덕궁
+    }
+
+    public function jusungBumo($jamidusu)
+    {
+        return $this->getPalaceInfo($jamidusu, 11); // 11: 부모궁
     }
 
     /**

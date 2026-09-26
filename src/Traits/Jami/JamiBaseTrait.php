@@ -103,7 +103,7 @@ trait JamiBaseTrait
             return (object) ['gung' => null, 'jusung14' => null, 'stars_with_sihua' => null];
         }
 
-        // + 가 아니라 - 로 계산해야 화면의 궁과 일치함
+        // 정통 역행(반시계) 계산: 명궁 인덱스에서 오프셋을 차감
         $palace_index = ($myung_index - $palace_offset + 12) % 12;
         $palaceOrder = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑'];
         $gung = $palaceOrder[$palace_index];
