@@ -133,7 +133,27 @@ trait JamiBaseTrait
     protected function jusung14($k, $goong): string
     {
         $res = '';
-        $stars = ['taeum', 'tamrang', 'geamun', 'cheansang', 'cheanryang', 'chilsal', 'pagun', 'yeamjung', 'chendong', 'mugok', 'taeyang', 'chengi', 'cheanbu', 'jami'];
+
+        // 💡 [정통 서열 순서로 교정]
+        // 자미(1) -> 천기(2) -> 태양(3) -> 무곡(4) -> 천동(5) -> 염정(6) ->
+        // 천부(7) -> 태음(8) -> 탐랑(9) -> 거문(10) -> 천상(11) -> 천량(12) -> 칠살(13) -> 파군(14)
+        $stars = [
+            'jami',         // 자미 (1)
+            'chengi',       // 천기 (2)
+            'taeyang',      // 태양 (3)
+            'mugok',        // 무곡 (4)
+            'chendong',     // 천동 (5)
+            'yeamjung',     // 염정 (6)
+            'cheanbu',      // 천부 (7)
+            'taeum',        // 태음 (8)
+            'tamrang',      // 탐랑 (9)
+            'geamun',       // 거문 (10)
+            'cheansang',    // 천상 (11)
+            'cheanryang',   // 천량 (12)
+            'chilsal',      // 칠살 (13)
+            'pagun',        // 파군 (14)
+        ];
+
         foreach ($stars as $s) {
             if (! empty($goong[$s][$k])) {
                 $res .= $goong[$s][$k];

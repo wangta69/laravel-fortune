@@ -70,6 +70,8 @@ class Saju
 
     public $dangsaju; // 당사주 분석기
 
+    public $interactions; // 간지 상호작용(합·충·형·파·해·공망) 분석기
+
     // [표준 메타데이터] 10천간 (1:甲 ~ 10:癸)
     private static array $ganMeta = [
         '甲' => ['ko' => '갑', 'ch' => '甲', 'num' => 1,  'code' => '01'],
@@ -603,5 +605,24 @@ class Saju
             ->sortByDesc(fn ($item) => $item->type === 'gilsin')
             ->values()
             ->all();
+    }
+
+    /**
+     * 사주 원국 간지 상호작용(형충회합 및 공망) 분석기
+     *
+     * - 천간: 천간합(干合), 천간충(干沖)
+     * - 지지: 육합(六合), 삼합·반합(三合·半合), 방합(方合), 칠충(七沖),
+     *         형살(三刑·自刑·相刑), 파(破), 해(害), 원진(怨嗔)
+     * - 결손: 일주 기준 순중공망(旬中空亡) 및 원국 적중 여부
+     *
+     * @return \Pondol\Fortune\Services\Interactions
+     */
+    public function interactions()
+    {
+        if (! isset($this->interactions)) {
+            $this->interactions = (new Interactions)->withSaju($this);
+        }
+
+        return $this->interactions;
     }
 }

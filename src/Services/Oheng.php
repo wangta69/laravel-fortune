@@ -475,4 +475,92 @@ class Oheng
             default => 1,
         };
     }
+
+    /**
+     * 사주 전체 오행의 밸런스(개수, 세력 점수, 비율, 최강/최약) 원천 데이터를 산출합니다.
+     *
+     * @return object {
+     *                elements: array<string, object>, // 목/화/토/금/수 상세 정보 (num, ko, ch, en, count, score, percent)
+     *                total_count: int,                // 총 글자 수 (8 또는 시주 불명시 6)
+     *                total_score: int,                // 총 세력 점수 (130 또는 105)
+     *                strongest: object,               // 가장 세력이 강한 오행 객체
+     *                weakest: object                  // 가장 세력이 약하거나 없는 오행 객체
+     *                }
+     */
+    public function getBalance(): object
+    {
+        // 1. 원국 8글자 단순 개수 (목/화/토/금/수)
+        $counts = $this->getOhaengCount();
+        $totalCount = array_sum($counts);
+
+        // 2. 궁위별 가중치 세력 점수 (월지 40, 일지 20, 년/시지 15, 천간 10)
+        $scoresByHanja = $this->saju->sinyaksingang()->getAllOhaengScores();
+        $totalScore = array_sum($scoresByHanja);
+
+        // 3. 표준 메타데이터 매핑
+        $meta = [
+            '목' => ['num' => 1, 'ch' => '木', 'ko' => '목', 'en' => 'thu'],
+            '화' => ['num' => 2, 'ch' => '火', 'ko' => '화', 'en' => 'tue'],
+            '토' => ['num' => 3, 'ch' => '土', 'ko' => '토', 'en' => 'sat'],
+            '금' => ['num' => 4, 'ch' => '金', 'ko' => '금', 'en' => 'fri'],
+            '수' => ['num' => 5, 'ch' => '水', 'ko' => '수', 'en' => 'wed'],
+        ];
+
+        // 金 / 金 한자 표기 호환용 맵
+        $hanjaToKo = [
+            '木' => '목',
+            '火' => '화',
+            '土' => '토',
+            '金' => '금', '金' => '금',
+            '水' => '수',
+        ];
+
+        $scores = ['목' => 0, '화' => 0, '토' => 0, '금' => 0, '수' => 0];
+        foreach ($scoresByHanja as $hanja => $score) {
+            $koKey = $hanjaToKo[$hanja] ?? '토';
+            $scores[$koKey] += $score;
+        }
+
+        // 4. 각 오행별 순수 통계 데이터 조립
+        $elements = [];
+        foreach (['목', '화', '토', '금', '수'] as $ko) {
+            $cnt = $counts[$ko] ?? 0;
+            $sc = $scores[$ko] ?? 0;
+
+            $countPercent = $totalCount > 0 ? round(($cnt / $totalCount) * 100, 1) : 0.0;
+            $scorePercent = $totalScore > 0 ? round(($sc / $totalScore) * 100, 1) : 0.0;
+
+            $elements[$ko] = (object) [
+                'num' => $meta[$ko]['num'],
+                'ko' => $ko,
+                'ch' => $meta[$ko]['ch'],
+                'en' => $meta[$ko]['en'],
+                'count' => $cnt,
+                'count_percent' => $countPercent,
+                'score' => $sc,
+                'score_percent' => $scorePercent,
+            ];
+        }
+
+        // 5. 최강 세력 및 취약 세력 도출 (점수 기준, 동점 시 개수 기준)
+        $sorted = $elements;
+        uasort($sorted, function ($a, $b) {
+            if ($a->score === $b->score) {
+                return $b->count <=> $a->count;
+            }
+
+            return $b->score <=> $a->score;
+        });
+
+        $strongest = reset($sorted);
+        $weakest = end($sorted);
+
+        return (object) [
+            'elements' => $elements,
+            'total_count' => $totalCount,
+            'total_score' => $totalScore,
+            'strongest' => $strongest,
+            'weakest' => $weakest,
+        ];
+    }
 }
