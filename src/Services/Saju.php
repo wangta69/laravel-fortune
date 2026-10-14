@@ -73,7 +73,7 @@ class Saju
     public $interactions; // 간지 상호작용(합·충·형·파·해·공망) 분석기
 
     // [표준 메타데이터] 10천간 (1:甲 ~ 10:癸)
-    private static array $ganMeta = [
+    public static array $ganMeta = [
         '甲' => ['ko' => '갑', 'ch' => '甲', 'num' => 1,  'code' => '01'],
         '乙' => ['ko' => '을', 'ch' => '乙', 'num' => 2,  'code' => '02'],
         '丙' => ['ko' => '병', 'ch' => '丙', 'num' => 3,  'code' => '03'],
@@ -89,7 +89,7 @@ class Saju
     // [프로젝트 공식 표준] 12지지 (01:인(寅) ~ 12:축(丑))
     // - num/code: 프로젝트 표준 (01:인 ~ 12:축)
     // - order: 천문 십이지 순번 (1:자 ~ 12:해) 호환용
-    private static array $jiMeta = [
+    public static array $jiMeta = [
         '寅' => ['ko' => '인', 'ch' => '寅', 'num' => 1,  'code' => '01', 'animal' => '호랑이', 'order' => 3, 'yookhap' => '亥'],
         '卯' => ['ko' => '묘', 'ch' => '卯', 'num' => 2,  'code' => '02', 'animal' => '토끼',   'order' => 4, 'yookhap' => '戌'],
         '辰' => ['ko' => '진', 'ch' => '辰', 'num' => 3,  'code' => '03', 'animal' => '용',     'order' => 5, 'yookhap' => '酉'],

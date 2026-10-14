@@ -585,4 +585,97 @@ class Juyeok
 
         return ($total === 0) ? 384 : (int) $total;
     }
+
+    /**
+     * [정통 주역] 본괘의 6비트 코드로부터 호괘(互卦: Nuclear Trigram) 산출
+     *
+     * [원리: 중호괘(重互卦) 수학 공식]
+     * - 하호괘(下互卦): 본괘의 2효, 3효, 4효 (인덱스 1, 2, 3)
+     * - 상호괘(上互卦): 본괘의 3효, 4효, 5효 (인덱스 2, 3, 4)
+     * - 결과: 6비트 호괘 코드 = [2,3,4효 비트] + [3,4,5효 비트]
+     *
+     * @param  string  $code  본괘 6비트 2진수 (예: '100100')
+     * @return object { code: string, map: array, sangwe: int, hagwe: int }
+     */
+    public function getNuclearGwe(string $code): object
+    {
+        // 6비트 안전 보장 (부족하면 패딩)
+        $code = str_pad(substr($code, 0, 6), 6, '0');
+
+        // 하호괘(2, 3, 4효) + 상호괘(3, 4, 5효)
+        $haNuclearBit = $code[1].$code[2].$code[3];
+        $sangNuclearBit = $code[2].$code[3].$code[4];
+
+        $nuclearCode = $haNuclearBit.$sangNuclearBit;
+
+        $bitToNum = array_flip($this->binaryMap);
+        $haNum = $bitToNum[$haNuclearBit] ?? 8;
+        $sangNum = $bitToNum[$sangNuclearBit] ?? 8;
+
+        return (object) [
+            'code' => $nuclearCode,
+            'sangwe' => $sangNum,
+            'hagwe' => $haNum,
+            'map' => $this->map('code', $nuclearCode),
+        ];
+    }
+
+    /**
+     * [정통 주역 삼단 논법] 본괘(本卦) · 호괘(互卦) · 변괘(變卦) 3단 종합 리딩
+     *
+     * @param  string|array  $sticks  6개 효 데이터 (문자열 '100100' 또는 배열 [1,0,0,1,0,0])
+     * @param  int|null  $donghyo  동효 위치 (1~6효, null일 경우 5효 또는 자동 산출)
+     * @return object { base, nuclear, changed, donghyo }
+     */
+    public function getThreeTiersReading($sticks, ?int $donghyo = null): object
+    {
+        // 1. 6비트 본괘 코드 조립 (0번 인덱스가 1효 초효)
+        if (is_array($sticks)) {
+            $baseCode = '';
+            for ($i = 0; $i < 6; $i++) {
+                $baseCode .= (isset($sticks[$i]) && (int) $sticks[$i] === 1) ? '1' : '0';
+            }
+        } else {
+            $baseCode = str_pad(substr((string) $sticks, 0, 6), 6, '0');
+        }
+
+        // 2. 동효(動爻: 변화하는 효) 결정 (지정 없으면 기본 5효 또는 주효)
+        $donghyo = $donghyo ?: 5;
+        if ($donghyo < 1 || $donghyo > 6) {
+            $donghyo = 5;
+        }
+
+        // [A] 본괘(本卦 · 현재) 도출
+        $haBit = substr($baseCode, 0, 3);
+        $sangBit = substr($baseCode, 3, 3);
+        $bitToNum = array_flip($this->binaryMap);
+        $baseHaNum = $bitToNum[$haBit] ?? 8;
+        $baseSangNum = $bitToNum[$sangBit] ?? 8;
+
+        $baseGwe = (object) [
+            'code' => $baseCode,
+            'sangwe' => $baseSangNum,
+            'hagwe' => $baseHaNum,
+            'map' => $this->map('code', $baseCode),
+            'role' => '본괘(本卦)',
+            'desc' => '현재 상황과 사안의 시작',
+        ];
+
+        // [B] 호괘(互卦 · 과정) 도출 (정통 수학 공식)
+        $nuclearGwe = $this->getNuclearGwe($baseCode);
+        $nuclearGwe->role = '호괘(互卦)';
+        $nuclearGwe->desc = '진행 과정과 내면의 속사정';
+
+        // [C] 변괘(變卦 · 미래) 도출 (동효 비트 반전)
+        $transformed = $this->getTransformedGwe($baseSangNum, $baseHaNum, $donghyo);
+        $transformed->role = '변괘(變卦)';
+        $transformed->desc = '미래의 변화와 최종 결과';
+
+        return (object) [
+            'base' => $baseGwe,       // 👈 본괘 (현재)
+            'nuclear' => $nuclearGwe,    // 👈 호괘 (과정/속사정)
+            'changed' => $transformed,   // 👈 변괘 (미래/결과)
+            'donghyo' => $donghyo,
+        ];
+    }
 }

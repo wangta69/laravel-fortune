@@ -58,6 +58,17 @@ class DangSajuResult
         return $this->data[$name] = $this->calculate($name);
     }
 
+    /**
+     * 💡 empty() 및 isset() 호출 시 매직 프로퍼티 정상 판별
+     * - 값이 없거나 '시주불명', '알수없음'일 때는 비어있는 것으로(false) 처리합니다.
+     */
+    public function __isset($name)
+    {
+        $val = $this->__get($name);
+
+        return ! empty($val) && ! in_array($val, ['시주불명', '알수없음'], true);
+    }
+
     protected function calculate($name)
     {
         switch ($name) {
