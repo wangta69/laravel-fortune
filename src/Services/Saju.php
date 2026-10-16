@@ -2,6 +2,7 @@
 
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Enums\Gender;
 use Pondol\Fortune\Facades\Lunar;
 
 class Saju
@@ -184,12 +185,31 @@ class Saju
         return $this;
     }
 
+    /**
+     * 성별 설정 (Enum 객체나 문자열 모두 수용)
+     *
+     * @param  \Pondol\Fortune\Enums\Gender|string  $gender
+     */
     public function gender($gender)
     {
-        // '남'/'여' 입력 시에도 'M'/'F'로 자동 정규화
-        $this->gender = in_array(strtoupper($gender), ['M', '남']) ? 'M' : 'F';
+        // 들어온 값이 무엇이든 Gender Enum으로 안전하게 정규화
+        $enum = Gender::fromMixed($gender);
+
+        // 패키지 내부 프로퍼티에는 표준 value('M' 또는 'F')를 할당
+        $this->gender = $enum->value;
 
         return $this;
+    }
+
+    // 외부에서 $saju->isFemale() 로 편리하게 조회할 수 있는 헬퍼 추가
+    public function isFemale(): bool
+    {
+        return Gender::fromMixed($this->gender)->isFemale();
+    }
+
+    public function isMale(): bool
+    {
+        return Gender::fromMixed($this->gender)->isMale();
     }
 
     public function name($name)
@@ -470,14 +490,10 @@ class Saju
     public function getJiDistance($targetJi, string $basePillar = 'day'): int
     {
         // 1. 기준 지지의 표준 순번(1:인 ~ 12:축) 추출
-        $baseNum = $this->{$basePillar}->e->num;
+        $baseNum = $this->{$basePillar}->e->num ?? 1;
 
-        // 2. 대상 지지가 문자(한자/한글)인 경우 표준 번호로 변환
-        if (is_string($targetJi)) {
-            $targetNum = self::$jiMeta[$targetJi]['num'] ?? 1;
-        } else {
-            $targetNum = (int) $targetJi;
-        }
+        // 2. constants.php 상수를 이용해 한자/한글/숫자 구분 없이 1~12 번호 즉시 추출
+        $targetNum = is_numeric($targetJi) ? (int) $targetJi : (JI_TO_NUM[$targetJi] ?? 1);
 
         // 3. 12진법 상대 거리 공식: ((대상 - 기준 + 12) % 12) + 1
         return (($targetNum - $baseNum + 12) % 12) + 1;
@@ -516,37 +532,29 @@ class Saju
         [$lYear, $lMonth] = explode('-', $this->lunar);
         $birthMonth = (int) $lMonth;
 
-        // 3. 유년신수 14 오프셋 순환 공식
+        // 3. 유년신수 14 오프셋 순환 공식 (1~12 결과 산출)
         $sv = 14 - $yearGanNum;
         if ($sv > 12) {
             $sv -= 12;
         }
-
-        // 1~12 결과 산출 (기존 getWolgyeSinsuCode 수식)
         $codeNum = ($sv + $birthMonth - 1) % 12 ?: 12;
 
-        // 4. 지지 매핑 (Saju::$jiMeta의 표준 인=1 ~ 축=12 규격과 연동)
-        // 12지 한글 배열 (순번 1~12 매칭)
-        $jiList = [
-            1 => '인', 2 => '묘', 3 => '진', 4 => '사', 5 => '오', 6 => '미',
-            7 => '신', 8 => '유', 9 => '술', 10 => '해', 11 => '자', 12 => '축',
-        ];
-        $ko = $jiList[$codeNum] ?? '자';
+        // 4. constants.php 상수를 직접 활용한 초간결 지지 매핑
+        $ch = JI_NUM_TO_CH[$codeNum] ?? '寅';
+        $ko = JI_NUM_TO_KO[$codeNum] ?? '인';
+        $meta = self::$jiMeta[$ch] ?? [];
 
-        // 지지 한자 및 메타데이터 추출
-        $meta = self::$jiMeta[array_search($ko, array_column(self::$jiMeta, 'ko', 'ch'))] ?? [];
-
-        // 5. 12운성 및 12신살 도출 (내 일간/년지 기준 결합)
-        $woonsung = Woonsung12::cal($this->day->h->ch, $meta['ch'] ?? '子');
-        $sinsal12 = Sinsal12::cal($this->year->e->ch, $meta['ch'] ?? '子'); // 년지 기준 12신살
+        // 5. 12운성 및 12신살 도출
+        $woonsung = Woonsung12::cal($this->day->h->ch, $ch);
+        $sinsal12 = Sinsal12::cal($this->year->e->ch, $ch);
 
         return (object) [
-            'num' => $codeNum,                                     // 1 ~ 12 (숫자)
-            'code' => str_pad((string) $codeNum, 2, '0', STR_PAD_LEFT), // '01' ~ '12' (패딩 문자열)
-            'ko' => $ko,                                          // '자', '축' ... (한글 지지)
-            'ch' => $meta['ch'] ?? '子',                          // '子', '丑' ... (한자 지지)
-            'woonsung' => $woonsung,                                    // '장생', '제왕' 등 12운성
-            'sinsal12' => $sinsal12,                                    // '역마살', '화개살' 등 12신살
+            'num' => $codeNum,                                          // 1 ~ 12
+            'code' => str_pad((string) $codeNum, 2, '0', STR_PAD_LEFT), // '01' ~ '12'
+            'ko' => $ko,                                               // '인', '묘' ...
+            'ch' => $ch,                                               // '寅', '卯' ...
+            'woonsung' => $woonsung,                                         // '장생', '제왕' 등
+            'sinsal12' => $sinsal12,                                         // '역마살', '화개살' 등
         ];
     }
 
@@ -624,5 +632,29 @@ class Saju
         }
 
         return $this->interactions;
+    }
+
+    /**
+     * 지지 식별자(한자 '子', 한글 '자', 숫자 1~12)를 프로젝트 표준 번호(1:인 ~ 12:축)로 반환
+     */
+    public static function jiNum(int|string $ji): int
+    {
+        return is_numeric($ji) ? (int) $ji : (JI_TO_NUM[$ji] ?? 1);
+    }
+
+    /**
+     * 표준 번호(1~12)로 지지 한자('寅' ~ '丑') 반환
+     */
+    public static function jiCh(int $num): string
+    {
+        return JI_NUM_TO_CH[$num] ?? '寅';
+    }
+
+    /**
+     * 표준 번호(1~12)로 지지 한글('인' ~ '축') 반환
+     */
+    public static function jiKo(int $num): string
+    {
+        return JI_NUM_TO_KO[$num] ?? '인';
     }
 }

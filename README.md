@@ -46,7 +46,7 @@ $saju = Saju::ymdhi($ymdhi)->sl($sl)->gender($gender)->leap($leap)->create();
 
 - $ymdhi : 198010101330 (생년월일시를 숫자로)
 - $sl : solar (양력) | lunar(음력) default: solar
-- $gender : M(남성) | W(여성) default : M
+- $gender : M(남성) | F(여성) default : M
 - $leap : 윤달여부로 음력일경우 true | false default : false
   > 아래와 같이 양력/음력 날짜및 60갑자의 생년월일시 를 출력한다.
 

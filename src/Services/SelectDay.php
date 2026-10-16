@@ -2,6 +2,7 @@
 
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Enums\Gender;
 use Pondol\Fortune\Traits\SelectDay as t_selectDay;
 
 /**
@@ -27,7 +28,7 @@ class SelectDay
         $this->day_e = $manse->get_e('day');
         $this->month_e = $manse->get_e('month');
         $this->year_e = $manse->get_e('year');
-        $this->gender = $manse->gender;
+        $this->gender = Gender::fromMixed($manse->gender)->value;
 
         return $this;
     }
@@ -85,7 +86,8 @@ class SelectDay
         $selected_year = substr($yyyymmdd, 0, 4);
         $my_age = $selected_year - substr($birth_date, 0, 4) + 1;
 
-        $direction = _direction($my_age, $profile->gender);
+        $legacyGender = Gender::fromMixed($profile->gender)->isMale() ? 'M' : 'W';
+        $direction = _direction($my_age, $legacyGender);
 
         $titles = [];
         $scores = [];
@@ -97,7 +99,7 @@ class SelectDay
             $scores['color'] = 20;
         }
 
-        $cal2 = _cal2($my_age, $profile->gender);
+        $cal2 = _cal2($my_age, $legacyGender);
         $senggi_01 = $cal2['senggi_01'];
         $senggi_02 = $cal2['senggi_02'];
         $bokduk_01 = $cal2['bokduk_01'];

@@ -2,6 +2,8 @@
 
 namespace Pondol\Fortune\Traits\Jami;
 
+use Pondol\Fortune\Enums\Gender;
+
 trait JamiBaseTrait
 {
     /**
@@ -84,7 +86,9 @@ trait JamiBaseTrait
     protected function yangum($gender, $year_h): string
     {
         $isYangGan = in_array($year_h, ['甲', '丙', '戊', '庚', '壬']);
-        if ($gender === 'M') {
+
+        // Gender Enum으로 Enum 객체, 문자열('M', 'F', 'W') 모두 완벽 판별
+        if (Gender::fromMixed($gender)->isMale()) {
             return $isYangGan ? '양남' : '음남';
         }
 

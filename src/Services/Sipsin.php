@@ -2,6 +2,8 @@
 
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Enums\Gender;
+
 /**
  * 십신(十神) 정보를 담는 간단한 데이터 객체(DTO)
  * 이 클래스는 타입 힌팅을 통해 코드의 안정성과 가독성을 높여줍니다.
@@ -209,6 +211,14 @@ class Sipsin
     }
 
     /**
+     * cal() 메서드의 하위 호환 및 가독성을 위한 별칭 메서드
+     */
+    public static function calculate(string $dayMaster, string $targetGanji, string $type): ?string
+    {
+        return self::cal($dayMaster, $targetGanji, $type);
+    }
+
+    /**
      * @param  string  $dayMaster  : 출생일의 일간
      * @param  string  $targetGanji  : 천간 혹은 지지
      * @param  string  $type  : h: 천간  e: 지지
@@ -255,7 +265,9 @@ class Sipsin
     {
         // 1. 이미 Sipsin에 저장된 dayMaster와 saju->gender 사용
         $dayH = $this->dayMaster;
-        $isMale = in_array(strtoupper($this->saju->gender ?? 'M'), ['M', '남']);
+
+        // [수정] Gender Enum으로 타입 에러 없이 안전하게 남성 판별
+        $isMale = Gender::fromMixed($this->saju->gender ?? 'M')->isMale();
 
         $map = $isMale
             ? ['甲' => '토', '乙' => '토', '丙' => '금', '丁' => '금', '戊' => '수', '己' => '수', '庚' => '목', '辛' => '목', '壬' => '화', '癸' => '화']

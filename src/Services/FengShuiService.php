@@ -2,6 +2,7 @@
 
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Enums\Gender;
 use Pondol\Fortune\Facades\Saju as SajuFacade;
 
 class FengShuiService
@@ -11,30 +12,44 @@ class FengShuiService
      */
     public function analyze($sajuOrProfile)
     {
-        // 1. 연도 및 성별 추출 (입춘 절기 자동 보정)
+        // 1. 프로필/배열이 넘어온 경우 Saju 객체로 먼저 통일 (입춘 보정 일관성 확보)
+        $saju = null;
         if (is_object($sajuOrProfile) && isset($sajuOrProfile->year)) {
-            $year = (int) substr($sajuOrProfile->solar, 0, 4);
-            $gender = $sajuOrProfile->gender ?? 'M';
+            $saju = $sajuOrProfile;
         } else {
             $birthYm = $sajuOrProfile->birth_ym ?? ($sajuOrProfile['birth_ym'] ?? null);
             if ($birthYm) {
                 $cleanDate = str_replace(['-', '.', ' ', ':'], '', trim($birthYm));
                 $ymdhi = (strlen($cleanDate) === 8) ? $cleanDate.'1200' : $cleanDate;
-                $saju = SajuFacade::ymdhi($ymdhi)->create();
-                $year = (int) substr($saju->solar, 0, 4);
-            } else {
-                $year = (int) ($sajuOrProfile->birth_year ?? 1990);
+                $rawGender = $sajuOrProfile->gender ?? ($sajuOrProfile['gender'] ?? Gender::MALE);
+                $saju = SajuFacade::ymdhi($ymdhi)->gender($rawGender)->create();
             }
-            $gender = $sajuOrProfile->gender ?? ($sajuOrProfile['gender'] ?? 'M');
         }
 
-        $isFemale = in_array(strtoupper($gender), ['F', 'W', '여']);
+        // 2. 연도 및 성별 추출 (입춘 절기 정밀 보정)
+        if ($saju) {
+            $solarYear = (int) substr($saju->solar, 0, 4);
+            $solarGan = GAN['ch'][($solarYear - 4) % 10] ?? '';
+            $sajuGan = $saju->year->h->ch ?? '';
 
-        // 2. 2000년대생 분기 처리된 정밀 본명궁 계산
+            // 양력 1~2월생 중 사주 년주 천간과 양력 연도 천간이 다르면 전년도로 보정 (입춘 전 출생)
+            $year = ($solarGan !== $sajuGan && (int) substr($saju->solar, 5, 2) <= 2)
+                ? $solarYear - 1
+                : $solarYear;
+
+            $gender = $saju->gender;
+        } else {
+            $year = (int) ($sajuOrProfile->birth_year ?? 1990);
+            $gender = $sajuOrProfile->gender ?? ($sajuOrProfile['gender'] ?? Gender::MALE);
+        }
+
+        $isFemale = Gender::fromMixed($gender)->isFemale();
+
+        // 3. 2000년대생 정밀 보정된 본명궁 계산
         $kuaNum = $this->calculateKuaNumber($year, $isFemale);
         $kuaGroup = in_array($kuaNum, [1, 3, 4, 9]) ? '동사택(東四宅)' : '서사택(西四宅)';
 
-        // 3. 고도화된 8괘 메타데이터 및 8방위 길흉 추출
+        // 4. 고도화된 8괘 메타데이터 및 8방위 길흉 추출
         $kuaData = $this->getKuaMapping($kuaNum);
         $directions = $this->getBaZhaiDirections($kuaNum);
 
@@ -57,11 +72,11 @@ class FengShuiService
             'kua_info' => [
                 'number' => $kuaNum,
                 'group' => $kuaGroup,
-                'trigram_ko' => $kuaData['trigram_ko'],     // '건', '곤', '감', '이'... (luck_code 매칭용)
-                'trigram_hanja' => $kuaData['trigram_hanja'],  // '乾', '坤', '坎', '離'...
-                'trigram_symbol' => $kuaData['trigram_symbol'], // '☰', '☷', '☵', '☲'... (UI 심볼용)
-                'trigram' => $kuaData['trigram'],        // '감(坎)', '건(乾)'...
-                'element_saju' => $kuaData['element_saju'],   // '수', '토', '목', '금', '화'
+                'trigram_ko' => $kuaData['trigram_ko'],
+                'trigram_hanja' => $kuaData['trigram_hanja'],
+                'trigram_symbol' => $kuaData['trigram_symbol'],
+                'trigram' => $kuaData['trigram'],
+                'element_saju' => $kuaData['element_saju'],
             ],
 
             // 4대 길방 / 4대 흉방
@@ -84,9 +99,13 @@ class FengShuiService
         ];
     }
 
+    /**
+     * [정밀] 본명궁 번호 산출 (연도 마지막 두 자리 기준 정석 공식)
+     */
     private function calculateKuaNumber(int $year, bool $isFemale): int
     {
-        $sum = array_sum(str_split((string) $year));
+        $lastTwoDigits = $year % 100;
+        $sum = array_sum(str_split((string) $lastTwoDigits));
         while ($sum > 9) {
             $sum = array_sum(str_split((string) $sum));
         }
@@ -94,7 +113,7 @@ class FengShuiService
         if ($year >= 2000) {
             $res = $isFemale ? (6 + $sum) : (9 - $sum);
         } else {
-            $res = $isFemale ? (4 + $sum) : (11 - $sum);
+            $res = $isFemale ? (5 + $sum) : (10 - $sum);
         }
 
         while ($res > 9) {
@@ -111,84 +130,17 @@ class FengShuiService
         return $res;
     }
 
-    /**
-     * [고도화] 본명궁별 선천팔괘 메타데이터 풀 정의
-     */
     private function getKuaMapping(int $num): array
     {
         $map = [
-            1 => [
-                'trigram_ko' => '감',
-                'trigram_hanja' => '坎',
-                'trigram_symbol' => '☵',
-                'trigram' => '감(坎)',
-                'element_ko' => '물',
-                'element_saju' => '수',
-                'element_key' => 'water',
-            ],
-            2 => [
-                'trigram_ko' => '곤',
-                'trigram_hanja' => '坤',
-                'trigram_symbol' => '☷',
-                'trigram' => '곤(坤)',
-                'element_ko' => '흙',
-                'element_saju' => '토',
-                'element_key' => 'earth',
-            ],
-            3 => [
-                'trigram_ko' => '진',
-                'trigram_hanja' => '震',
-                'trigram_symbol' => '☳',
-                'trigram' => '진(震)',
-                'element_ko' => '나무',
-                'element_saju' => '목',
-                'element_key' => 'wood',
-            ],
-            4 => [
-                'trigram_ko' => '손',
-                'trigram_hanja' => '巽',
-                'trigram_symbol' => '☴',
-                'trigram' => '손(巽)',
-                'element_ko' => '나무',
-                'element_saju' => '목',
-                'element_key' => 'wood',
-            ],
-            6 => [
-                'trigram_ko' => '건',
-                'trigram_hanja' => '乾',
-                'trigram_symbol' => '☰',
-                'trigram' => '건(乾)',
-                'element_ko' => '쇠',
-                'element_saju' => '금',
-                'element_key' => 'metal',
-            ],
-            7 => [
-                'trigram_ko' => '태',
-                'trigram_hanja' => '兌',
-                'trigram_symbol' => '☱',
-                'trigram' => '태(兌)',
-                'element_ko' => '쇠',
-                'element_saju' => '금',
-                'element_key' => 'metal',
-            ],
-            8 => [
-                'trigram_ko' => '간',
-                'trigram_hanja' => '艮',
-                'trigram_symbol' => '☶',
-                'trigram' => '간(艮)',
-                'element_ko' => '흙',
-                'element_saju' => '토',
-                'element_key' => 'earth',
-            ],
-            9 => [
-                'trigram_ko' => '이',
-                'trigram_hanja' => '離',
-                'trigram_symbol' => '☲',
-                'trigram' => '이(離)',
-                'element_ko' => '불',
-                'element_saju' => '화',
-                'element_key' => 'fire',
-            ],
+            1 => ['trigram_ko' => '감', 'trigram_hanja' => '坎', 'trigram_symbol' => '☵', 'trigram' => '감(坎)', 'element_ko' => '물', 'element_saju' => '수', 'element_key' => 'water'],
+            2 => ['trigram_ko' => '곤', 'trigram_hanja' => '坤', 'trigram_symbol' => '☷', 'trigram' => '곤(坤)', 'element_ko' => '흙', 'element_saju' => '토', 'element_key' => 'earth'],
+            3 => ['trigram_ko' => '진', 'trigram_hanja' => '震', 'trigram_symbol' => '☳', 'trigram' => '진(震)', 'element_ko' => '나무', 'element_saju' => '목', 'element_key' => 'wood'],
+            4 => ['trigram_ko' => '손', 'trigram_hanja' => '巽', 'trigram_symbol' => '☴', 'trigram' => '손(巽)', 'element_ko' => '나무', 'element_saju' => '목', 'element_key' => 'wood'],
+            6 => ['trigram_ko' => '건', 'trigram_hanja' => '乾', 'trigram_symbol' => '☰', 'trigram' => '건(乾)', 'element_ko' => '쇠', 'element_saju' => '금', 'element_key' => 'metal'],
+            7 => ['trigram_ko' => '태', 'trigram_hanja' => '兌', 'trigram_symbol' => '☱', 'trigram' => '태(兌)', 'element_ko' => '쇠', 'element_saju' => '금', 'element_key' => 'metal'],
+            8 => ['trigram_ko' => '간', 'trigram_hanja' => '艮', 'trigram_symbol' => '☶', 'trigram' => '간(艮)', 'element_ko' => '흙', 'element_saju' => '토', 'element_key' => 'earth'],
+            9 => ['trigram_ko' => '이', 'trigram_hanja' => '離', 'trigram_symbol' => '☲', 'trigram' => '이(離)', 'element_ko' => '불', 'element_saju' => '화', 'element_key' => 'fire'],
         ];
 
         return $map[$num] ?? $map[1];

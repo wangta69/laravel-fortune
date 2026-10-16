@@ -2,6 +2,7 @@
 
 namespace Pondol\Fortune\Traits;
 
+use Pondol\Fortune\Enums\Gender;
 use Pondol\Fortune\Services\Taekil;
 
 trait SelectDay
@@ -127,9 +128,8 @@ trait SelectDay
         return ['daejanggun' => '', 'samsalbang' => ''];
     }
 
-    //
     /**
-     * [추가] 생기복덕천의 산출 로직
+     * 생기복덕천의 산출 로직
      * 사용자의 나이와 성별에 따른 길한 지지 배열을 반환합니다.
      */
     protected function _senggiBokdukCheneu($my_age, $gender)
@@ -138,7 +138,10 @@ trait SelectDay
         // 나이를 8로 나눈 나머지를 기준으로 순환 (전통 방식)
         $mod = $my_age % 8;
 
-        if ($gender === 'M') {
+        // [수정] Gender Enum으로 안전하게 남성 판별
+        $isMale = Gender::fromMixed($gender)->isMale();
+
+        if ($isMale) {
             switch ($mod) {
                 case 2: $res = ['senggi' => ['戌', '亥'], 'bokduk' => ['未', '申'], 'cheneu' => ['午']];
                     break;
@@ -476,7 +479,7 @@ trait SelectDay
 
     protected function _group_sbc_group($saju, $ctx)
     {
-        $my_age = (int) date('Y') - (int) substr($saju->solar, 0, 4) + 1;
+        $my_age = $saju->korean_age ?? ((int) date('Y') - (int) substr($saju->solar, 0, 4) + 1);
         $sbc = $this->_senggiBokdukCheneu($my_age, $saju->gender);
         if (in_array($ctx['day_e'], $sbc['senggi'])) {
             return 'senggi';

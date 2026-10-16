@@ -2,6 +2,8 @@
 
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Enums\Gender;
+
 class NameService
 {
     /**
@@ -133,7 +135,7 @@ class NameService
         $overcomingCycle = ['木' => '金', '火' => '水', '土' => '木', '金' => '火', '水' => '土'];
         $expressionCycle = array_flip($generationCycle);
 
-        $dayMaster = $strengthResult->day_master;
+        $dayMaster = $strengthResult->day_master ?? ($saju ? $saju->get_h('day') : '甲');
         $candidates = [];
 
         if ($strengthResult->result === '신강') {
@@ -164,7 +166,10 @@ class NameService
         $oheng2 = mb_substr($ohengs, 1, 1);
         $oheng3 = mb_substr($ohengs, 2, 1);
 
-        $suri_no = ($gender === 'M')
+        // Gender Enum으로 남성 여부를 완벽하게 판별
+        $isMale = Gender::fromMixed($gender)->isMale();
+
+        $suri_no = $isMale
             ? [1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 18, 21, 23, 24, 25, 29, 31, 32, 33, 35, 37, 39, 41, 45, 47, 48, 52, 57, 61, 63, 65, 67, 68, 81]
             : [1, 3, 5, 6, 7, 8, 11, 13, 15, 16, 17, 18, 24, 25, 29, 31, 35, 37, 38, 41, 45, 47, 48, 52, 57, 58, 61, 63, 65, 67, 68, 81];
 

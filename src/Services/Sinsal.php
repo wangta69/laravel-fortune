@@ -2,6 +2,7 @@
 
 namespace Pondol\Fortune\Services;
 
+use Pondol\Fortune\Enums\Gender;
 use Pondol\Fortune\Traits\SinsalRules;
 
 /**
@@ -95,7 +96,7 @@ class Sinsal
             $this->saju['e']['h'] = $saju->get_e('hour');
         }
 
-        $this->gender = $saju->gender;
+        $this->gender = Gender::fromMixed($saju->gender)->value;
 
         return $this;
     }
@@ -108,8 +109,14 @@ class Sinsal
         }
 
         foreach ($this->rules as $name => $rule) {
-            if (isset($rule['gender']) && $rule['gender'] !== $this->gender) {
-                continue;
+            if (isset($rule['gender'])) {
+                $ruleGender = Gender::fromMixed($rule['gender']);
+                $currentGender = Gender::fromMixed($this->gender);
+
+                // 남녀 성별이 다르면 건너뜀 ('W'와 'F'를 동일한 여성으로 인식!)
+                if ($ruleGender !== $currentGender) {
+                    continue;
+                }
             }
 
             $logic = $rule['logic'];
@@ -335,7 +342,7 @@ class Sinsal
                 },
             ],
             '과숙살' => [
-                'gender' => 'W', // 여성에게만 적용
+                'gender' => 'F', // 여성에게만 적용
                 'params' => ['yeonji', 'jiji'],
                 'logic' => function ($yeonji, $jiji) {
                     if (in_array($yeonji, ['寅', '卯', '辰'])) {
