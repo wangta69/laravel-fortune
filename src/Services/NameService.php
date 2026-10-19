@@ -8,15 +8,13 @@ class NameService
 {
     /**
      * 한글 초성을 오행으로 변환하는 맵.
-     *
-     * @var array
      */
     private static $choseongToOhaengMap = [
-        'ㄱ' => '목', 'ㅋ' => '목', 'ㄲ' => '목', // 木 (나무)
-        'ㄴ' => '화', 'ㄷ' => '화', 'ㄹ' => '화', 'ㅌ' => '화', 'ㄸ' => '화', // 火 (불)
-        'ㅇ' => '토', 'ㅎ' => '토', // 土 (흙)
-        'ㅅ' => '금', 'ㅈ' => '금', 'ㅊ' => '금', 'ㅆ' => '금', 'ㅉ' => '금', // 金 (쇠)
-        'ㅁ' => '수', 'ㅂ' => '수', 'ㅍ' => '수', 'ㅃ' => '수', // 水 (물)
+        'ㄱ' => '목', 'ㅋ' => '목', 'ㄲ' => '목', // 木
+        'ㄴ' => '화', 'ㄷ' => '화', 'ㄹ' => '화', 'ㅌ' => '화', 'ㄸ' => '화', // 火
+        'ㅇ' => '토', 'ㅎ' => '토', // 土
+        'ㅅ' => '금', 'ㅈ' => '금', 'ㅊ' => '금', 'ㅆ' => '금', 'ㅉ' => '금', // 金
+        'ㅁ' => '수', 'ㅂ' => '수', 'ㅍ' => '수', 'ㅃ' => '수', // 水
     ];
 
     /**
@@ -24,13 +22,9 @@ class NameService
      */
     public function getChoseong(string $char): ?string
     {
-        // 초성 리스트
         $choseongArr = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
-
-        // UTF-8 문자의 유니코드 코드포인트 얻기
         $unicode = mb_ord($char, 'UTF-8');
 
-        // 한글 음절 범위 (가 ~ 힣) 인지 확인
         if ($unicode >= 0xAC00 && $unicode <= 0xD7A3) {
             $syllableIndex = $unicode - 0xAC00;
             $choseongIndex = floor($syllableIndex / 588);
@@ -38,7 +32,6 @@ class NameService
             return $choseongArr[$choseongIndex];
         }
 
-        // 한글 음절이 아니면 null 반환
         return null;
     }
 
@@ -56,12 +49,8 @@ class NameService
         return null;
     }
 
-    // =================================================================================
-    // 이름 풀이 및 작명을 위한 계산 메소드 (From NameController)
-    // =================================================================================
-
     /**
-     * 이름 구조 타입(예: '12')을 결정합니다.
+     * 이름 구조 타입(예: '12', '13')을 결정합니다.
      */
     public function determineNameType(array $input): string
     {
@@ -72,32 +61,268 @@ class NameService
     }
 
     /**
-     * 4격 전체를 계산하여 배열로 반환합니다.
+     * 4격(원형이정) 전체를 계산하여 배열로 반환합니다.
      */
     public function calculateAllGueks(int $f_sum, int $g1, int $g2_etc): array
     {
         $isOneCharName = ($g2_etc === 0);
 
         return [
-            'early' => $isOneCharName ? ($g1 + 1) : ($g1 + $g2_etc), // 원격
-            'first' => $f_sum + $g1,                                // 형격
-            'middle' => $isOneCharName ? ($f_sum + 1) : ($f_sum + $g2_etc), // 이격
-            'last' => $f_sum + $g1 + $g2_etc,                      // 정격
+            'early' => $isOneCharName ? ($g1 + 1) : ($g1 + $g2_etc),           // 원격(초년)
+            'first' => $f_sum + $g1,                                           // 형격(장년)
+            'middle' => $isOneCharName ? ($f_sum + 1) : ($f_sum + $g2_etc),    // 이격(중년)
+            'last' => $f_sum + $g1 + $g2_etc,                                 // 정격(말년)
         ];
     }
 
     /**
-     * 길흉(吉凶) 등급에 따라 점수와 한글 등급명을 반환합니다.
+     * 각 시기별 획수 계산 공식을 텍스트로 생성합니다.
+     */
+    public function generateLuckFormulas(array $info, array $gueks): array
+    {
+        $f1 = $info['f1'] ?? null;
+        $f2 = $info['f2'] ?? null;
+        $g1 = $info['g1'] ?? null;
+        $g2 = $info['g2'] ?? null;
+        $g3 = $info['g3'] ?? null;
+
+        $lastSungChar = $f2 ?: $f1;
+        $lastNameChar = $g3 ?: ($g2 ?: $g1);
+        $isOneCharName = ! isset($g2) && ! isset($g3);
+
+        return [
+            'earlyYear' => $isOneCharName
+                ? "{$g1->hanja_char}({$g1->stroke_count}) + 가수(1) = {$gueks['early']}"
+                : "{$g1->hanja_char}({$g1->stroke_count}) + {$g2->hanja_char}({$g2->stroke_count}) = {$gueks['early']}",
+            'firstYear' => "{$lastSungChar->hanja_char}({$lastSungChar->stroke_count}) + {$g1->hanja_char}({$g1->stroke_count}) = {$gueks['first']}",
+            'middleYear' => $isOneCharName
+                ? "{$f1->hanja_char}({$f1->stroke_count}) + 가수(1) = {$gueks['middle']}"
+                : "{$f1->hanja_char}({$f1->stroke_count}) + {$lastNameChar->hanja_char}({$lastNameChar->stroke_count}) = {$gueks['middle']}",
+            'lastYear' => "성명 전체 획수 합계 = {$gueks['last']}",
+        ];
+    }
+
+    /**
+     * 길흉(吉凶) 등급에 따라 점수와 한글 등급명을 반환합니다. (통합 표준)
      */
     public function getScoreByRating(string $rating): array
     {
         switch ($rating) {
-            case '吉':   return ['jumsu' => 100, 'title' => '上格'];
-            case '中吉': return ['jumsu' => 80,  'title' => '中上格'];
-            case '中凶': return ['jumsu' => 60,  'title' => '中下格'];
-            case '凶':   return ['jumsu' => 40,  'title' => '下格'];
-            default:   return ['jumsu' => 0,   'title' => ''];
+            case '吉':
+                return ['jumsu' => 100, 'title' => '대길(大吉)'];
+            case '中吉':
+                return ['jumsu' => 80,  'title' => '길(吉)'];
+            case '半吉半凶':
+                return ['jumsu' => 80,  'title' => '반길반흉(半吉半凶)'];
+            case '中凶':
+                return ['jumsu' => 60,  'title' => '보통(平)'];
+            case '凶':
+                return ['jumsu' => 40,  'title' => '흉(凶)'];
+            default:
+                return ['jumsu' => 60,  'title' => '보통(平)'];
         }
+    }
+
+    /**
+     * 총점에 따라 최종 등급(rank 0~5)을 계산합니다.
+     */
+    public function calculateRank(int $totalScore): int
+    {
+        if ($totalScore >= 530) {
+            return 5;
+        }
+        if ($totalScore >= 430) {
+            return 4;
+        }
+        if ($totalScore >= 300) {
+            return 3;
+        }
+        if ($totalScore >= 200) {
+            return 2;
+        }
+        if ($totalScore >= 100) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * 사주(태어난 월/계절)와의 조화(궁합)를 분석하여 점수와 해설을 계산합니다.
+     */
+    public function calculateSajuCompatibility(string $month_e, array $gueks): array
+    {
+        $seasonalElements = $this->getSeasonalElements($month_e);
+        if (! $seasonalElements) {
+            return ['jumsu' => 0, 'title' => '정보없음', 'analysis' => '태어난 월에 대한 사주 정보가 없습니다.'];
+        }
+
+        $nameElements = [
+            'early' => $this->getOhaengByNumber($this->correctMod(10, $gueks['early'])),
+            'first' => $this->getOhaengByNumber($this->correctMod(10, $gueks['first'])),
+            'last' => $this->getOhaengByNumber($this->correctMod(10, $gueks['last'])),
+        ];
+
+        $elementCounts = $this->countKeyElements(array_values($nameElements), $seasonalElements);
+        $scoreResult = $this->determineFinalScore($elementCounts);
+
+        return [
+            'jumsu' => $scoreResult['jumsu'],
+            'title' => $scoreResult['title'],
+            'analysis' => [
+                'month_e' => $month_e,
+                'season' => $seasonalElements['season'],
+                'primary_needed' => $seasonalElements['primaryNeeded'],
+                'secondary_needed' => $seasonalElements['secondaryNeeded'],
+                'name_elements' => $nameElements,
+                'element_counts' => $elementCounts,
+            ],
+        ];
+    }
+
+    private function getSeasonalElements(string $month_e): ?array
+    {
+        if (in_array($month_e, ['寅', '卯', '辰'])) {
+            return [
+                'season' => '봄',
+                'primaryNeeded' => '金',
+                'secondaryNeeded' => '土',
+                'avoided' => ['木'],
+            ];
+        }
+        if (in_array($month_e, ['巳', '午', '未'])) {
+            return [
+                'season' => '여름',
+                'primaryNeeded' => '水',
+                'secondaryNeeded' => '金',
+                'avoided' => ['火'],
+            ];
+        }
+        if (in_array($month_e, ['申', '酉', '戌'])) {
+            return [
+                'season' => '가을',
+                'primaryNeeded' => '木',
+                'secondaryNeeded' => '水',
+                'avoided' => ['金', '火'],
+            ];
+        }
+        if (in_array($month_e, ['亥', '子', '丑'])) {
+            return [
+                'season' => '겨울',
+                'primaryNeeded' => '火',
+                'secondaryNeeded' => '木',
+                'avoided' => ['水'],
+            ];
+        }
+
+        return null;
+    }
+
+    private function countKeyElements(array $nameElements, array $seasonalElements): array
+    {
+        $counts = array_count_values($nameElements);
+
+        $primaryNeededCount = $counts[$seasonalElements['primaryNeeded']] ?? 0;
+        $secondaryNeededCount = $counts[$seasonalElements['secondaryNeeded']] ?? 0;
+
+        $totalAvoidedCount = 0;
+        foreach ($seasonalElements['avoided'] as $avoidedElement) {
+            $totalAvoidedCount += $counts[$avoidedElement] ?? 0;
+        }
+
+        return compact('primaryNeededCount', 'secondaryNeededCount', 'totalAvoidedCount');
+    }
+
+    private function determineFinalScore(array $counts): array
+    {
+        $primaryNeededCount = $counts['primaryNeededCount'];
+        $secondaryNeededCount = $counts['secondaryNeededCount'];
+        $totalAvoidedCount = $counts['totalAvoidedCount'];
+        $otherElementCount = 3 - ($primaryNeededCount + $secondaryNeededCount + $totalAvoidedCount);
+
+        if ($primaryNeededCount == 3) {
+            return ['jumsu' => 95, 'title' => '最上格'];
+        }
+        if ($primaryNeededCount == 2 && $secondaryNeededCount == 1) {
+            return ['jumsu' => 95, 'title' => '最上格'];
+        }
+        if ($primaryNeededCount == 1 && $secondaryNeededCount == 2) {
+            return ['jumsu' => 95, 'title' => '最上格'];
+        }
+        if ($secondaryNeededCount == 3) {
+            return ['jumsu' => 90, 'title' => '上格'];
+        }
+        if ($primaryNeededCount == 2 && $otherElementCount == 1) {
+            return ['jumsu' => 90, 'title' => '上格'];
+        }
+        if ($secondaryNeededCount == 2 && $primaryNeededCount == 0 && $otherElementCount == 1) {
+            return ['jumsu' => 90, 'title' => '上格'];
+        }
+        if ($primaryNeededCount == 1 && $secondaryNeededCount == 1 && $otherElementCount == 1) {
+            return ['jumsu' => 85, 'title' => '上格'];
+        }
+        if ($primaryNeededCount == 1 && $secondaryNeededCount == 1 && $totalAvoidedCount == 1) {
+            return ['jumsu' => 80, 'title' => '上格'];
+        }
+        if ($primaryNeededCount == 1 && $otherElementCount == 2) {
+            return ['jumsu' => 75, 'title' => '中格'];
+        }
+        if ($primaryNeededCount == 2 && $totalAvoidedCount == 1) {
+            return ['jumsu' => 70, 'title' => '中格'];
+        }
+        if ($secondaryNeededCount == 2 && $totalAvoidedCount == 1) {
+            return ['jumsu' => 65, 'title' => '中格'];
+        }
+        if ($secondaryNeededCount == 1 && $otherElementCount == 2) {
+            return ['jumsu' => 60, 'title' => '中格'];
+        }
+        if ($otherElementCount == 3) {
+            return ['jumsu' => 55, 'title' => '下格'];
+        }
+        if ($primaryNeededCount == 1 && $totalAvoidedCount == 1 && $otherElementCount == 1) {
+            return ['jumsu' => 50, 'title' => '下格'];
+        }
+        if ($secondaryNeededCount == 1 && $totalAvoidedCount == 1 && $otherElementCount == 1) {
+            return ['jumsu' => 45, 'title' => '下格'];
+        }
+        if ($totalAvoidedCount == 1 && $otherElementCount == 2) {
+            return ['jumsu' => 30, 'title' => '不調化'];
+        }
+        if ($primaryNeededCount == 1 && $totalAvoidedCount == 2) {
+            return ['jumsu' => 25, 'title' => '不調化'];
+        }
+        if ($secondaryNeededCount == 1 && $totalAvoidedCount == 2) {
+            return ['jumsu' => 20, 'title' => '不調化'];
+        }
+        if ($totalAvoidedCount == 2 && $otherElementCount == 1) {
+            return ['jumsu' => 10, 'title' => '不調化'];
+        }
+
+        return ['jumsu' => 0, 'title' => '最下格'];
+    }
+
+    /**
+     * 숫자에 따른 오행 한자 반환 (사주 조화 계산용)
+     */
+    public function getOhaengByNumber(int $num): string
+    {
+        if ($num == 0) {
+            $num = 10;
+        }
+        if ($num <= 2) {
+            return '木';
+        }
+        if ($num <= 4) {
+            return '火';
+        }
+        if ($num <= 6) {
+            return '土';
+        }
+        if ($num <= 8) {
+            return '金';
+        }
+
+        return '水';
     }
 
     /**
@@ -135,7 +360,14 @@ class NameService
         $overcomingCycle = ['木' => '金', '火' => '水', '土' => '木', '金' => '火', '水' => '土'];
         $expressionCycle = array_flip($generationCycle);
 
-        $dayMaster = $strengthResult->day_master ?? ($saju ? $saju->get_h('day') : '甲');
+        // 천간 -> 오행 매핑 (타입 불일치 방지)
+        $stemToElement = [
+            '甲' => '木', '乙' => '木', '丙' => '火', '丁' => '火', '戊' => '土',
+            '己' => '土', '庚' => '金', '辛' => '金', '壬' => '水', '癸' => '水',
+        ];
+
+        $rawStem = $strengthResult->day_master ?? ($saju ? $saju->get_h('day') : '甲');
+        $dayMaster = $stemToElement[$rawStem] ?? $rawStem;
         $candidates = [];
 
         if ($strengthResult->result === '신강') {
@@ -166,7 +398,6 @@ class NameService
         $oheng2 = mb_substr($ohengs, 1, 1);
         $oheng3 = mb_substr($ohengs, 2, 1);
 
-        // Gender Enum으로 남성 여부를 완벽하게 판별
         $isMale = Gender::fromMixed($gender)->isMale();
 
         $suri_no = $isMale
