@@ -43,7 +43,11 @@ class Calendar
     public function samjae($year)
     {
         $lunar = new \Pondol\Fortune\Services\LunarSolar\Lunar;
-        $year_e = mb_substr($lunar->gabja($year.'0101')->year->ch, 1, 1);
+
+        // [핵심 수정] 0101은 입춘 전이므로 항상 전년도가 나옵니다.
+        // 입춘 이후인 0601(6월 1일) 기준으로 해당 연도의 간지를 정확히 추출합니다.
+        $yearGabja = $lunar->gabja($year.'0601')->year;
+        $year_e = mb_substr($yearGabja->ch, 1, 1);
 
         $samjae_groups = [
             '申子辰' => ['寅', '卯', '辰'],
@@ -58,7 +62,6 @@ class Calendar
                 $idx = array_search($year_e, $years);
                 $status = ($idx === 0) ? '들삼재' : (($idx === 1) ? '눌삼재' : '날삼재');
 
-                // [추가] 컨트롤러 112라인에서 기대하는 'type' 키 생성 ('들', '눌', '날')
                 $type_labels = ['들', '눌', '날'];
                 $type = $type_labels[$idx];
 
@@ -73,9 +76,13 @@ class Calendar
 
                 $target_samjae = [
                     'status' => $status,
-                    'type' => $type, // 컨트롤러 불일치 해결을 위한 키 추가
+                    'type' => $type,
                     'zodiacs' => $zodiacs_hanja,
                     'current_year_ji' => $year_e,
+                    'year_ganji' => [                  // [보너스 추가] 해당 연도 간지명 (예: 병오, 丙午)
+                        'ko' => $yearGabja->ko,
+                        'ch' => $yearGabja->ch,
+                    ],
                     'samjaes' => [
                         'ko' => $samjae_ko,
                     ],

@@ -108,13 +108,11 @@ class Sinsal
             $this->calculatedSinsals['h'] = [];
         }
 
+        $currentGender = Gender::fromMixed($this->gender);
+
         foreach ($this->rules as $name => $rule) {
             if (isset($rule['gender'])) {
-                $ruleGender = Gender::fromMixed($rule['gender']);
-                $currentGender = Gender::fromMixed($this->gender);
-
-                // 남녀 성별이 다르면 건너뜀 ('W'와 'F'를 동일한 여성으로 인식!)
-                if ($ruleGender !== $currentGender) {
+                if (Gender::fromMixed($rule['gender']) !== $currentGender) {
                     continue;
                 }
             }

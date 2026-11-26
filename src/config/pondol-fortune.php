@@ -1,5 +1,6 @@
 <?php
 
+// config/pondol-fortune.php
 return [
     'route_fortune' => [
         'prefix' => 'fortune',
